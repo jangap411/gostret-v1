@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -8,6 +9,7 @@ const pageVariants = {
 };
 
 export default function Signup() {
+  const navigate = useNavigate();
   return (
     <motion.div
       initial="initial"
@@ -81,6 +83,7 @@ export default function Signup() {
 
         <div className="flex px-4 py-3 max-w-[480px] mx-auto w-full mt-4">
           <button
+            onClick={() => { localStorage.setItem('isAuthenticated', 'true'); navigate('/'); }}
             className="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-[#f4c653] text-[#1c170d] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#eab332] hover:shadow-lg transition-all"
           >
             <span className="truncate">Sign up</span>
@@ -89,7 +92,7 @@ export default function Signup() {
       </div>
       
       <div>
-        <p className="text-[#9b844b] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer hover:text-[#7a683a] mb-4">Already have an account? Sign in</p>
+        <p onClick={() => navigate('/login')} className="text-[#9b844b] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline cursor-pointer hover:text-[#7a683a] mb-4">Already have an account? Sign in</p>
         <div className="h-5 bg-[#fcfbf8]"></div>
       </div>
     </motion.div>

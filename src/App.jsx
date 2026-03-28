@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import Home from './components/Home';
@@ -13,6 +13,14 @@ import Signup from './components/Signup';
 import Account from './components/Account';
 import SearchLocation from './components/SearchLocation';
 
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function App() {
   const location = useLocation();
 
@@ -20,16 +28,16 @@ function App() {
     <div className="w-full max-w-md mx-auto min-h-screen shadow-2xl relative overflow-hidden bg-neutral-50">
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/ride-details" element={<RideDetails />} />
-          <Route path="/payment-methods" element={<PaymentMethods />} />
-          <Route path="/ride-in-progress" element={<RideInProgress />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/ride-details" element={<ProtectedRoute><RideDetails /></ProtectedRoute>} />
+          <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
+          <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress /></ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
-          <Route path="/activity" element={<Activity />} />
-          <Route path="/driver-en-route" element={<DriverEnRoute />} />
+          <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
+          <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute /></ProtectedRoute>} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/search-location" element={<SearchLocation />} />
+          <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+          <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
         </Routes>
       </AnimatePresence>
     </div>
