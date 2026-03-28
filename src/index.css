@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+@theme {
+  --color-neutral-50: #fcfbf8;
+  --color-neutral-100: #f3f0e7;
+  --color-neutral-200: #e8e4d8;
+  --color-neutral-300: #dbdbdb;
+  --color-neutral-500: #9b844b;
+  --color-neutral-800: #1c170d;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-neutral-50);
+    color: #141414;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
