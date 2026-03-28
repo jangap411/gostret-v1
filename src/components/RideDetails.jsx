@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import MapView from './MapView';
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -50,10 +51,17 @@ export default function RideDetails() {
           </div>
         </div>
         <div className="flex px-4 py-3">
-          <div
-            className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl object-cover"
-            style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB5sMIDVydryFpYFvui_CWIw_KgjwyywtlNnpYeGh-jKzPMV_6D0ZYjj_NFpq0ojDzofWeqtQkeJFJPuKxXU_LMfPpuDv3-Bx0RRWU_1hHcXkXze3-KnOlyg4O2CxV0EYl9mpbwJ2mfTOML7i39XKGMqKUOd9EbgQk535vaC31Uidv_OjoQBWcY-r1XJdj3oQgHDDLfN8_Y-dLeKciAUdHDY40WuZ3xyoPcPOr0Qn4HIyqOvHGdkmrgYvW1rSKY6XNBz5lZWGvfyZg")' }}
-          ></div>
+          <div className="w-full aspect-video rounded-xl overflow-hidden relative z-0">
+            <MapView 
+              center={[-9.43869006941101, 147.1810054779053]} 
+              zoom={13} 
+              markers={[
+                { position: [-9.43869006941101, 147.1810054779053], popup: "Pickup: 123 Main St" },
+                { position: [-9.44869006941101, 147.1910054779053], popup: "Destination: 456 Oak Ave" }
+              ]} 
+              className="absolute inset-0 w-full h-full z-0" 
+            />
+          </div>
         </div>
         <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ride options</h3>
         <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition-colors duration-200">
