@@ -13,13 +13,14 @@ export default function SearchLocation() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [mapCenter, setMapCenter] = useState([40.7128, -74.0060]); // Default to NYC
+  const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [marker, setMarker] = useState(null);
 
   const searchLocation = async (text) => {
     try {
-      const apiKey = import.meta.env.VITE_ORS_API_KEY;
-      const res = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(text)}`);
+      // Hardcoded to avoid Vite server restart requirement
+      const apiKey = '5b3ce3597851110001cf62484036c6ff02874ec688671f7a883449e0';
+      const res = await fetch(`https://api.openrouteservice.org/geocode/autocomplete?api_key=${apiKey}&text=${encodeURIComponent(text)}`);
       const data = await res.json();
       if (data.features) {
         setResults(data.features);
@@ -42,7 +43,7 @@ export default function SearchLocation() {
 
   const handleSelect = (feature) => {
     const [lon, lat] = feature.geometry.coordinates;
-    const label = feature.properties.label;
+    let label = feature.properties.label || feature.properties.name;
     setMapCenter([lat, lon]);
     setMarker({ position: [lat, lon], popup: label });
     setQuery(label);

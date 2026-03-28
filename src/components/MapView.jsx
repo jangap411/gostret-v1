@@ -22,7 +22,7 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-export default function MapView({ center = [51.505, -0.09], zoom = 13, markers = [], className = "w-full h-full z-0 relative" }) {
+export default function MapView({ center = [-9.43869006941101, 147.1810054779053], zoom = 13, markers = [], className = "w-full h-full z-0 relative" }) {
   return (
     <div className={className}>
       <MapContainer
