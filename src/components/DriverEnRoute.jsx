@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import MapView from './MapView';
 
 const pageVariants = {
   initial: { opacity: 0, y: 50 },
@@ -28,10 +29,9 @@ export default function DriverEnRoute() {
           <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Driver is on their way</h2>
         </div>
         <div className="flex px-4 py-3 relative h-[400px]">
-          <div
-            className="w-full h-full bg-center bg-no-repeat bg-cover rounded-xl object-cover"
-            style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAfhw8GK-4W-yMSIrdGRh-vsUIICoTlxZePeYvryyVhWQ9rwrI3dyQzmekLvL0vc1zwDAQgLToz8UR6LtSUzFae3D3rElAZDPQ4Aju-T060lkgn7kIDW4Pit5AU2IkaU0KfoNOB6F4wRF9UKDQphigGnljd7Xnifom2lUxIBuI8YwTGEWPJtgFc6iKTNyNUVERBT5mpYVJP_8htjPVOK_prwFsMJ_U7qXDhItDUwm-gydPWsfOhDlipnhoWqHDQqr4Yn_RoSvXraMY")'}}
-          ></div>
+          <div className="w-full h-full rounded-xl overflow-hidden relative z-0">
+            <MapView className="absolute inset-0 w-full h-full z-0" zoom={14} />
+          </div>
         </div>
       </div>
 
