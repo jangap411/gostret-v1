@@ -13,6 +13,25 @@ const pageVariants = {
 export default function Home() {
   const navigate = useNavigate();
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
+  const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
+  const [mapZoom, setMapZoom] = useState(13);
+
+  const handleLocateMe = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setMapCenter([position.coords.latitude, position.coords.longitude]);
+          setMapZoom(16);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Unable to fetch location. Please check your browser permissions.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser");
+    }
+  };
 
   return (
     <motion.div
@@ -25,7 +44,7 @@ export default function Home() {
       style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
     >
       {/* Full Screen Map behind overlays */}
-      <MapView center={[-9.43869006941101, 147.1810054779053]} zoom={13} className="absolute inset-0 w-full h-full z-0" />
+      <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
 
       {/* Top Left Overlay Controls */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
@@ -68,7 +87,7 @@ export default function Home() {
               <path d="M213.66,101.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,53.66,113l74.34-74.34V216a8,8,0,0,0,16,0V38.69l74.34,74.34a8,8,0,0,0,11.32-11.32Z"></path>
             </svg>
           </button>
-          <button className="flex items-center justify-center h-10 w-full hover:bg-neutral-50 text-neutral-600">
+          <button onClick={handleLocateMe} className="flex items-center justify-center h-10 w-full hover:bg-neutral-50 text-neutral-600 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32l-96,96a8,8,0,0,1-11.32-11.32l27.72-27.72a40,40,0,1,0,17.87,31.09,8,8,0,1,1,16-.9,56,56,0,1,1-22.38-41.65L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"></path>
             </svg>
