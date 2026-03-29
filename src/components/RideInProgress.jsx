@@ -1,3 +1,4 @@
+import BottomNav from './BottomNav';
 import React from 'react';
 import { motion } from 'framer-motion';
 import MapView from './MapView';
@@ -77,7 +78,7 @@ export default function RideInProgress() {
       </div>
       
       {/* Bottom Sheet */}
-      <div className="absolute bottom-0 left-0 w-full z-10">
+      <div className="absolute bottom-[66px] left-0 w-full z-10">
         <div className="flex w-full flex-col justify-end items-stretch rounded-t-3xl overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
           <div className="flex flex-col items-stretch bg-neutral-50 pb-5">
             <button className="flex h-5 w-full items-center justify-center cursor-pointer hover:bg-neutral-100 transition"><div className="h-1 w-9 rounded-full bg-[#dbdbdb]"></div></button>
@@ -105,12 +106,12 @@ export default function RideInProgress() {
               <div className="flex justify-stretch">
                 <div className="flex flex-1 gap-3 px-5 py-3 justify-between">
                   <button
-                    className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-black text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-neutral-800 transition"
+                    className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#C53D34] transition"
                   >
                     <span className="truncate">Message</span>
                   </button>
                   <button
-                    className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-[#ededed] text-[#141414] text-base font-bold leading-normal tracking-[0.015em] hover:bg-neutral-200 transition"
+                    className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-neutral-100 text-[#1D3557] text-base font-bold leading-normal tracking-[0.015em] hover:bg-neutral-200 transition"
                   >
                     <span className="truncate">Call</span>
                   </button>
@@ -120,6 +121,7 @@ export default function RideInProgress() {
           </div>
         </div>
       </div>
+      <BottomNav />
     </motion.div>
   );
 }

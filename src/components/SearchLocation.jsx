@@ -163,7 +163,7 @@ export default function SearchLocation() {
         <div className="flex justify-end px-5 pb-5">
           <button
             onClick={() => marker ? navigate('/ride-details') : alert('Please select a destination first')}
-            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${marker ? 'bg-[#f4c653] text-[#1c170d]' : 'bg-[#141414]'}`}
+            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${marker ? 'bg-[#D9483E] text-[#1c170d]' : 'bg-[#141414]'}`}
           >
             <div className={marker ? 'text-[#1c170d]' : 'text-neutral-50'} data-icon="Target" data-size="24px" data-weight="regular">
               <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="28px" fill="currentColor" viewBox="0 0 256 256">

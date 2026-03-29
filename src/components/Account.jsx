@@ -1,3 +1,4 @@
+import BottomNav from './BottomNav';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -57,12 +58,13 @@ export default function Account() {
         <div className="flex px-4 py-3 pb-8">
           <button
             onClick={() => { localStorage.removeItem('isAuthenticated'); navigate('/login'); }}
-            className="flex min-w-[84px] max-w-[480px] w-full mx-auto cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-[#ededed] text-[#141414] text-base font-bold leading-normal tracking-[0.015em] hover:bg-red-50 hover:text-red-600 transition"
+            className="flex min-w-[84px] max-w-[480px] w-full mx-auto cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-neutral-100 text-[#1D3557] text-base font-bold leading-normal tracking-[0.015em] hover:bg-red-50 hover:text-red-600 transition"
           >
             <span className="truncate">Sign out</span>
           </button>
         </div>
       </div>
+      <BottomNav />
     </motion.div>
   );
 }

@@ -1,3 +1,4 @@
+import BottomNav from './BottomNav';
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -136,52 +137,7 @@ export default function PaymentMethods() {
         </div>
       </div>
       
-      {/* Bottom Nav */}
-      <div>
-        <div className="flex gap-2 border-t border-[#ededed] bg-neutral-50 px-4 pb-3 pt-2">
-          <a className="just flex flex-1 flex-col items-center justify-end gap-1 text-neutral-500 hover:text-[#141414] transition" href="#">
-            <div className="flex h-8 items-center justify-center" data-icon="House" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
-              </svg>
-            </div>
-            <p className="text-xs font-medium leading-normal tracking-[0.015em]">Home</p>
-          </a>
-          <a className="just flex flex-1 flex-col items-center justify-end gap-1 text-neutral-500 hover:text-[#141414] transition" href="#">
-            <div className="flex h-8 items-center justify-center" data-icon="Car" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M240,112H229.2L201.42,49.5A16,16,0,0,0,186.8,40H69.2a16,16,0,0,0-14.62,9.5L26.8,112H16a8,8,0,0,0,0,16h8v80a16,16,0,0,0,16,16H64a16,16,0,0,0,16-16V192h96v16a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16V128h8a8,8,0,0,0,0-16ZM69.2,56H186.8l24.89,56H44.31ZM64,208H40V192H64Zm128,0V192h24v16Zm24-32H40V128H216ZM56,152a8,8,0,0,1,8-8H80a8,8,0,0,1,0,16H64A8,8,0,0,1,56,152Zm112,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,152Z"></path>
-              </svg>
-            </div>
-            <p className="text-xs font-medium leading-normal tracking-[0.015em]">Ride</p>
-          </a>
-          <a className="just flex flex-1 flex-col items-center justify-end gap-1 text-neutral-500 hover:text-[#141414] transition" href="#">
-            <div className="flex h-8 items-center justify-center" data-icon="BowlFood" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M224,104h-8.37a88,88,0,0,0-175.26,0H32a8,8,0,0,0-8,8,104.35,104.35,0,0,0,56,92.28V208a16,16,0,0,0,16,16h64a16,16,0,0,0,16-16v-3.72A104.35,104.35,0,0,0,232,112,8,8,0,0,0,224,104Zm-24.46,0H148.12a71.84,71.84,0,0,1,41.27-29.57A71.45,71.45,0,0,1,199.54,104ZM173.48,56.23q2.75,2.25,5.27,4.75a87.92,87.92,0,0,0-49.15,43H100.1A72.26,72.26,0,0,1,168,56C169.83,56,171.66,56.09,173.48,56.23ZM128,40a71.87,71.87,0,0,1,19,2.57A88.36,88.36,0,0,0,83.33,104H56.46A72.08,72.08,0,0,1,128,40Zm36.66,152A8,8,0,0,0,160,199.3V208H96v-8.7A8,8,0,0,0,91.34,192a88.29,88.29,0,0,1-51-72H215.63A88.29,88.29,0,0,1,164.66,192Z"></path>
-              </svg>
-            </div>
-            <p className="text-xs font-medium leading-normal tracking-[0.015em]">Eat</p>
-          </a>
-          <a className="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-[#141414]" href="#">
-            <div className="flex h-8 items-center justify-center" data-icon="Wallet" data-size="24px" data-weight="fill">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm-36,80a12,12,0,1,1,12-12A12,12,0,0,1,180,152Z"></path>
-              </svg>
-            </div>
-            <p className="text-xs font-medium leading-normal tracking-[0.015em]">Wallet</p>
-          </a>
-          <a className="just flex flex-1 flex-col items-center justify-end gap-1 text-neutral-500 hover:text-[#141414] transition" href="#">
-            <div className="flex h-8 items-center justify-center" data-icon="List" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
-              </svg>
-            </div>
-            <p className="text-xs font-medium leading-normal tracking-[0.015em]">Activity</p>
-          </a>
-        </div>
-        <div className="h-5 bg-neutral-50"></div>
-      </div>
+      <BottomNav />
     </motion.div>
   );
 }

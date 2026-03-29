@@ -65,12 +65,12 @@ export default function DriverEnRoute() {
         <div className="flex justify-stretch">
           <div className="flex flex-1 gap-3 flex-wrap px-5 py-3 justify-between">
             <button
-              className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-black text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-neutral-800 transition"
+              className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#C53D34] transition"
             >
               <span className="truncate">Message</span>
             </button>
             <button
-              className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-[#ededed] text-[#141414] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#e0e0e0] transition"
+              className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-4 flex-1 bg-neutral-100 text-[#1D3557] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#e0e0e0] transition"
             >
               <span className="truncate">Call</span>
             </button>
