@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
@@ -12,6 +12,7 @@ import DriverEnRoute from './components/DriverEnRoute';
 import Signup from './components/Signup';
 import Account from './components/Account';
 import SearchLocation from './components/SearchLocation';
+import SplashScreen from './components/SplashScreen';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -22,7 +23,19 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto min-h-screen shadow-2xl relative overflow-hidden bg-neutral-50">
