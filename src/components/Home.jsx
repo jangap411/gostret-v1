@@ -1,5 +1,5 @@
 import BottomNav from './BottomNav';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import MapView from './MapView';
@@ -15,6 +15,20 @@ export default function Home() {
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setMapCenter([position.coords.latitude, position.coords.longitude]);
+          setMapZoom(16);
+        },
+        (error) => {
+          console.warn("Geolocation failed or denied, using default center.", error);
+        }
+      );
+    }
+  }, []);
 
   const handleLocateMe = () => {
     if ("geolocation" in navigator) {
@@ -63,16 +77,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Top Middle Language Toggle */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-        <div className="flex items-center bg-white rounded-full shadow-md px-3 py-2 gap-2">
-          <span className="text-sm font-bold text-neutral-800">EN</span>
-          <div className="w-10 h-6 bg-neutral-300 rounded-full p-1 cursor-pointer relative flex items-center">
-            <div className="w-4 h-4 bg-white rounded-full shadow absolute left-1"></div>
-          </div>
-          <span className="text-sm font-bold text-neutral-500">TP</span>
-        </div>
-      </div>
+
 
       {/* Top Right Controls */}
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-4 items-center">

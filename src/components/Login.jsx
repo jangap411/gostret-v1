@@ -26,7 +26,7 @@ export default function Login() {
             <h1 className="text-4xl font-extrabold tracking-tight">
               <span className="text-[#1D3557]">Go</span><span className="text-[#D9483E]">Stret</span>
             </h1>
-            <span className="text-3xl">🥎</span>
+            {/* <span className="text-3xl">🥎</span> */}
           </div>
           <h2 className="text-[#1c170d] text-2xl font-bold mt-4 tracking-tight">Login to Your Account</h2>
         </div>
