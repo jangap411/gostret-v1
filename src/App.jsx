@@ -14,6 +14,7 @@ import Account from './components/Account';
 import SearchLocation from './components/SearchLocation';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
+import SearchingDriver from './components/SearchingDriver';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -55,6 +56,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
+            <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
           </Routes>
         </AnimatePresence>
       </div>

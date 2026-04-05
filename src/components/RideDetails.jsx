@@ -156,6 +156,7 @@ export default function RideDetails() {
       <div className="bg-white border-t border-neutral-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <div className="flex px-4 py-4">
           <button
+            onClick={() => navigate('/searching-driver')}
             className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] shadow-lg shadow-red-200 active:scale-95 transition-transform"
           >
             <span className="truncate">Book GoStret Regular</span>
