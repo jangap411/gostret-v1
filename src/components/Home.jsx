@@ -1,7 +1,6 @@
-import BottomNav from './BottomNav';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
 
 const pageVariants = {
@@ -40,7 +39,7 @@ export default function Home() {
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="relative flex size-full h-screen flex-col bg-neutral-100 justify-between group/design-root overflow-hidden"
+      className="relative flex size-full h-full flex-col bg-neutral-100 justify-between group/design-root overflow-hidden"
       style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
     >
       {/* Full Screen Map behind overlays */}
@@ -67,7 +66,7 @@ export default function Home() {
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-4 items-center">
         <button onClick={() => navigate('/account')} className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-            <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+            <path d="M230.92,212-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
           </svg>
         </button>
         <div className="flex flex-col items-center bg-white rounded-lg shadow-md overflow-hidden w-10">
@@ -95,7 +94,7 @@ export default function Home() {
             expanded: { height: '380px' }
           }}
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-          className="bg-white rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pt-4 pb-6 px-6 pointer-events-auto flex flex-col"
+          className="bg-white rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pt-4 pb-6 px-6 pointer-events-auto flex flex-col mb-0"
         >
           {/* Drag Handle - Clickable */}
           <div 
@@ -174,8 +173,6 @@ export default function Home() {
             )}
           </AnimatePresence>
         </motion.div>
-
-        <BottomNav />
       </div>
     </motion.div>
   );

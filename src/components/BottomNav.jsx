@@ -34,7 +34,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <div className="flex gap-2 border-t border-neutral-100 bg-white px-4 pb-3 pt-2 relative z-50 pointer-events-auto mt-auto">
+    <div className="flex gap-2 border-t border-neutral-100 bg-white px-4 pb-3 pt-2 relative z-50 pointer-events-auto">
       {tabs.map((tab) => {
         const isActive = currentPath === tab.path;
         return (

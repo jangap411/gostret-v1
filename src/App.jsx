@@ -13,6 +13,7 @@ import Signup from './components/Signup';
 import Account from './components/Account';
 import SearchLocation from './components/SearchLocation';
 import SplashScreen from './components/SplashScreen';
+import BottomNav from './components/BottomNav';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -37,22 +38,27 @@ function App() {
     return <SplashScreen />;
   }
 
+  const showBottomNav = !['/login', '/signup'].includes(location.pathname);
+
   return (
-    <div className="w-full max-w-md mx-auto min-h-screen shadow-2xl relative overflow-hidden bg-neutral-50">
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/ride-details" element={<ProtectedRoute><RideDetails /></ProtectedRoute>} />
-          <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
-          <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress /></ProtectedRoute>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
-          <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute /></ProtectedRoute>} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-          <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
-        </Routes>
-      </AnimatePresence>
+    <div className="w-full max-w-md mx-auto h-screen flex flex-col shadow-2xl relative overflow-hidden bg-neutral-50">
+      <div className="flex-1 relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/ride-details" element={<ProtectedRoute><RideDetails /></ProtectedRoute>} />
+            <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
+            <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress /></ProtectedRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
+            <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute /></ProtectedRoute>} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
+          </Routes>
+        </AnimatePresence>
+      </div>
+      {showBottomNav && <BottomNav />}
     </div>
   );
 }
