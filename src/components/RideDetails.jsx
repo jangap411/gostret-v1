@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
 
 const pageVariants = {
@@ -9,6 +11,17 @@ const pageVariants = {
 };
 
 export default function RideDetails() {
+  const navigate = useNavigate();
+  const pickup = useSelector((state) => state.ride.pickup);
+  const destination = useSelector((state) => state.ride.destination);
+
+  const mapMarkers = [];
+  if (pickup?.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup: ' + pickup.marker.popup });
+  if (destination?.marker) mapMarkers.push({ ...destination.marker, popup: 'Destination: ' + destination.marker.popup });
+
+  // Use destination marker as center if available, otherwise pickup, otherwise default
+  const mapCenter = destination?.marker?.position || pickup?.marker?.position || [-9.43869006941101, 147.1810054779053];
+
   return (
     <motion.div
       initial="initial"
@@ -21,48 +34,55 @@ export default function RideDetails() {
     >
       <div>
         <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
-          <div className="text-[#141414] flex size-12 shrink-0 items-center" data-icon="ArrowLeft" data-size="24px" data-weight="regular">
+          <button onClick={() => navigate(-1)} className="text-[#141414] flex size-12 shrink-0 items-center justify-center hover:bg-neutral-200 transition rounded-full cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path>
             </svg>
-          </div>
+          </button>
           <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Ride details</h2>
         </div>
+        
+        {/* Pickup Info */}
         <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2">
-          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12" data-icon="MapPin" data-size="24px" data-weight="regular">
+          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="#D9483E" viewBox="0 0 256 256">
+                <circle cx="128" cy="128" r="40"></circle>
+            </svg>
+          </div>
+          <div className="flex flex-col justify-center">
+            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Pickup</p>
+            <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">
+              {pickup?.query || 'Not selected'}
+            </p>
+          </div>
+        </div>
+        
+        {/* Destination Info */}
+        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2">
+          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12">
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"></path>
             </svg>
           </div>
           <div className="flex flex-col justify-center">
-            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Home</p>
-            <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">123 Main St</p>
+            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Destination</p>
+            <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">
+              {destination?.query || 'Not selected'}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2">
-          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12" data-icon="MapPin" data-size="24px" data-weight="regular">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"></path>
-            </svg>
-          </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Work</p>
-            <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">456 Oak Ave</p>
-          </div>
-        </div>
+
         <div className="flex px-4 py-3">
           <div className="w-full aspect-video rounded-xl overflow-hidden relative z-0">
             <MapView 
-              center={[-9.43869006941101, 147.1810054779053]} 
+              center={mapCenter} 
               zoom={13} 
-              markers={[
-                { position: [-9.43869006941101, 147.1810054779053], popup: "Pickup: 123 Main St" },
-                { position: [-9.44869006941101, 147.1910054779053], popup: "Destination: 456 Oak Ave" }
-              ]} 
+              markers={mapMarkers} 
               className="absolute inset-0 w-full h-full z-0" 
             />
           </div>
         </div>
+        
         <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ride options</h3>
         <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition-colors duration-200">
           <div className="flex items-center gap-4">
