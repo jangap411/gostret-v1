@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setPickup, setDestination } from '../store/rideSlice';
 import MapView from './MapView';
 
 const pageVariants = {
@@ -11,23 +13,21 @@ const pageVariants = {
 
 export default function SearchLocation() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  // Redux state
+  const pickup = useSelector((state) => state.ride.pickup);
+  const destination = useSelector((state) => state.ride.destination);
 
   const [activeField, setActiveField] = useState('destination'); // 'pickup' or 'destination'
-  const [pickupQuery, setPickupQuery] = useState('Current location');
-  const [destinationQuery, setDestinationQuery] = useState('');
-  
-  const [pickupMarker, setPickupMarker] = useState(null);
-  const [destinationMarker, setDestinationMarker] = useState(null);
-  
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [results, setResults] = useState([]);
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false);
 
-  const activeQuery = activeField === 'pickup' ? pickupQuery : destinationQuery;
+  const activeQuery = activeField === 'pickup' ? pickup.query : destination.query;
 
   const searchLocation = async (text) => {
     try {
-      // Hardcoded to avoid Vite server restart requirement
       const apiKey = '5b3ce3597851110001cf62484036c6ff02874ec688671f7a883449e0';
       const res = await fetch(`https://api.openrouteservice.org/geocode/autocomplete?api_key=${apiKey}&text=${encodeURIComponent(text)}&boundary.country=PG`);
       const data = await res.json();
@@ -41,7 +41,6 @@ export default function SearchLocation() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      // Prevent searching for default text or map selection text
       if (activeQuery === 'Current location' || activeQuery === 'Selected on map' || isMapSelectionMode) {
         setResults([]);
         return;
@@ -62,11 +61,9 @@ export default function SearchLocation() {
     const newMarker = { position: [lat, lon], popup: label };
     
     if (activeField === 'pickup') {
-       setPickupMarker(newMarker);
-       setPickupQuery(label);
+       dispatch(setPickup({ query: label, marker: newMarker }));
     } else {
-       setDestinationMarker(newMarker);
-       setDestinationQuery(label);
+       dispatch(setDestination({ query: label, marker: newMarker }));
     }
     setResults([]);
     setIsMapSelectionMode(false);
@@ -84,18 +81,16 @@ export default function SearchLocation() {
     const newMarker = { position: [lat, lng], popup: 'Selected on map' };
     
     if (activeField === 'pickup') {
-      setPickupMarker(newMarker);
-      setPickupQuery('Selected on map');
+      dispatch(setPickup({ query: 'Selected on map', marker: newMarker }));
     } else {
-      setDestinationMarker(newMarker);
-      setDestinationQuery('Selected on map');
+      dispatch(setDestination({ query: 'Selected on map', marker: newMarker }));
     }
     setIsMapSelectionMode(false);
   };
 
   const mapMarkers = [];
-  if (pickupMarker) mapMarkers.push({ ...pickupMarker, popup: 'Pickup: ' + pickupMarker.popup });
-  if (destinationMarker) mapMarkers.push({ ...destinationMarker, popup: 'Destination: ' + destinationMarker.popup });
+  if (pickup.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup: ' + pickup.marker.popup });
+  if (destination.marker) mapMarkers.push({ ...destination.marker, popup: 'Destination: ' + destination.marker.popup });
 
   return (
     <motion.div
@@ -117,7 +112,6 @@ export default function SearchLocation() {
           <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Where to?</h2>
         </div>
 
-        {/* Inputs */}
         <div className="px-4 flex flex-col gap-3 py-3 w-full max-w-[600px] mx-auto relative z-50">
           
           {/* Pickup Input */}
@@ -130,11 +124,10 @@ export default function SearchLocation() {
               </div>
               <input
                 placeholder="Pickup location"
-                value={pickupQuery}
+                value={pickup.query}
                 onFocus={() => { setActiveField('pickup'); setResults([]); setIsMapSelectionMode(false); }}
                 onChange={(e) => {
-                  setPickupQuery(e.target.value);
-                  setPickupMarker(null);
+                  dispatch(setPickup({ query: e.target.value, marker: null }));
                 }}
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#141414] focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-neutral-500 px-4 text-base font-normal leading-normal transition"
               />
@@ -153,20 +146,16 @@ export default function SearchLocation() {
                 <input
                   placeholder="Enter destination"
                   autoFocus
-                  value={destinationQuery}
+                  value={destination.query}
                   onFocus={() => { setActiveField('destination'); setResults([]); setIsMapSelectionMode(false); }}
                   onChange={(e) => {
-                    setDestinationQuery(e.target.value);
-                    if (e.target.value.trim().length === 0) {
-                      setDestinationMarker(null);
-                    }
+                    dispatch(setDestination({ query: e.target.value, marker: null }));
                   }}
                   className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#141414] focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-neutral-500 px-4 text-base font-normal leading-normal transition"
                 />
               </div>
             </label>
             
-            {/* Search Results Dropdown */}
             {results.length > 0 && !isMapSelectionMode && (
               <ul className="absolute top-16 left-0 w-full bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
                 {results.map((r, i) => (
@@ -183,7 +172,6 @@ export default function SearchLocation() {
             )}
           </div>
           
-          {/* Map Pin Option Button */}
           <div className="flex justify-end mt-1">
             <button
               onClick={toggleMapSelection}
@@ -197,7 +185,6 @@ export default function SearchLocation() {
           </div>
         </div>
 
-        {/* Map Area */}
         <div className="flex flex-col flex-1 pb-4 relative z-0 mt-2">
           <div className="flex flex-1 flex-col px-4 h-full">
             <div className={`relative flex min-h-[220px] flex-1 flex-col justify-between rounded-2xl overflow-hidden shadow-inner object-cover bg-neutral-200 transition-all ${isMapSelectionMode ? 'ring-2 ring-[#D9483E]' : ''}`}>
@@ -220,9 +207,9 @@ export default function SearchLocation() {
               )}
 
               <div className="flex flex-col items-end gap-3 self-end mt-auto mb-4 mr-4 pointer-events-none relative z-10">
-                <button className="flex size-12 pointer-events-auto items-center justify-center rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:bg-neutral-50 transition mt-2 cursor-pointer" onClick={() => {
-                  if (activeField === 'pickup' && pickupMarker) setMapCenter(pickupMarker.position);
-                  else if (activeField === 'destination' && destinationMarker) setMapCenter(destinationMarker.position);
+                <button className="flex size-12 pointer-events-auto items-center justify-center rounded-full bg-white shadow-[0_4px_12_rgba(0,0,0,0.15)] hover:bg-neutral-50 transition mt-2 cursor-pointer" onClick={() => {
+                  if (activeField === 'pickup' && pickup.marker) setMapCenter(pickup.marker.position);
+                  else if (activeField === 'destination' && destination.marker) setMapCenter(destination.marker.position);
                   else if (mapMarkers.length > 0) setMapCenter(mapMarkers[0].position);
                 }}>
                   <div className="text-[#141414]" data-icon="NavigationArrow" data-size="24px" data-weight="regular">
@@ -241,10 +228,10 @@ export default function SearchLocation() {
       <div className="mt-auto z-10 relative">
         <div className="flex justify-end px-5 pb-5">
           <button
-            onClick={() => destinationQuery ? navigate('/ride-details') : alert('Please select a destination first')}
-            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${destinationQuery ? 'bg-[#D9483E] text-[#1c170d]' : 'bg-[#141414]'}`}
+            onClick={() => destination.query ? navigate('/ride-details') : alert('Please select a destination first')}
+            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${destination.marker ? 'bg-[#D9483E] text-[#1c170d]' : 'bg-[#141414]'}`}
           >
-            <div className={destinationQuery ? 'text-[#1c170d]' : 'text-neutral-50'} data-icon="Target" data-size="24px" data-weight="regular">
+            <div className={destination.marker ? 'text-[#1c170d]' : 'text-neutral-50'} data-icon="Target" data-size="24px" data-weight="regular">
               <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="28px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
               </svg>
