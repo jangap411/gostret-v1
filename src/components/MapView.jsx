@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 // Create a custom marker icon using a simple SVG to avoid Vite default icon issues
@@ -22,7 +22,19 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-export default function MapView({ center = [-9.43869006941101, 147.1810054779053], zoom = 13, markers = [], className = "w-full h-full z-0 relative" }) {
+function MapEvents({ onMapClick, onMapMove }) {
+  useMapEvents({
+    click(e) {
+      if (onMapClick) onMapClick(e);
+    },
+    move(e) {
+      if (onMapMove) onMapMove(e);
+    }
+  });
+  return null;
+}
+
+export default function MapView({ center = [-9.43869006941101, 147.1810054779053], zoom = 13, markers = [], className = "w-full h-full z-0 relative", onMapClick, onMapMove }) {
   return (
     <div className={className}>
       <MapContainer
@@ -37,6 +49,7 @@ export default function MapView({ center = [-9.43869006941101, 147.1810054779053
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         <ChangeView center={center} zoom={zoom} />
+        <MapEvents onMapClick={onMapClick} onMapMove={onMapMove} />
         
         {/* Render singular center marker if no markers are provided */}
         {markers.length === 0 && center && (

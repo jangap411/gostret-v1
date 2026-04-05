@@ -11,10 +11,19 @@ const pageVariants = {
 
 export default function SearchLocation() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+
+  const [activeField, setActiveField] = useState('destination'); // 'pickup' or 'destination'
+  const [pickupQuery, setPickupQuery] = useState('Current location');
+  const [destinationQuery, setDestinationQuery] = useState('');
+  
+  const [pickupMarker, setPickupMarker] = useState(null);
+  const [destinationMarker, setDestinationMarker] = useState(null);
+  
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
-  const [marker, setMarker] = useState(null);
+  const [results, setResults] = useState([]);
+  const [isMapSelectionMode, setIsMapSelectionMode] = useState(false);
+
+  const activeQuery = activeField === 'pickup' ? pickupQuery : destinationQuery;
 
   const searchLocation = async (text) => {
     try {
@@ -32,23 +41,61 @@ export default function SearchLocation() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (query.trim().length > 2 && !marker) {
-        searchLocation(query);
+      // Prevent searching for default text or map selection text
+      if (activeQuery === 'Current location' || activeQuery === 'Selected on map' || isMapSelectionMode) {
+        setResults([]);
+        return;
+      }
+      if (activeQuery.trim().length > 2) {
+        searchLocation(activeQuery);
       } else {
         setResults([]);
       }
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [query, marker]);
+  }, [activeQuery, activeField, isMapSelectionMode]);
 
   const handleSelect = (feature) => {
     const [lon, lat] = feature.geometry.coordinates;
     let label = feature.properties.label || feature.properties.name;
     setMapCenter([lat, lon]);
-    setMarker({ position: [lat, lon], popup: label });
-    setQuery(label);
+    const newMarker = { position: [lat, lon], popup: label };
+    
+    if (activeField === 'pickup') {
+       setPickupMarker(newMarker);
+       setPickupQuery(label);
+    } else {
+       setDestinationMarker(newMarker);
+       setDestinationQuery(label);
+    }
+    setResults([]);
+    setIsMapSelectionMode(false);
+  };
+
+  const toggleMapSelection = () => {
+    setIsMapSelectionMode(!isMapSelectionMode);
     setResults([]);
   };
+
+  const handleMapClick = (e) => {
+    if (!isMapSelectionMode) return;
+    const { lat, lng } = e.latlng;
+    setMapCenter([lat, lng]);
+    const newMarker = { position: [lat, lng], popup: 'Selected on map' };
+    
+    if (activeField === 'pickup') {
+      setPickupMarker(newMarker);
+      setPickupQuery('Selected on map');
+    } else {
+      setDestinationMarker(newMarker);
+      setDestinationQuery('Selected on map');
+    }
+    setIsMapSelectionMode(false);
+  };
+
+  const mapMarkers = [];
+  if (pickupMarker) mapMarkers.push({ ...pickupMarker, popup: 'Pickup: ' + pickupMarker.popup });
+  if (destinationMarker) mapMarkers.push({ ...destinationMarker, popup: 'Destination: ' + destinationMarker.popup });
 
   return (
     <motion.div
@@ -72,29 +119,33 @@ export default function SearchLocation() {
 
         {/* Inputs */}
         <div className="px-4 flex flex-col gap-3 py-3 w-full max-w-[600px] mx-auto relative z-50">
-          <label className="flex flex-col min-w-40 h-14 w-full group relative shadow-sm hover:shadow-md transition">
-            <div className="flex w-full flex-1 items-stretch rounded-xl h-full border border-transparent group-hover:border-neutral-300 overflow-hidden bg-[#ededed]">
-              <div
-                className="text-neutral-500 flex border-none items-center justify-center pl-4 pr-2"
-              >
+          
+          {/* Pickup Input */}
+          <label className={`flex flex-col min-w-40 h-14 w-full group relative shadow-sm transition ${activeField === 'pickup' ? 'shadow-md shadow-neutral-200' : ''}`}>
+            <div className={`flex w-full flex-1 items-stretch rounded-xl h-full border ${activeField === 'pickup' ? 'border-neutral-800 bg-white' : 'border-transparent group-hover:border-neutral-300 bg-[#ededed]'} overflow-hidden transition-colors`}>
+              <div className="text-neutral-500 flex border-none items-center justify-center pl-4 pr-2">
                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
                   <circle cx="128" cy="128" r="40"></circle>
                 </svg>
               </div>
               <input
-                placeholder="Current location"
+                placeholder="Pickup location"
+                value={pickupQuery}
+                onFocus={() => { setActiveField('pickup'); setResults([]); setIsMapSelectionMode(false); }}
+                onChange={(e) => {
+                  setPickupQuery(e.target.value);
+                  setPickupMarker(null);
+                }}
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#141414] focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-neutral-500 px-4 text-base font-normal leading-normal transition"
-                defaultValue="Current Location"
               />
             </div>
           </label>
+
+          {/* Destination Input */}
           <div className="relative w-full">
-            <label className="flex flex-col min-w-40 h-14 w-full group shadow-sm hover:shadow-md transition">
-              <div className="flex w-full flex-1 items-stretch rounded-xl h-full border border-transparent group-focus-within:border-neutral-800 overflow-hidden bg-[#ededed]">
-                <div
-                  className="text-neutral-500 flex border-none items-center justify-center pl-4 pr-2"
-                  data-icon="MagnifyingGlass" data-size="24px" data-weight="regular"
-                >
+            <label className={`flex flex-col min-w-40 h-14 w-full group shadow-sm transition ${activeField === 'destination' ? 'shadow-md shadow-neutral-200' : ''}`}>
+              <div className={`flex w-full flex-1 items-stretch rounded-xl h-full border ${activeField === 'destination' ? 'border-neutral-800 bg-white' : 'border-transparent group-hover:border-neutral-300 bg-[#ededed]'} overflow-hidden transition-colors`}>
+                <div className="text-neutral-500 flex border-none items-center justify-center pl-4 pr-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                     <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
                   </svg>
@@ -102,10 +153,13 @@ export default function SearchLocation() {
                 <input
                   placeholder="Enter destination"
                   autoFocus
-                  value={query}
+                  value={destinationQuery}
+                  onFocus={() => { setActiveField('destination'); setResults([]); setIsMapSelectionMode(false); }}
                   onChange={(e) => {
-                    setQuery(e.target.value);
-                    setMarker(null); // Clear marker on edit
+                    setDestinationQuery(e.target.value);
+                    if (e.target.value.trim().length === 0) {
+                      setDestinationMarker(null);
+                    }
                   }}
                   className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#141414] focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-neutral-500 px-4 text-base font-normal leading-normal transition"
                 />
@@ -113,7 +167,7 @@ export default function SearchLocation() {
             </label>
             
             {/* Search Results Dropdown */}
-            {results.length > 0 && (
+            {results.length > 0 && !isMapSelectionMode && (
               <ul className="absolute top-16 left-0 w-full bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
                 {results.map((r, i) => (
                   <li 
@@ -128,23 +182,48 @@ export default function SearchLocation() {
               </ul>
             )}
           </div>
+          
+          {/* Map Pin Option Button */}
+          <div className="flex justify-end mt-1">
+            <button
+              onClick={toggleMapSelection}
+              className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition cursor-pointer shadow-sm active:scale-95 ${isMapSelectionMode ? 'bg-[#141414] text-white shadow-md' : 'bg-white border border-neutral-200 text-[#141414] hover:bg-neutral-50'}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M128,16a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,56a32,32,0,1,1-32,32A32,32,0,0,1,128,72Z"></path>
+              </svg>
+              {isMapSelectionMode ? 'Cancel Map Selection' : 'Pin on map'}
+            </button>
+          </div>
         </div>
 
         {/* Map Area */}
-        <div className="flex flex-col flex-1 pb-4 relative z-0">
+        <div className="flex flex-col flex-1 pb-4 relative z-0 mt-2">
           <div className="flex flex-1 flex-col px-4 h-full">
-            <div className="relative flex min-h-[320px] flex-1 flex-col justify-between rounded-2xl overflow-hidden shadow-inner object-cover bg-neutral-200">
+            <div className={`relative flex min-h-[220px] flex-1 flex-col justify-between rounded-2xl overflow-hidden shadow-inner object-cover bg-neutral-200 transition-all ${isMapSelectionMode ? 'ring-2 ring-[#D9483E]' : ''}`}>
               
               <MapView 
                 center={mapCenter} 
                 zoom={14} 
-                markers={marker ? [marker] : []}
-                className="absolute inset-0 w-full h-full z-0"
+                markers={mapMarkers}
+                onMapClick={handleMapClick}
+                className={`absolute inset-0 w-full h-full z-0 transition-opacity ${isMapSelectionMode ? 'cursor-crosshair' : ''}`}
               />
+
+              {isMapSelectionMode && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#141414]/90 backdrop-blur-md text-white px-5 py-2.5 rounded-full text-sm font-medium z-10 shadow-lg pointer-events-none flex items-center gap-2 animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Z"></path>
+                  </svg>
+                  Tap anywhere on map for {activeField === 'pickup' ? 'pickup' : 'destination'}
+                </div>
+              )}
 
               <div className="flex flex-col items-end gap-3 self-end mt-auto mb-4 mr-4 pointer-events-none relative z-10">
                 <button className="flex size-12 pointer-events-auto items-center justify-center rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:bg-neutral-50 transition mt-2 cursor-pointer" onClick={() => {
-                  if(marker) setMapCenter(marker.position);
+                  if (activeField === 'pickup' && pickupMarker) setMapCenter(pickupMarker.position);
+                  else if (activeField === 'destination' && destinationMarker) setMapCenter(destinationMarker.position);
+                  else if (mapMarkers.length > 0) setMapCenter(mapMarkers[0].position);
                 }}>
                   <div className="text-[#141414]" data-icon="NavigationArrow" data-size="24px" data-weight="regular">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256" transform="scale(-1, 1)">
@@ -162,10 +241,10 @@ export default function SearchLocation() {
       <div className="mt-auto z-10 relative">
         <div className="flex justify-end px-5 pb-5">
           <button
-            onClick={() => marker ? navigate('/ride-details') : alert('Please select a destination first')}
-            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${marker ? 'bg-[#D9483E] text-[#1c170d]' : 'bg-[#141414]'}`}
+            onClick={() => destinationQuery ? navigate('/ride-details') : alert('Please select a destination first')}
+            className={`flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-16 w-16 shadow-lg text-neutral-50 text-base font-bold transition hover:scale-105 hover:shadow-xl ${destinationQuery ? 'bg-[#D9483E] text-[#1c170d]' : 'bg-[#141414]'}`}
           >
-            <div className={marker ? 'text-[#1c170d]' : 'text-neutral-50'} data-icon="Target" data-size="24px" data-weight="regular">
+            <div className={destinationQuery ? 'text-[#1c170d]' : 'text-neutral-50'} data-icon="Target" data-size="24px" data-weight="regular">
               <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="28px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
               </svg>

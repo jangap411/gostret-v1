@@ -63,17 +63,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Top Middle Language Toggle */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-        <div className="flex items-center bg-white rounded-full shadow-md px-3 py-2 gap-2">
-          <span className="text-sm font-bold text-neutral-800">EN</span>
-          <div className="w-10 h-6 bg-neutral-300 rounded-full p-1 cursor-pointer relative flex items-center">
-            <div className="w-4 h-4 bg-white rounded-full shadow absolute left-1"></div>
-          </div>
-          <span className="text-sm font-bold text-neutral-500">TP</span>
-        </div>
-      </div>
-
       {/* Top Right Controls */}
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-4 items-center">
         <button onClick={() => navigate('/account')} className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors">
