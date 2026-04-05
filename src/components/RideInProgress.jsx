@@ -17,7 +17,7 @@ export default function RideInProgress() {
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="relative flex size-full min-h-screen flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden"
+      className="relative flex size-full h-full flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden"
       style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
     >
       <div>
@@ -121,7 +121,6 @@ export default function RideInProgress() {
           </div>
         </div>
       </div>
-      <BottomNav />
     </motion.div>
   );
 }

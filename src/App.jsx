@@ -39,7 +39,7 @@ function App() {
     return <SplashScreen />;
   }
 
-  const showBottomNav = !['/login', '/signup'].includes(location.pathname);
+  const showBottomNav = !['/login', '/signup', '/searching-driver'].includes(location.pathname);
 
   return (
     <div className="w-full max-w-md mx-auto h-screen flex flex-col shadow-2xl relative overflow-hidden bg-neutral-50">

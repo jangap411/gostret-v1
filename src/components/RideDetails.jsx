@@ -24,7 +24,7 @@ export default function RideDetails() {
       if (pickup?.marker?.position && destination?.marker?.position) {
         setLoadingRoute(true);
         try {
-          const apiKey = '5b3ce3597851110001cf62484036c6ff02874ec688671f7a883449e0';
+          const apiKey = import.meta.env.VITE_OPENROUTE_API_KEY;
           const [lat1, lon1] = pickup.marker.position;
           const [lat2, lon2] = destination.marker.position;
           

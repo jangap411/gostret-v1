@@ -28,7 +28,7 @@ export default function SearchLocation() {
 
   const searchLocation = async (text) => {
     try {
-      const apiKey = '5b3ce3597851110001cf62484036c6ff02874ec688671f7a883449e0';
+      const apiKey = import.meta.env.VITE_OPENROUTE_API_KEY;
       const res = await fetch(`https://api.openrouteservice.org/geocode/autocomplete?api_key=${apiKey}&text=${encodeURIComponent(text)}&boundary.country=PG`);
       const data = await res.json();
       if (data.features) {
