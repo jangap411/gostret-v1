@@ -1,6 +1,6 @@
-import BottomNav from './BottomNav';
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -8,7 +8,53 @@ const pageVariants = {
   exit: { opacity: 0, x: -50 }
 };
 
+const INITIAL_METHODS = [
+  { id: '1', type: 'Credit', brand: 'Visa', last4: '4567', icon: 'visa', bg: 'bg-blue-100', text: 'text-blue-800' },
+  { id: '2', type: 'Credit', brand: 'Mastercard', last4: '1234', icon: 'mastercard', bg: 'bg-orange-100', text: 'text-orange-600' },
+];
+
+const DIGITAL_WALLETS = [
+  { id: 'w1', name: 'Paypal', icon: 'Pay', bg: 'bg-blue-50' },
+  { id: 'w2', name: 'Venmo', icon: 'V', bg: 'bg-cyan-100' },
+  { id: 'w3', name: 'Apple Pay', icon: 'Ap', bg: 'bg-neutral-200' },
+];
+
 export default function PaymentMethods() {
+  const navigate = useNavigate();
+  const [methods, setMethods] = useState(INITIAL_METHODS);
+  const [editingMethod, setEditingMethod] = useState(null); // { id, brand, last4, etc } or 'new'
+  const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit' });
+
+  const handleEdit = (method) => {
+    setEditingMethod(method.id);
+    setFormData({ brand: method.brand, last4: method.last4, type: method.type });
+  };
+
+  const handleAdd = () => {
+    setEditingMethod('new');
+    setFormData({ brand: '', last4: '', type: 'Credit' });
+  };
+
+  const handleSave = () => {
+    if (editingMethod === 'new') {
+      const newMethod = {
+        id: Date.now().toString(),
+        ...formData,
+        bg: 'bg-neutral-100',
+        text: 'text-neutral-800'
+      };
+      setMethods([...methods, newMethod]);
+    } else {
+      setMethods(methods.map(m => m.id === editingMethod ? { ...m, ...formData } : m));
+    }
+    setEditingMethod(null);
+  };
+
+  const handleDelete = (id) => {
+    setMethods(methods.filter(m => m.id !== id));
+    setEditingMethod(null);
+  };
+
   return (
     <motion.div
       initial="initial"
@@ -19,124 +65,145 @@ export default function PaymentMethods() {
       className="relative flex size-full h-full flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden"
       style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
     >
-      <div>
+      <div className="flex-1 flex flex-col">
         <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
-          <button className="text-[#141414] flex size-12 shrink-0 items-center cursor-pointer hover:bg-neutral-200 rounded-full justify-center transition" data-icon="ArrowLeft" data-size="24px" data-weight="regular">
+          <button 
+            onClick={() => editingMethod ? setEditingMethod(null) : navigate(-1)} 
+            className="text-[#141414] flex size-12 shrink-0 items-center cursor-pointer hover:bg-neutral-200 rounded-full justify-center transition"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path>
             </svg>
           </button>
-          <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Payment methods</h2>
-        </div>
-        <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Credit and debit cards</h3>
-        
-        {/* Visa */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 bg-blue-100 rounded flex items-center justify-center text-[10px] font-bold text-blue-800" style={{ backgroundImage: 'url("/visa.svg")' }}>
-              VISA
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Credit</p>
-              <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">Visa ... 4567</p>
-            </div>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
+          <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : 'Payment methods'}
+          </h2>
         </div>
 
-        {/* Mastercard */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 bg-orange-100 rounded flex items-center justify-center text-[10px] font-bold text-orange-600" style={{ backgroundImage: 'url("/mastercard.svg")' }}>
-              MC
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">Credit</p>
-              <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">Mastercard ... 1234</p>
-            </div>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <AnimatePresence mode="wait">
+          {!editingMethod ? (
+            <motion.div 
+              key="list"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex-1 flex flex-col"
+            >
+              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Credit and debit cards</h3>
+              
+              {methods.map((method) => (
+                <div 
+                  key={method.id} 
+                  onClick={() => handleEdit(method)}
+                  className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition border-b border-neutral-100 last:border-b-0"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 ${method.bg || 'bg-neutral-100'} rounded flex items-center justify-center text-[10px] font-bold ${method.text || 'text-neutral-800'}`}>
+                      {method.brand?.toUpperCase() || 'CARD'}
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-[#141414] text-base font-medium leading-normal">{method.type}</p>
+                      <p className="text-neutral-500 text-sm font-normal leading-normal">{method.brand} ... {method.last4}</p>
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    <div className="text-neutral-400 flex size-7 items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              ))}
 
-        {/* Add Payment Method */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-10" data-icon="Plus" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-              </svg>
-            </div>
-            <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">Add payment method</p>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+              <div 
+                onClick={handleAdd}
+                className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition mt-2"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-[#D9483E] flex items-center justify-center rounded-lg bg-red-50 shrink-0 size-10 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                    </svg>
+                  </div>
+                  <p className="text-[#D9483E] text-base font-bold leading-normal flex-1">Add payment method</p>
+                </div>
+              </div>
 
-        <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Digital wallets</h3>
-        
-        {/* Paypal */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 bg-blue-50 rounded flex items-center justify-center text-[#141414]" style={{ backgroundImage: 'url("/paypal.svg")' }}>Pay</div>
-            <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">Paypal</p>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-6">Digital wallets</h3>
+              {DIGITAL_WALLETS.map((wallet) => (
+                <div key={wallet.id} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition">
+                  <div className="flex items-center gap-4">
+                    <div className={`bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 ${wallet.bg} rounded flex items-center justify-center text-[10px] font-bold text-[#141414]`}>
+                      {wallet.icon}
+                    </div>
+                    <p className="text-[#141414] text-base font-normal leading-normal">{wallet.name}</p>
+                  </div>
+                  <div className="shrink-0 text-neutral-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="form"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex-1 flex flex-col px-4 pt-4 gap-6"
+            >
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Card Brand</label>
+                <input 
+                  type="text"
+                  placeholder="Visa, Mastercard, etc."
+                  value={formData.brand}
+                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                  className="w-full h-14 bg-white border border-neutral-200 rounded-xl px-4 text-[#141414] font-medium focus:ring-2 focus:ring-[#D9483E]/20 focus:border-[#D9483E] outline-none transition"
+                />
+              </div>
 
-        {/* Venmo */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 bg-cyan-100 rounded flex items-center justify-center text-[#141414]" style={{ backgroundImage: 'url("/venmo.svg")' }}>V</div>
-            <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">Venmo</p>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Last 4 Digits</label>
+                <input 
+                  type="text"
+                  placeholder="4567"
+                  maxLength={4}
+                  value={formData.last4}
+                  onChange={(e) => setFormData({ ...formData, last4: e.target.value.replace(/\D/g, '') })}
+                  className="w-full h-14 bg-white border border-neutral-200 rounded-xl px-4 text-[#141414] font-medium focus:ring-2 focus:ring-[#D9483E]/20 focus:border-[#D9483E] outline-none transition"
+                />
+              </div>
 
-        {/* Apple Pay */}
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-200 cursor-pointer transition">
-          <div className="flex items-center gap-4">
-            <div className="bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 bg-neutral-200 rounded flex items-center justify-center text-[#141414]" style={{ backgroundImage: 'url("/applepay.svg")' }}>Ap</div>
-            <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">Apple Pay</p>
-          </div>
-          <div className="shrink-0">
-            <div className="text-[#141414] flex size-7 items-center justify-center" data-icon="CaretRight" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+              <div className="mt-auto flex flex-col gap-3 pb-8">
+                <button 
+                  onClick={handleSave}
+                  className="w-full h-14 bg-[#D9483E] text-white font-bold rounded-2xl shadow-lg shadow-red-100 active:scale-95 transition"
+                >
+                  Save Payment Method
+                </button>
+                {editingMethod !== 'new' && (
+                  <button 
+                    onClick={() => handleDelete(editingMethod)}
+                    className="w-full h-14 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition"
+                  >
+                    Delete Method
+                  </button>
+                )}
+                <button 
+                  onClick={() => setEditingMethod(null)}
+                  className="w-full h-14 bg-neutral-100 text-neutral-600 font-bold rounded-2xl hover:bg-neutral-200 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      
     </motion.div>
   );
 }
