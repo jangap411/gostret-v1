@@ -107,39 +107,7 @@ export default function RideInProgress() {
           />
         </div>
         
-        {/* Search Overlay */}
-        <div className="relative z-10 w-full px-4 pt-4 pointer-events-auto">
-          <label className="flex flex-col min-w-40 h-12 shadow-md rounded-xl hover:shadow-lg transition-shadow bg-neutral-50">
-            <div className="flex w-full flex-1 items-stretch rounded-xl h-full overflow-hidden">
-              <div className="text-neutral-500 flex items-center justify-center pl-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-                </svg>
-              </div>
-              <input
-                placeholder="Where to?"
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-[#141414] focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-neutral-500 px-4 text-base font-normal leading-normal"
-                defaultValue=""
-              />
-            </div>
-          </label>
-        </div>
-
-        {/* Map Controls */}
-        <div className="absolute right-4 top-20 flex flex-col gap-2 z-10">
-          <div className="flex flex-col rounded-xl overflow-hidden shadow-md bg-white">
-            <button className="flex size-10 items-center justify-center hover:bg-neutral-100 transition border-b border-neutral-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="#141414" viewBox="0 0 256 256">
-                <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-              </svg>
-            </button>
-            <button className="flex size-10 items-center justify-center hover:bg-neutral-100 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="#141414" viewBox="0 0 256 256">
-                <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
+        {/* Map area is now clear of search bar and controls */}
       </div>
       
       {/* Expandable Bottom Sheet */}
