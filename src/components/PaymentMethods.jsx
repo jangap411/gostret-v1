@@ -14,9 +14,9 @@ const INITIAL_METHODS = [
 ];
 
 const DIGITAL_WALLETS = [
-  { id: 'w1', name: 'Paypal', icon: 'Pay', bg: 'bg-blue-50' },
-  { id: 'w2', name: 'Venmo', icon: 'V', bg: 'bg-cyan-100' },
-  { id: 'w3', name: 'Apple Pay', icon: 'Ap', bg: 'bg-neutral-200' },
+  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100' },
+  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100' },
+  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100' },
 ];
 
 export default function PaymentMethods() {
