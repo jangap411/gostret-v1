@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
@@ -15,12 +15,15 @@ export default function Home() {
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
 
+  
+
   const handleLocateMe = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setMapCenter([position.coords.latitude, position.coords.longitude]);
           setMapZoom(16);
+          console.log(position);
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -31,6 +34,10 @@ export default function Home() {
       alert("Geolocation is not supported by your browser");
     }
   };
+
+   useEffect(() => {
+    handleLocateMe();
+  }, []);
 
   return (
     <motion.div

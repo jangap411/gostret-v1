@@ -41,7 +41,9 @@ export default function SearchLocation() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (activeQuery === 'Current location' || activeQuery === 'Selected on map' || isMapSelectionMode) {
+      // Regex to match "lat, lng" format
+      const coordRegex = /^-?\d+\.\d+,\s*-?\d+\.\d+$/;
+      if (activeQuery === 'Current location' || coordRegex.test(activeQuery) || isMapSelectionMode) {
         setResults([]);
         return;
       }
@@ -77,13 +79,14 @@ export default function SearchLocation() {
   const handleMapClick = (e) => {
     if (!isMapSelectionMode) return;
     const { lat, lng } = e.latlng;
+    const coordString = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     setMapCenter([lat, lng]);
-    const newMarker = { position: [lat, lng], popup: 'Selected on map' };
+    const newMarker = { position: [lat, lng], popup: coordString };
     
     if (activeField === 'pickup') {
-      dispatch(setPickup({ query: 'Selected on map', marker: newMarker }));
+      dispatch(setPickup({ query: coordString, marker: newMarker }));
     } else {
-      dispatch(setDestination({ query: 'Selected on map', marker: newMarker }));
+      dispatch(setDestination({ query: coordString, marker: newMarker }));
     }
     setIsMapSelectionMode(false);
   };
