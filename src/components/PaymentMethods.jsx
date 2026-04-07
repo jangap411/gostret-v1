@@ -14,15 +14,16 @@ const INITIAL_METHODS = [
 ];
 
 const DIGITAL_WALLETS = [
-  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100' },
-  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100' },
-  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100' },
+  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100', identifier: '+675 7000 1234', status: 'Linked' },
+  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100', identifier: '+675 7100 5678', status: 'Linked' },
+  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100', identifier: 'wantok.user@bsp.com.pg', status: 'Linked' },
 ];
 
 export default function PaymentMethods() {
   const navigate = useNavigate();
   const [methods, setMethods] = useState(INITIAL_METHODS);
   const [editingMethod, setEditingMethod] = useState(null); // { id, brand, last4, etc } or 'new'
+  const [editingWallet, setEditingWallet] = useState(null); // wallet object or null
   const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit' });
 
   const handleEdit = (method) => {
@@ -68,7 +69,11 @@ export default function PaymentMethods() {
       <div className="flex-1 flex flex-col">
         <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
           <button 
-            onClick={() => editingMethod ? setEditingMethod(null) : navigate(-1)} 
+            onClick={() => {
+              if (editingMethod) setEditingMethod(null);
+              else if (editingWallet) setEditingWallet(null);
+              else navigate(-1);
+            }} 
             className="text-[#141414] flex size-12 shrink-0 items-center cursor-pointer hover:bg-neutral-200 rounded-full justify-center transition"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -76,12 +81,12 @@ export default function PaymentMethods() {
             </svg>
           </button>
           <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
-            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : 'Payment methods'}
+            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : (editingWallet ? 'Wallet details' : 'Payment methods')}
           </h2>
         </div>
 
         <AnimatePresence mode="wait">
-          {!editingMethod ? (
+          {!editingMethod && !editingWallet ? (
             <motion.div 
               key="list"
               initial={{ opacity: 0, y: 10 }}
@@ -132,7 +137,7 @@ export default function PaymentMethods() {
 
               <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-6">Digital wallets</h3>
               {DIGITAL_WALLETS.map((wallet) => (
-                <div key={wallet.id} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition">
+                <div key={wallet.id} onClick={() => setEditingWallet(wallet)} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition">
                   <div className="flex items-center gap-4">
                     <div className={`bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 ${wallet.bg} rounded flex items-center justify-center text-[10px] font-bold text-[#141414]`}>
                       {wallet.icon}
@@ -147,7 +152,7 @@ export default function PaymentMethods() {
                 </div>
               ))}
             </motion.div>
-          ) : (
+          ) : editingMethod ? (
             <motion.div 
               key="form"
               initial={{ opacity: 0, x: 20 }}
@@ -198,6 +203,56 @@ export default function PaymentMethods() {
                   className="w-full h-14 bg-neutral-100 text-neutral-600 font-bold rounded-2xl hover:bg-neutral-200 transition"
                 >
                   Cancel
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="wallet-details"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex-1 flex flex-col px-4 pt-4 gap-8"
+            >
+              <div className="flex flex-col items-center gap-4 py-8 bg-white rounded-3xl shadow-sm border border-neutral-100">
+                <div className={`bg-center bg-no-repeat aspect-video bg-contain h-16 w-24 ${editingWallet.bg} rounded-xl flex items-center justify-center text-xl font-bold text-[#141414] shadow-sm`}>
+                  {editingWallet.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-[#141414]">{editingWallet.name}</h3>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1 px-2">
+                  <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Linked Account</label>
+                  <div className="w-full h-16 bg-white border border-neutral-100 rounded-2xl flex items-center px-4 shadow-sm">
+                    <p className="text-[#141414] font-semibold text-lg">{editingWallet.identifier}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 px-2">
+                  <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Status</label>
+                  <div className="w-full h-16 bg-white border border-neutral-100 rounded-2xl flex items-center px-4 shadow-sm justify-between">
+                    <p className="text-[#141414] font-semibold text-lg">{editingWallet.status}</p>
+                    <div className="size-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-auto flex flex-col gap-3 pb-8">
+                <button 
+                  onClick={() => {
+                    alert(`${editingWallet.name} unlinked successfully`);
+                    setEditingWallet(null);
+                  }}
+                  className="w-full h-14 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition shadow-sm"
+                >
+                  Unlink Wallet
+                </button>
+                <button 
+                  onClick={() => setEditingWallet(null)}
+                  className="w-full h-14 bg-[#141414] text-white font-bold rounded-2xl hover:bg-neutral-800 transition shadow-lg"
+                >
+                  Back to Payments
                 </button>
               </div>
             </motion.div>
