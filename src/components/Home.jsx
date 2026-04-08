@@ -12,6 +12,7 @@ const pageVariants = {
 export default function Home() {
   const navigate = useNavigate();
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
+  const [showSosModal, setShowSosModal] = useState(false);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
 
@@ -54,18 +55,18 @@ export default function Home() {
 
       {/* Top Left Overlay Controls */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
-        <button className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors">
+        <button className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
             <path d="M224,128a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16H224A8,8,0,0,1,224,128ZM32,72H224a8,8,0,0,0,0-16H32a8,8,0,0,0,0,16ZM224,184H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16Z"></path>
           </svg>
         </button>
-        <div className="flex flex-col items-center gap-1">
-          <button className="flex items-center justify-center w-12 h-12 bg-[#D9483E] rounded-full shadow-md text-white hover:bg-[#c53d34] transition-colors">
+        <div className="flex flex-col items-center gap-1 cursor-pointer group" onClick={() => setShowSosModal(true)}>
+          <button className="flex items-center justify-center w-12 h-12 bg-[#D9483E] rounded-full shadow-md text-white hover:bg-[#c53d34] group-hover:scale-105 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path>
             </svg>
           </button>
-          <div className="bg-white px-2 py-1 rounded shadow text-xs font-bold text-neutral-800">SOS</div>
+          <div className="bg-white px-2 py-1 rounded shadow text-xs font-bold text-neutral-800 group-hover:shadow-md transition-shadow">SOS</div>
         </div>
       </div>
 
@@ -181,6 +182,49 @@ export default function Home() {
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Interactive SOS Modal Overlay */}
+      <AnimatePresence>
+        {showSosModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-[24px] p-6 w-full max-w-sm flex flex-col items-center shadow-2xl"
+            >
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-[#D9483E]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path>
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-[#1D3557] mb-2 text-center tracking-tight">Emergency Assistance</h2>
+              <p className="text-center text-neutral-500 mb-8 text-sm">Do you need immediate help? This will connect you directly to emergency services.</p>
+              
+              <div className="flex flex-col w-full gap-3">
+                <button 
+                  onClick={() => { window.location.href='tel:111'; setShowSosModal(false); }}
+                  className="w-full h-[52px] bg-[#D9483E] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#c53d34] shadow-md hover:shadow-lg transition-all text-[15px]"
+                >
+                  Call Police (111)
+                </button>
+                <button 
+                  onClick={() => setShowSosModal(false)}
+                  className="w-full h-[52px] bg-neutral-100 text-[#1D3557] font-bold rounded-xl hover:bg-neutral-200 transition-colors text-[15px]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
   );
 }
