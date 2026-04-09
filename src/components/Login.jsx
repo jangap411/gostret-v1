@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/api';
 
 const pageVariants = {
   initial: { opacity: 0, y: 50 },
@@ -10,6 +11,33 @@ const pageVariants = {
 
 export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    setError('');
+    setLoading(true);
+
+    try {
+      const data = await authService.login(email, password);
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial="initial"
@@ -30,13 +58,23 @@ export default function Login() {
           </div>
           <h2 className="text-[#1c170d] text-2xl font-bold mt-4 tracking-tight">Login to Your Account</h2>
         </div>
-        <div className="flex max-w-[480px] flex-col gap-5 px-6 py-4 mx-auto w-full mt-4">
+        
+        <form onSubmit={handleLogin} className="flex max-w-[480px] flex-col gap-5 px-6 py-4 mx-auto w-full mt-4">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-semibold border border-red-100 mb-2">
+              {error}
+            </div>
+          )}
+          
           <label className="flex flex-col flex-1 gap-2">
-            <span className="text-sm font-semibold text-neutral-700">Username</span>
+            <span className="text-sm font-semibold text-neutral-700">Email</span>
             <input
-              placeholder="Enter your username"
+              type="email"
+              placeholder="Enter your email"
               className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1c170d] focus:outline-none focus:ring-2 focus:ring-[#D9483E] border border-neutral-200 bg-white h-14 placeholder:text-neutral-400 p-4 text-base font-normal leading-normal transition"
-              defaultValue=""
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </label>
           <label className="flex flex-col flex-1 gap-2">
@@ -45,18 +83,21 @@ export default function Login() {
               type="password"
               placeholder="Enter your password"
               className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1c170d] focus:outline-none focus:ring-2 focus:ring-[#D9483E] border border-neutral-200 bg-white h-14 placeholder:text-neutral-400 p-4 text-base font-normal leading-normal transition"
-              defaultValue=""
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </label>
-        </div>
-        <div className="flex px-6 py-3 max-w-[480px] mx-auto w-full mt-2">
-          <button
-            onClick={() => { localStorage.setItem('isAuthenticated', 'true'); navigate('/'); }}
-            className="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#C53D34] shadow-md hover:shadow-lg transition-all"
-          >
-            <span className="truncate">Login</span>
-          </button>
-        </div>
+          <div className="flex py-3 w-full mt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#C53D34] shadow-md hover:shadow-lg transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              <span className="truncate">{loading ? 'Logging in...' : 'Login'}</span>
+            </button>
+          </div>
+        </form>
       </div>
       <div>
         <p className="text-neutral-500 text-[15px] font-normal leading-normal pb-8 pt-8 px-4 text-center mb-4">
