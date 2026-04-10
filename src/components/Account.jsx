@@ -16,6 +16,10 @@ export default function Account() {
   const [activeSubmenu, setActiveSubmenu] = React.useState(null);
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editForm, setEditForm] = React.useState({ name: '', email: '', avatar_url: '' });
+  const [updating, setUpdating] = React.useState(false);
 
   React.useEffect(() => {
     const fetchProfile = async () => {
@@ -32,6 +36,26 @@ export default function Account() {
     };
     fetchProfile();
   }, []);
+
+  const handleEditClick = () => {
+    setEditForm({ name: user?.name || '', email: user?.email || '', avatar_url: user?.avatar_url || '' });
+    setIsEditing(true);
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    try {
+      const token = localStorage.getItem('token');
+      const updatedUser = await userService.updateProfile(editForm, token);
+      setUser(updatedUser);
+      setIsEditing(false);
+    } catch (error) {
+      alert("Failed to update profile: " + error.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const submenus = {
     Preferences: (
@@ -104,6 +128,7 @@ export default function Account() {
   };
 
   return (
+    <>
     <motion.div
       initial="initial"
       animate="animate"
@@ -139,7 +164,7 @@ export default function Account() {
             >
               {/* Profile Header */}
               <div className="flex items-center gap-4 px-4 py-8 bg-white border-b border-neutral-100">
-                <div className="relative">
+                <div className="relative cursor-pointer hover:opacity-80 transition" onClick={handleEditClick}>
                   <div 
                     className="size-20 rounded-full bg-neutral-100 border-2 border-white shadow-md bg-cover bg-center"
                     style={{ backgroundImage: user?.avatar_url ? `url(${user.avatar_url})` : 'none' }}
@@ -156,18 +181,26 @@ export default function Account() {
                     </svg>
                   </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col flex-1">
                   {loading ? (
                     <div className="h-6 w-32 bg-neutral-100 animate-pulse rounded"></div>
                   ) : (
                     <h3 className="text-xl font-bold text-[#141414] leading-tight">{user?.name}</h3>
                   )}
                   <p className="text-neutral-500 text-sm font-medium">{user?.email}</p>
-                  <div className="flex items-center gap-1.5 mt-1.5 bg-green-50 px-2 py-0.5 rounded-full w-fit">
-                    <div className="size-1.5 bg-green-500 rounded-full"></div>
-                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">
-                      Wallet: {loading ? '...' : `PGK ${user?.wallet_balance || '0.00'}`}
-                    </span>
+                  <div className="flex items-center justify-between w-full mt-1.5">
+                    <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full w-fit">
+                      <div className="size-1.5 bg-green-500 rounded-full"></div>
+                      <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">
+                        Wallet: {loading ? '...' : `PGK ${user?.wallet_balance || '0.00'}`}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={handleEditClick}
+                      className="text-sm font-bold text-[#D9483E] hover:text-[#b53a31]"
+                    >
+                      Edit Profile
+                    </button>
                   </div>
                 </div>
               </div>
@@ -235,5 +268,97 @@ export default function Account() {
       </div>
 
     </motion.div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {isEditing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-neutral-100">
+                <h3 className="text-xl font-bold text-[#141414]">Edit Profile</h3>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="size-8 flex items-center justify-center rounded-full bg-neutral-100 text-neutral-500 hover:bg-neutral-200 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div className="p-5 overflow-y-auto no-scrollbar">
+                <form id="edit-profile-form" onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-[#141414]">Full Name</label>
+                    <input
+                      required
+                      type="text"
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-[#D9483E] focus:ring-2 focus:ring-[#D9483E]/20 transition outline-none"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter your name"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-[#141414]">Email Address</label>
+                    <input
+                      required
+                      type="email"
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-[#D9483E] focus:ring-2 focus:ring-[#D9483E]/20 transition outline-none"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 relative">
+                    <label className="text-sm font-bold text-[#141414] flex justify-between">
+                      Avatar URL <span className="text-xs font-normal text-neutral-400">Optional</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="size-12 shrink-0 rounded-xl bg-neutral-100 border border-neutral-200 overflow-hidden bg-cover bg-center flex items-center justify-center text-neutral-400 font-bold"
+                           style={{ backgroundImage: editForm.avatar_url ? `url(${editForm.avatar_url})` : 'none' }}>
+                         {!editForm.avatar_url && (editForm.name.charAt(0) || 'U')}
+                      </div>
+                      <input
+                        type="url"
+                        className="flex-1 h-12 px-4 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-[#D9483E] focus:ring-2 focus:ring-[#D9483E]/20 transition outline-none"
+                        value={editForm.avatar_url}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, avatar_url: e.target.value }))}
+                        placeholder="https://example.com/avatar.png"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <div className="p-5 border-t border-neutral-100 bg-neutral-50">
+                <button
+                  type="submit"
+                  form="edit-profile-form"
+                  disabled={updating}
+                  className={`w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-[#D9483E] text-white font-bold tracking-wide active:scale-95 transition ${updating ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#C53D34] shadow-md shadow-[#D9483E]/30'}`}
+                >
+                  {updating ? (
+                    <><div className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Saving...</>
+                  ) : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
