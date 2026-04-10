@@ -165,9 +165,9 @@ export default function RideDetails() {
         <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ride options</h3>
         <div className="overflow-y-auto max-h-[250px] scrollbar-hide pb-2">
           {[
-            { id: 'uberx', name: 'GoStret Regular', time: '4 min', price: '$12.34', icon: 'Car' },
-            { id: 'uberxl', name: 'GoStret Premium', time: '6 min', price: '$18.51', icon: 'Car' },
-            { id: 'comfort', name: 'GoStret XL', time: '8 min', price: '$22.78', icon: 'Car' }
+            { id: 'uberx', name: 'GoStret Regular', time: '4 min', price: 'PGK 12.34', icon: 'Car' },
+            { id: 'uberxl', name: 'GoStret Premium', time: '6 min', price: 'PGK 18.51', icon: 'Car' },
+            { id: 'comfort', name: 'GoStret XL', time: '8 min', price: 'PGK 22.78', icon: 'Car' }
           ].map((option) => (
             <div key={option.id} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition-colors duration-200 active:scale-[0.98]">
               <div className="flex items-center gap-4">

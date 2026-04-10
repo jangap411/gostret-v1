@@ -69,7 +69,7 @@ export default function RideInProgress() {
            </div>
            <div className="text-right">
               <p className="text-xs font-bold opacity-60 uppercase tracking-widest">Fare</p>
-              <p className="text-lg font-extrabold text-[#D9483E]">${activeRide?.fare || '0.00'}</p>
+              <p className="text-lg font-extrabold text-[#D9483E]">PGK {activeRide?.fare || '0.00'}</p>
            </div>
         </div>
       </div>

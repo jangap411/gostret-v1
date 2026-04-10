@@ -138,7 +138,7 @@ export default function PaymentMethods() {
               <div className="mx-4 mt-4 p-6 bg-gradient-to-br from-[#1D3557] to-[#141414] rounded-3xl shadow-xl shadow-blue-950/20 text-white flex flex-col gap-1">
                 <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Available Balance</p>
                 <div className="flex items-end gap-2">
-                  <h3 className="text-4xl font-extrabold tracking-tight">${walletBalance}</h3>
+                  <h3 className="text-4xl font-extrabold tracking-tight">PGK {walletBalance}</h3>
                   <span className="text-sm font-medium text-blue-300 pb-1.5">PGK</span>
                 </div>
                 <button 
@@ -237,7 +237,7 @@ export default function PaymentMethods() {
                     onClick={() => setTopUpAmount(amt.toString())}
                     className={`h-14 rounded-2xl font-bold transition flex items-center justify-center border-2 ${topUpAmount === amt.toString() ? 'bg-[#D9483E] border-[#D9483E] text-white shadow-lg shadow-red-200' : 'bg-white border-neutral-100 text-[#1D3557] hover:border-neutral-200'}`}
                   >
-                    ${amt}
+                    PGK {amt}
                   </button>
                 ))}
               </div>

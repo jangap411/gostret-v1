@@ -121,7 +121,7 @@ export default function Activity() {
                           <div className="flex flex-col justify-center min-w-0">
                             <p className="text-[#141414] text-base font-bold leading-tight truncate">{ride.destination_address}</p>
                             <p className="text-neutral-500 text-xs font-medium mt-1">
-                                {new Date(ride.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · {ride.fare}
+                             {new Date(ride.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · PGK {ride.fare}
                             </p>
                           </div>
                         </div>
@@ -158,7 +158,7 @@ export default function Activity() {
                 <div className="p-4 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div className="flex flex-col">
-                      <h4 className="text-xl font-bold text-[#141414]">${selectedRide.fare}</h4>
+                      <h4 className="text-xl font-bold text-[#141414]">PGK {selectedRide.fare}</h4>
                       <p className="text-neutral-500 text-sm">
                         {new Date(selectedRide.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </p>

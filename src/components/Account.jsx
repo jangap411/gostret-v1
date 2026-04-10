@@ -166,7 +166,7 @@ export default function Account() {
                   <div className="flex items-center gap-1.5 mt-1.5 bg-green-50 px-2 py-0.5 rounded-full w-fit">
                     <div className="size-1.5 bg-green-500 rounded-full"></div>
                     <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">
-                      Wallet: {loading ? '...' : `$${user?.wallet_balance || '0.00'}`}
+                      Wallet: {loading ? '...' : `PGK ${user?.wallet_balance || '0.00'}`}
                     </span>
                   </div>
                 </div>
