@@ -76,17 +76,34 @@ export default function SearchLocation() {
     setResults([]);
   };
 
-  const handleMapClick = (e) => {
+  const handleMapClick = async (e) => {
     if (!isMapSelectionMode) return;
     const { lat, lng } = e.latlng;
     const coordString = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     setMapCenter([lat, lng]);
-    const newMarker = { position: [lat, lng], popup: coordString };
+    
+    let locationName = coordString;
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTE_API_KEY;
+      const res = await fetch(`https://api.openrouteservice.org/geocode/reverse?api_key=${apiKey}&point.lon=${lng}&point.lat=${lat}`);
+      const data = await res.json();
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        const label = feature.properties.name || feature.properties.label || feature.properties.street || "";
+        if (label) {
+          locationName = `${label} (${coordString})`;
+        }
+      }
+    } catch (error) {
+      console.error("Reverse geocoding failed", error);
+    }
+
+    const newMarker = { position: [lat, lng], popup: locationName };
     
     if (activeField === 'pickup') {
-      dispatch(setPickup({ query: coordString, marker: newMarker }));
+      dispatch(setPickup({ query: locationName, marker: newMarker }));
     } else {
-      dispatch(setDestination({ query: coordString, marker: newMarker }));
+      dispatch(setDestination({ query: locationName, marker: newMarker }));
     }
     setIsMapSelectionMode(false);
   };
