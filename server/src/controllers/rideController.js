@@ -1,5 +1,7 @@
 import { query } from '../config/db.js';
-// @desc    Request a new ride
+import { sendReceiptEmail } from '../utils/mailer.js';
+
+
 // @route   POST /api/rides
 export const requestRide = async (req, res) => {
   const { pickup_address, destination_address, pickup_lat, pickup_lng, destination_lat, destination_lng, fare, distance, duration } = req.body;
@@ -124,5 +126,45 @@ export const getActiveRide = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Send ride receipt to user email
+// @route   POST /api/rides/:id/receipt
+export const sendReceipt = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Fetch the ride
+    const rideResult = await query(
+      'SELECT * FROM rides WHERE id = $1 AND (rider_id = $2 OR driver_id = $2)',
+      [id, userId]
+    );
+
+    if (rideResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    const ride = rideResult.rows[0];
+
+    // Fetch the user's email and name
+    const userResult = await query(
+      'SELECT name, email FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { name, email } = userResult.rows[0];
+
+    await sendReceiptEmail({ to: email, name, ride });
+
+    res.json({ message: `Receipt sent to ${email}` });
+  } catch (error) {
+    console.error('Receipt send error:', error);
+    res.status(500).json({ message: 'Failed to send receipt' });
   }
 };

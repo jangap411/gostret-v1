@@ -84,6 +84,18 @@ export const rideService = {
     if (!response.ok) throw new Error(data.message || 'Status update failed');
     return data;
   },
+
+  sendReceipt: async (id, token) => {
+    const response = await fetch(`${API_BASE_URL}/rides/${id}/receipt`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to send receipt');
+    return data;
+  },
 };
 
 export const userService = {

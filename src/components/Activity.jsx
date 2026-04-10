@@ -14,6 +14,7 @@ export default function Activity() {
   const [rides, setRides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRide, setSelectedRide] = useState(null);
+  const [sendingReceipt, setSendingReceipt] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -198,10 +199,24 @@ export default function Activity() {
                 </div>
 
                 <button 
-                  onClick={() => alert("Receipt sent to your email")}
-                  className="mt-4 w-full h-14 bg-white border-2 border-neutral-100 text-[#141414] font-bold rounded-2xl hover:bg-neutral-50 transition active:scale-[0.98]"
+                  onClick={async () => {
+                    setSendingReceipt(true);
+                    try {
+                      const token = localStorage.getItem('token');
+                      const result = await rideService.sendReceipt(selectedRide.id, token);
+                      alert(result.message);
+                    } catch (error) {
+                      alert('Failed to send receipt: ' + error.message);
+                    } finally {
+                      setSendingReceipt(false);
+                    }
+                  }}
+                  disabled={sendingReceipt}
+                  className={`mt-4 w-full h-14 bg-white border-2 border-neutral-100 text-[#141414] font-bold rounded-2xl hover:bg-neutral-50 transition active:scale-[0.98] flex items-center justify-center gap-2 ${sendingReceipt ? 'opacity-60 cursor-not-allowed' : ''}`}
                 >
-                  View Receipt
+                  {sendingReceipt ? (
+                    <><div className="w-4 h-4 border-2 border-[#D9483E] border-t-transparent rounded-full animate-spin" /> Sending...</>
+                  ) : 'View Receipt'}
                 </button>
               </div>
             </motion.div>
