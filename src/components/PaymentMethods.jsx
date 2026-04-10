@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,17 @@ const pageVariants = {
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: -50 }
 };
+
+const INITIAL_METHODS = [
+  { id: '1', type: 'Credit', brand: 'Visa', last4: '4567', icon: 'visa', bg: 'bg-blue-100', text: 'text-blue-800' },
+  { id: '2', type: 'Credit', brand: 'Mastercard', last4: '1234', icon: 'mastercard', bg: 'bg-orange-100', text: 'text-orange-600' },
+];
+
+const DIGITAL_WALLETS = [
+  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100', identifier: '+675 7000 1234', status: 'Linked' },
+  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100', identifier: '+675 7100 5678', status: 'Linked' },
+  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100', identifier: 'wantok.user@bsp.com.pg', status: 'Linked' },
+];
 
 import { userService } from '../services/api';
 
@@ -17,7 +28,7 @@ export default function PaymentMethods() {
   const [editingWallet, setEditingWallet] = useState(null); 
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState('');
-  const [walletBalance, setWalletBalance] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(100);
   const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit' });
   const [loading, setLoading] = useState(false);
 
@@ -127,7 +138,7 @@ export default function PaymentMethods() {
               <div className="mx-4 mt-4 p-6 bg-gradient-to-br from-[#1D3557] to-[#141414] rounded-3xl shadow-xl shadow-blue-950/20 text-white flex flex-col gap-1">
                 <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Available Balance</p>
                 <div className="flex items-end gap-2">
-                  <h3 className="text-4xl font-extrabold tracking-tight">${walletBalance.toFixed(2)}</h3>
+                  <h3 className="text-4xl font-extrabold tracking-tight">${walletBalance}</h3>
                   <span className="text-sm font-medium text-blue-300 pb-1.5">PGK</span>
                 </div>
                 <button 
