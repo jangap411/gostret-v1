@@ -8,23 +8,32 @@ const pageVariants = {
   exit: { opacity: 0, x: -50 }
 };
 
-const INITIAL_METHODS = [
-  { id: '1', type: 'Credit', brand: 'Visa', last4: '4567', icon: 'visa', bg: 'bg-blue-100', text: 'text-blue-800' },
-  { id: '2', type: 'Credit', brand: 'Mastercard', last4: '1234', icon: 'mastercard', bg: 'bg-orange-100', text: 'text-orange-600' },
-];
-
-const DIGITAL_WALLETS = [
-  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100', identifier: '+675 7000 1234', status: 'Linked' },
-  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100', identifier: '+675 7100 5678', status: 'Linked' },
-  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100', identifier: 'wantok.user@bsp.com.pg', status: 'Linked' },
-];
+import { userService } from '../services/api';
 
 export default function PaymentMethods() {
   const navigate = useNavigate();
   const [methods, setMethods] = useState(INITIAL_METHODS);
-  const [editingMethod, setEditingMethod] = useState(null); // { id, brand, last4, etc } or 'new'
-  const [editingWallet, setEditingWallet] = useState(null); // wallet object or null
+  const [editingMethod, setEditingMethod] = useState(null); 
+  const [editingWallet, setEditingWallet] = useState(null); 
+  const [isTopUpOpen, setIsTopUpOpen] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState('');
+  const [walletBalance, setWalletBalance] = useState(0);
   const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit' });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const profile = await userService.getProfile(token);
+        setWalletBalance(profile.wallet_balance || 0);
+      } catch (error) {
+        console.error("Balance fetch error", error);
+      }
+    };
+    fetchBalance();
+  }, []);
 
   const handleEdit = (method) => {
     setEditingMethod(method.id);
@@ -51,6 +60,26 @@ export default function PaymentMethods() {
     setEditingMethod(null);
   };
 
+  const handleTopUp = async () => {
+    if (!topUpAmount || isNaN(topUpAmount) || parseFloat(topUpAmount) <= 0) {
+      alert("Please enter a valid amount");
+      return;
+    }
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const data = await userService.topUpWallet(parseFloat(topUpAmount), token);
+      setWalletBalance(data.wallet_balance);
+      setIsTopUpOpen(false);
+      setTopUpAmount('');
+      alert("Wallet topped up successfully!");
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = (id) => {
     setMethods(methods.filter(m => m.id !== id));
     setEditingMethod(null);
@@ -67,11 +96,12 @@ export default function PaymentMethods() {
       style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
     >
       <div className="flex-1 flex flex-col">
-        <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
+        <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between sticky top-0 z-50">
           <button 
             onClick={() => {
               if (editingMethod) setEditingMethod(null);
               else if (editingWallet) setEditingWallet(null);
+              else if (isTopUpOpen) setIsTopUpOpen(false);
               else navigate(-1);
             }} 
             className="text-[#141414] flex size-12 shrink-0 items-center cursor-pointer hover:bg-neutral-200 rounded-full justify-center transition"
@@ -81,12 +111,12 @@ export default function PaymentMethods() {
             </svg>
           </button>
           <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
-            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : (editingWallet ? 'Wallet details' : 'Payment methods')}
+            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : (editingWallet ? 'Wallet details' : (isTopUpOpen ? 'Top up wallet' : 'Payment methods'))}
           </h2>
         </div>
 
         <AnimatePresence mode="wait">
-          {!editingMethod && !editingWallet ? (
+          {!editingMethod && !editingWallet && !isTopUpOpen ? (
             <motion.div 
               key="list"
               initial={{ opacity: 0, y: 10 }}
@@ -94,7 +124,24 @@ export default function PaymentMethods() {
               exit={{ opacity: 0, y: -10 }}
               className="flex-1 flex flex-col"
             >
-              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Credit and debit cards</h3>
+              <div className="mx-4 mt-4 p-6 bg-gradient-to-br from-[#1D3557] to-[#141414] rounded-3xl shadow-xl shadow-blue-950/20 text-white flex flex-col gap-1">
+                <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Available Balance</p>
+                <div className="flex items-end gap-2">
+                  <h3 className="text-4xl font-extrabold tracking-tight">${walletBalance.toFixed(2)}</h3>
+                  <span className="text-sm font-medium text-blue-300 pb-1.5">PGK</span>
+                </div>
+                <button 
+                  onClick={() => setIsTopUpOpen(true)}
+                  className="mt-4 h-12 bg-[#D9483E] rounded-xl text-white font-bold text-sm shadow-lg shadow-red-950/20 active:scale-95 transition flex items-center justify-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                  </svg>
+                  Top Up Now
+                </button>
+              </div>
+
+              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-8">Credit and debit cards</h3>
               
               {methods.map((method) => (
                 <div 
@@ -111,12 +158,10 @@ export default function PaymentMethods() {
                       <p className="text-neutral-500 text-sm font-normal leading-normal">{method.brand} ... {method.last4}</p>
                     </div>
                   </div>
-                  <div className="shrink-0">
-                    <div className="text-neutral-400 flex size-7 items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-                      </svg>
-                    </div>
+                  <div className="shrink-0 text-neutral-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                    </svg>
                   </div>
                 </div>
               ))}
@@ -151,6 +196,56 @@ export default function PaymentMethods() {
                   </div>
                 </div>
               ))}
+            </motion.div>
+          ) : isTopUpOpen ? (
+            <motion.div 
+              key="topup"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex-1 flex flex-col px-4 pt-6 gap-8"
+            >
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-neutral-500 uppercase tracking-widest pl-1">Amount to Top Up</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-neutral-400">$</span>
+                  <input 
+                    type="number"
+                    placeholder="0.00"
+                    value={topUpAmount}
+                    onChange={(e) => setTopUpAmount(e.target.value)}
+                    className="w-full h-20 bg-white border border-neutral-200 rounded-[28px] pl-10 pr-6 text-3xl font-extrabold text-[#141414] focus:ring-4 focus:ring-[#D9483E]/10 focus:border-[#D9483E] outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {[10, 20, 50, 100, 200, 500].map(amt => (
+                  <button 
+                    key={amt}
+                    onClick={() => setTopUpAmount(amt.toString())}
+                    className={`h-14 rounded-2xl font-bold transition flex items-center justify-center border-2 ${topUpAmount === amt.toString() ? 'bg-[#D9483E] border-[#D9483E] text-white shadow-lg shadow-red-200' : 'bg-white border-neutral-100 text-[#1D3557] hover:border-neutral-200'}`}
+                  >
+                    ${amt}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-auto flex flex-col gap-3 pb-8">
+                <button 
+                  disabled={loading}
+                  onClick={handleTopUp}
+                  className={`w-full h-16 bg-[#D9483E] text-white font-bold rounded-2xl shadow-xl shadow-red-100 active:scale-95 transition flex items-center justify-center gap-3 ${loading ? 'opacity-70' : ''}`}
+                >
+                  {loading ? 'Processing...' : 'Confirm Top Up'}
+                </button>
+                <button 
+                  onClick={() => setIsTopUpOpen(false)}
+                  className="w-full h-14 bg-neutral-100 text-neutral-600 font-bold rounded-2xl hover:bg-neutral-200 transition"
+                >
+                  Cancel
+                </button>
+              </div>
             </motion.div>
           ) : editingMethod ? (
             <motion.div 

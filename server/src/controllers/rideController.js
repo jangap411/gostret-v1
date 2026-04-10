@@ -1,10 +1,9 @@
-import { query } from '../config/db.js';
-
 // @desc    Request a new ride
 // @route   POST /api/rides
 export const requestRide = async (req, res) => {
   const { pickup_address, destination_address, pickup_lat, pickup_lng, destination_lat, destination_lng, fare, distance, duration } = req.body;
   const rider_id = req.user.id;
+  const io = req.app.get('io');
 
   try {
     const result = await query(
@@ -12,18 +11,56 @@ export const requestRide = async (req, res) => {
       [rider_id, pickup_address, destination_address, pickup_lat, pickup_lng, destination_lat, destination_lng, fare, distance, duration]
     );
 
-    res.status(201).json(result.rows[0]);
+    const ride = result.rows[0];
+
+    // --- Driver Simulation for Demo ---
+    setTimeout(async () => {
+      try {
+        await query('UPDATE rides SET status = $1 WHERE id = $2', ['accepted', ride.id]);
+        io.to(`ride_${ride.id}`).emit('status_update', { status: 'accepted' });
+        console.log(`Ride ${ride.id} accepted by simulated driver`);
+
+        setTimeout(async () => {
+          await query('UPDATE rides SET status = $1 WHERE id = $2', ['in_progress', ride.id]);
+          io.to(`ride_${ride.id}`).emit('status_update', { status: 'in_progress' });
+          console.log(`Ride ${ride.id} in progress`);
+
+          // Simulate location updates during ride
+          let progress = 0;
+          const locationInterval = setInterval(() => {
+            progress += 0.1;
+            if (progress >= 1) {
+               clearInterval(locationInterval);
+               return;
+            }
+            // Simple interpolation for demo
+            const lat = pickup_lat + (destination_lat - pickup_lat) * progress;
+            const lng = pickup_lng + (destination_lng - pickup_lng) * progress;
+            io.to(`ride_${ride.id}`).emit('location_update', { lat, lng });
+          }, 3000);
+
+          setTimeout(async () => {
+            await query('UPDATE rides SET status = $1 WHERE id = $2', ['completed', ride.id]);
+            io.to(`ride_${ride.id}`).emit('status_update', { status: 'completed' });
+            console.log(`Ride ${ride.id} completed`);
+          }, 20000);
+        }, 10000);
+      } catch (err) {
+        console.error('Simulation error:', err);
+      }
+    }, 5000);
+
+    res.status(201).json(ride);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// @desc    Update ride status
-// @route   PUT /api/rides/:id/status
 export const updateRideStatus = async (req, res) => {
   const { id } = req.params;
   const { status, driver_id } = req.body;
+  const io = req.app.get('io');
 
   try {
     let result;
@@ -43,7 +80,10 @@ export const updateRideStatus = async (req, res) => {
       return res.status(404).json({ message: 'Ride not found' });
     }
 
-    res.json(result.rows[0]);
+    const updatedRide = result.rows[0];
+    io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status });
+
+    res.json(updatedRide);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

@@ -9,6 +9,7 @@ const initialState = {
     query: '',
     marker: null,
   },
+  activeRide: null,
 };
 
 const rideSlice = createSlice({
@@ -21,11 +22,22 @@ const rideSlice = createSlice({
     setDestination: (state, action) => {
       state.destination = action.payload;
     },
+    setActiveRide: (state, action) => {
+      state.activeRide = action.payload;
+    },
+    updateRideStatus: (state, action) => {
+      if (state.activeRide) {
+        state.activeRide.status = action.payload;
+      }
+    },
     clearRide: (state) => {
-      return initialState;
+      state.activeRide = null;
+      state.pickup = initialState.pickup;
+      state.destination = initialState.destination;
     },
   },
 });
 
-export const { setPickup, setDestination, clearRide } = rideSlice.actions;
+export const { setPickup, setDestination, setActiveRide, updateRideStatus, clearRide } = rideSlice.actions;
 export default rideSlice.reducer;
+

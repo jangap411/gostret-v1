@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate,useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import Home from './components/Home';
@@ -16,6 +16,10 @@ import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import SearchingDriver from './components/SearchingDriver';
 
+import { useDispatch } from 'react-redux';
+import { rideService } from './services/api';
+import { setActiveRide } from './store/rideSlice';
+
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   if (!isAuthenticated) {
@@ -24,20 +28,52 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+import { socketService } from './services/socket';
+
 function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+    const initializeApp = async () => {
+      const token = localStorage.getItem('token');
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+
+      if (token && isAuthenticated) {
+        socketService.connect();
+        try {
+          const activeRide = await rideService.getActiveRide(token);
+          if (activeRide) {
+            dispatch(setActiveRide(activeRide));
+            socketService.joinRide(activeRide.id);
+            
+            const currentPath = window.location.pathname;
+            if (currentPath === '/' || currentPath === '/searching-driver') {
+              if (activeRide.status === 'pending') navigate('/searching-driver');
+              else if (activeRide.status === 'accepted') navigate('/driver-en-route');
+              else if (activeRide.status === 'in_progress') navigate('/ride-in-progress');
+            }
+          }
+        } catch (error) {
+          console.error("App initialization error", error);
+        }
+      }
+      
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    };
+
+    initializeApp();
+  }, [dispatch]);
+
 
   if (loading) {
     return <SplashScreen />;
   }
+
 
   const showBottomNav = !['/login', '/signup', '/searching-driver'].includes(location.pathname);
 

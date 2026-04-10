@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
+import { rideService } from '../services/api';
+import { setActiveRide } from '../store/rideSlice';
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -12,12 +14,14 @@ const pageVariants = {
 
 export default function RideDetails() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const pickup = useSelector((state) => state.ride.pickup);
   const destination = useSelector((state) => state.ride.destination);
 
   const [route, setRoute] = useState(null);
   const [routeMeta, setRouteMeta] = useState(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [booking, setBooking] = useState(false);
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -33,12 +37,10 @@ export default function RideDetails() {
           
           if (data.features && data.features.length > 0) {
             const feature = data.features[0];
-            // ORS returns [lon, lat], Leaflet wants [lat, lon]
             const coords = feature.geometry.coordinates.map(c => [c[1], c[0]]);
             setRoute(coords);
             
             const { distance, duration } = feature.properties.summary;
-            // distance is in meters, duration in seconds
             const distKm = (distance / 1000).toFixed(1) + ' km';
             const durMin = Math.round(duration / 60) + ' min';
             setRouteMeta({ distance: distKm, duration: durMin });
@@ -53,6 +55,35 @@ export default function RideDetails() {
 
     fetchRoute();
   }, [pickup, destination]);
+
+  const handleBookRide = async () => {
+    if (!pickup?.marker || !destination?.marker) return;
+
+    setBooking(true);
+    try {
+      const token = localStorage.getItem('token');
+      const rideData = {
+        pickup_address: pickup.query,
+        destination_address: destination.query,
+        pickup_lat: pickup.marker.position[0],
+        pickup_lng: pickup.marker.position[1],
+        destination_lat: destination.marker.position[0],
+        destination_lng: destination.marker.position[1],
+        fare: 12.34, // Mock fare for selected car
+        distance: routeMeta?.distance,
+        duration: routeMeta?.duration,
+      };
+
+      const ride = await rideService.requestRide(rideData, token);
+      dispatch(setActiveRide(ride));
+      navigate('/searching-driver');
+    } catch (error) {
+      console.error("Booking failed", error);
+      alert("Failed to book ride: " + error.message);
+    } finally {
+      setBooking(false);
+    }
+  };
 
   const mapMarkers = [];
   if (pickup?.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup' });
@@ -118,11 +149,13 @@ export default function RideDetails() {
               routeMeta={routeMeta}
               className="absolute inset-0 w-full h-full z-0" 
             />
-            {loadingRoute && (
+            {(loadingRoute || booking) && (
               <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-20 flex items-center justify-center">
                 <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-xl">
                   <div className="w-5 h-5 border-2 border-[#D9483E] border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-[#141414] font-bold text-sm">Calculating route...</span>
+                  <span className="text-[#141414] font-bold text-sm">
+                    {booking ? 'Booking ride...' : 'Calculating route...'}
+                  </span>
                 </div>
               </div>
             )}
@@ -156,13 +189,15 @@ export default function RideDetails() {
       <div className="bg-white border-t border-neutral-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <div className="flex px-4 py-4">
           <button
-            onClick={() => navigate('/searching-driver')}
-            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] shadow-lg shadow-red-200 active:scale-95 transition-transform"
+            onClick={handleBookRide}
+            disabled={booking || loadingRoute}
+            className={`flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] shadow-lg shadow-red-200 active:scale-95 transition-all ${booking || loadingRoute ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <span className="truncate">Book GoStret Regular</span>
+            <span className="truncate">{booking ? 'Booking...' : 'Book GoStret Regular'}</span>
           </button>
         </div>
       </div>
+
     </motion.div>
   );
 }

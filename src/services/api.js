@@ -34,6 +34,58 @@ export const authService = {
   },
 };
 
+export const rideService = {
+  requestRide: async (rideData, token) => {
+    const response = await fetch(`${API_BASE_URL}/rides`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(rideData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Ride request failed');
+    return data;
+  },
+
+  getActiveRide: async (token) => {
+    const response = await fetch(`${API_BASE_URL}/rides/active`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch active ride');
+    return data;
+  },
+
+  getRideHistory: async (token) => {
+    const response = await fetch(`${API_BASE_URL}/rides/history`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch history');
+    return data;
+  },
+
+  updateRideStatus: async (id, status, token) => {
+    const response = await fetch(`${API_BASE_URL}/rides/${id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Status update failed');
+    return data;
+  },
+};
+
 export const userService = {
   getProfile: async (token) => {
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
@@ -41,6 +93,33 @@ export const userService = {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch profile');
+    return data;
+  },
+
+  topUpWallet: async (amount, token) => {
+    const response = await fetch(`${API_BASE_URL}/user/wallet/top-up`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ amount }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to top up wallet');
+    return data;
+  },
+
+  getTransactions: async (token) => {
+    const response = await fetch(`${API_BASE_URL}/user/transactions`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch transactions');
+    return data;
   },
 };
