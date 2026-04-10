@@ -1,3 +1,4 @@
+import { query } from '../config/db.js';
 // @desc    Request a new ride
 // @route   POST /api/rides
 export const requestRide = async (req, res) => {
