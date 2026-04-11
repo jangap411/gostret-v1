@@ -20,26 +20,25 @@ const IncomingRequest = ({
   onExplore,
 }) => {
   return (
-    <div className="bg-surface text-on-surface font-body selection:bg-secondary-container overflow-hidden h-screen w-screen relative">
+    <div className="bg-neutral-50 text-[#141414] font-body selection:bg-[#E8E4D8] overflow-hidden h-screen w-screen relative">
       {/* Top Navigation Anchor */}
-      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm dark:shadow-none">
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-white/90 backdrop-blur-md shadow-sm border-b border-neutral-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-100 border border-neutral-200 shadow-sm">
             <img
               alt="Driver Profile Photo"
               className="w-full h-full object-cover"
               src={driverImage}
             />
           </div>
-          <span className="plusJakartaSans font-bold text-lg tracking-tight text-blue-900 dark:text-blue-100">
+          <span className="plusJakartaSans font-bold text-lg tracking-tight text-[#1D3557]">
             Navigator
           </span>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">ONLINE</span>
+        <div className="flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 rounded-full shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+          <span className="text-xs font-bold text-green-700">ONLINE</span>
         </div>
-        <div className="style_separation_logic bg-slate-200/50 dark:bg-slate-800/50 h-[1px] w-full absolute bottom-0"></div>
       </header>
 
       {/* Map Canvas (Background) */}
@@ -54,21 +53,21 @@ const IncomingRequest = ({
         <div className="absolute top-24 right-6 flex flex-col gap-4">
           <button 
             onClick={onLocation}
-            className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
+            className="w-12 h-12 rounded-full bg-white/95 backdrop-blur-md flex items-center justify-center shadow-md border border-neutral-100 text-[#1D3557] active:scale-90 transition-all">
             <span className="material-symbols-outlined">my_location</span>
           </button>
           <button 
             onClick={onExplore}
-            className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
+            className="w-12 h-12 rounded-full bg-white/95 backdrop-blur-md flex items-center justify-center shadow-md border border-neutral-100 text-[#1D3557] active:scale-90 transition-all">
             <span className="material-symbols-outlined">explore</span>
           </button>
         </div>
         <div className="absolute top-24 left-6">
-          <div className="bg-tertiary-container/90 backdrop-blur-md text-on-tertiary px-4 py-2 rounded-xl flex items-center gap-2 shadow-xl border border-white/10">
+          <div className="bg-[#D9483E]/90 backdrop-blur-md text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-md border border-white/20">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-              warning
+              local_fire_department
             </span>
-            <span className="text-sm font-bold plusJakartaSans tracking-tight uppercase">High Demand Zone</span>
+            <span className="text-sm font-bold plusJakartaSans tracking-tight uppercase">High Demand</span>
           </div>
         </div>
       </div>
@@ -76,11 +75,11 @@ const IncomingRequest = ({
       {/* Main Content Canvas (Focused UI) */}
       <main className="relative z-10 h-full flex flex-col justify-end px-4 pb-8 pointer-events-none">
         {/* Trip Request Card */}
-        <div className="w-full max-w-lg mx-auto bg-surface-container-lowest rounded-[2.5rem] p-6 shadow-[0_24px_48px_rgba(3,22,54,0.12)] pointer-events-auto border border-white/40 flex flex-col gap-6">
+        <div className="w-full max-w-lg mx-auto bg-white rounded-[2.5rem] p-6 shadow-[0_16px_48px_rgba(0,0,0,0.12)] pointer-events-auto border border-neutral-100 flex flex-col gap-6">
           {/* Trip Header: Rider Info & Price */}
           <div className="flex justify-between items-start">
             <div className="flex gap-4">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface-container-high ring-4 ring-surface-container-low shadow-inner">
+              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200 shadow-sm">
                 <img
                   alt={`${riderName} Profile`}
                   className="w-full h-full object-cover"
@@ -88,85 +87,89 @@ const IncomingRequest = ({
                 />
               </div>
               <div className="flex flex-col justify-center">
-                <h2 className="plusJakartaSans font-extrabold text-2xl tracking-tight text-primary">{riderName}</h2>
+                <h2 className="plusJakartaSans font-extrabold text-2xl tracking-tight text-[#141414]">{riderName}</h2>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="material-symbols-outlined text-amber-500 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  <span className="material-symbols-outlined text-yellow-500 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
                     star
                   </span>
-                  <span className="font-bold text-on-surface">{riderRating}</span>
-                  <span className="text-on-surface-variant text-sm ml-1">• {requestType}</span>
+                  <span className="font-bold text-[#141414]">{riderRating}</span>
+                  <span className="text-neutral-500 text-sm ml-1">• {requestType}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-1">
-                Estimated Fare
+              <span className="text-neutral-500 text-xs font-bold uppercase tracking-widest mb-1">
+                Est. Fare
               </span>
-              <div className="bg-primary-container text-on-primary rounded-2xl px-4 py-2">
+              <div className="bg-[#1D3557] text-[#FCFBF8] rounded-2xl px-4 py-2 shadow-md border border-[#11233e]">
                 <span className="plusJakartaSans font-extrabold text-3xl tracking-tighter">${estFare}</span>
               </div>
             </div>
           </div>
 
           {/* Route Details: Asymmetric Bento Style */}
-          <div className="bg-surface-container-low rounded-3xl p-5 flex flex-col gap-6 relative">
+          <div className="bg-[#F3F0E7] rounded-3xl p-5 flex flex-col gap-6 relative border border-neutral-200">
             {/* Vertical Progress Line */}
-            <div className="absolute left-8 top-12 bottom-12 w-0.5 bg-gradient-to-b from-blue-500 via-primary to-emerald-500"></div>
+            <div className="absolute left-8 top-12 bottom-12 w-0.5 bg-gradient-to-b from-[#1D3557] via-[#D9483E] to-green-600"></div>
 
             {/* Pickup */}
             <div className="flex gap-4 items-start relative z-10">
-              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] text-white font-bold ring-4 ring-white shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-[#1D3557] flex items-center justify-center text-[10px] text-white font-bold ring-4 ring-white shadow-sm">
                 <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                   person_pin_circle
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
-                  Pickup • {pickupTime}
+                <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">
+                  Pickup • <span className="text-[#141414]">{pickupTime}</span>
                 </span>
-                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">{pickupAddress}</p>
+                <p className="plusJakartaSans font-bold text-lg text-[#141414] leading-tight">{pickupAddress}</p>
               </div>
             </div>
 
             {/* Dropoff */}
             <div className="flex gap-4 items-start relative z-10">
-              <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] text-white font-bold ring-4 ring-white shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-[10px] text-white font-bold ring-4 ring-white shadow-sm">
                 <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                   location_on
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
-                  Drop-off • {dropoffTime}
+                <span className="text-neutral-500 text-xs font-bold uppercase tracking-wider">
+                  Drop-off • <span className="text-[#141414]">{dropoffTime}</span>
                 </span>
-                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">{dropoffAddress}</p>
+                <p className="plusJakartaSans font-bold text-lg text-[#141414] leading-tight">{dropoffAddress}</p>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mt-2">
+          <div className="flex gap-3 mt-1">
             <button 
               onClick={onDecline}
-              className="flex-1 py-5 rounded-2xl bg-surface-container-high text-on-surface font-bold text-lg plusJakartaSans active:scale-95 transition-all flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined">close</span>
+              className="flex-1 py-5 rounded-2xl bg-neutral-100 text-[#141414] font-bold text-lg plusJakartaSans active:scale-[0.98] transition-all flex items-center justify-center border border-neutral-200 hover:bg-neutral-200">
               Decline
             </button>
             <button 
               onClick={onAccept}
-              className="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-extrabold text-xl plusJakartaSans active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
-              Accept
-              <span className="material-symbols-outlined">chevron_right</span>
+              className="flex-[2] py-5 rounded-2xl bg-[#1D3557] text-[#FCFBF8] font-extrabold text-xl plusJakartaSans active:scale-[0.98] transition-all shadow-md shadow-[#1D3557]/20 flex items-center justify-center gap-2 hover:bg-[#152a48]">
+              Accept Request
+              <span className="material-symbols-outlined font-bold">arrow_forward</span>
             </button>
           </div>
 
           {/* Urgent Countdown Timer */}
-          <div className="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
-            <div className="bg-on-tertiary-container h-full w-2/3 rounded-full"></div>
+          <div className="w-full pt-2">
+            <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden mb-2 pointer-events-none">
+                <div 
+                  className="bg-[#D9483E] h-full rounded-full transition-all duration-1000 ease-linear" 
+                  style={{ width: `${(parseInt(secondsRemaining) / 15) * 100}%` }}>
+                </div>
+            </div>
+            <p className="text-center text-[#D9483E] text-xs font-bold tracking-widest uppercase">
+              {secondsRemaining} Seconds Remaining
+            </p>
           </div>
-          <p className="text-center text-on-surface-variant text-xs font-bold tracking-widest uppercase -mt-2">
-            {secondsRemaining} Seconds Remaining
-          </p>
         </div>
       </main>
 
@@ -174,9 +177,9 @@ const IncomingRequest = ({
       <div className="fixed bottom-10 right-6 z-50">
         <button 
           onClick={onEmergency}
-          className="w-14 h-14 rounded-full bg-tertiary-container text-white flex items-center justify-center shadow-[0_8px_24px_rgba(95,0,5,0.4)] active:scale-90 transition-all">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            emergency
+          className="w-14 h-14 rounded-full bg-[#D9483E] text-white flex items-center justify-center shadow-lg border-2 border-white active:scale-90 transition-all">
+          <span className="material-symbols-outlined font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>
+            sos
           </span>
         </button>
       </div>

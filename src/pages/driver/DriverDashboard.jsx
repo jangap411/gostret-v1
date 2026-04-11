@@ -26,7 +26,7 @@ const DriverDashboard = ({
       subtitle: 'Completed • 14:20 PM',
       amount: '+$42.50',
       meta: 'Tip Included',
-      metaColor: 'text-emerald-600',
+      metaColor: 'text-green-600',
     },
     {
       id: 2,
@@ -35,7 +35,7 @@ const DriverDashboard = ({
       subtitle: 'Promotion • 12:45 PM',
       amount: '+$8.00',
       meta: 'Multiplier x1.4',
-      metaColor: 'text-on-surface-variant',
+      metaColor: 'text-neutral-500',
     },
     {
       id: 3,
@@ -44,7 +44,7 @@ const DriverDashboard = ({
       subtitle: 'Completed • 11:15 AM',
       amount: '+$18.25',
       meta: '8.2 miles',
-      metaColor: 'text-on-surface-variant',
+      metaColor: 'text-neutral-500',
     },
   ],
   navItems = [
@@ -59,31 +59,30 @@ const DriverDashboard = ({
   onSOS,
 }) => {
   return (
-    <div className="bg-surface text-on-surface">
+    <div className="bg-neutral-50 text-[#141414] font-body min-h-screen">
       {/* TopAppBar */}
-      <header className="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm dark:shadow-none h-16">
+      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm h-16">
         <div className="flex justify-between items-center px-6 py-4 w-full h-full relative">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border-2 border-primary-container/10">
+            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center overflow-hidden border-2 border-neutral-200">
               <img
                 alt="Driver Profile Photo"
                 className="w-full h-full object-cover"
                 src={profileImage}
               />
             </div>
-            <h1 className="plusJakartaSans font-bold text-lg tracking-tight text-blue-900 dark:text-blue-100">
+            <h1 className="plusJakartaSans font-bold text-lg tracking-tight text-[#1D3557]">
               Navigator
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <button 
               onClick={onToggleOnline}
-              className={`text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest flex items-center gap-2 active:scale-95 transition-transform duration-150 ${isOnline ? 'bg-emerald-500' : 'bg-gray-500'}`}>
+              className={`text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest flex items-center gap-2 active:scale-95 transition-transform duration-150 ${isOnline ? 'bg-green-500' : 'bg-neutral-500'}`}>
               {isOnline && <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>}
               {isOnline ? 'ONLINE' : 'OFFLINE'}
             </button>
           </div>
-          <div className="bg-slate-200/50 dark:bg-slate-800/50 h-[1px] w-full absolute bottom-0 left-0"></div>
         </div>
       </header>
 
@@ -91,14 +90,14 @@ const DriverDashboard = ({
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Earnings Summary (Large) */}
-          <section className="md:col-span-8 bg-surface-container-lowest rounded-[2rem] p-8 shadow-[0_4px_24px_rgba(3,22,54,0.04)] flex flex-col justify-between overflow-hidden relative border border-outline-variant/10">
+          <section className="md:col-span-8 bg-white rounded-[2rem] p-8 shadow-sm flex flex-col justify-between overflow-hidden relative border border-neutral-100">
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <p className="text-on-surface-variant font-medium text-sm">Weekly Earnings</p>
-                  <h2 className="plusJakartaSans text-4xl font-extrabold text-primary tracking-tighter mt-1">${weeklyEarnings}</h2>
+                  <p className="text-neutral-500 font-medium text-sm">Weekly Earnings</p>
+                  <h2 className="plusJakartaSans text-4xl font-extrabold text-[#1D3557] tracking-tighter mt-1">${weeklyEarnings}</h2>
                 </div>
-                <div className="bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold">
+                <div className="bg-[#1D3557] text-white px-3 py-1 rounded-lg text-xs font-bold">
                   {earningsGrowth}
                 </div>
               </div>
@@ -109,13 +108,13 @@ const DriverDashboard = ({
                   <div key={item.day} className="flex-1 flex flex-col items-center gap-2">
                     <div
                       className={`w-full rounded-t-lg transition-all duration-500 ${
-                        item.active ? 'bg-primary' : 'bg-surface-container-high'
+                        item.active ? 'bg-[#D9483E]' : 'bg-neutral-200'
                       }`}
                       style={{ height: item.height }}
                     ></div>
                     <span
                       className={`text-[10px] font-bold ${
-                        item.active ? 'text-primary' : 'text-on-surface-variant'
+                        item.active ? 'text-[#D9483E]' : 'text-neutral-500'
                       }`}
                     >
                       {item.day}
@@ -124,47 +123,45 @@ const DriverDashboard = ({
                 ))}
               </div>
             </div>
-            {/* Background Accent */}
-            <div className="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
           </section>
 
           {/* Status & Map HUD (Small) */}
           <section className="md:col-span-4 space-y-6">
             {/* Map Fragment */}
-            <div className="bg-surface-container-low rounded-[2rem] h-64 overflow-hidden relative shadow-[0_4px_24px_rgba(3,22,54,0.04)] group">
+            <div className="bg-white rounded-[2rem] h-64 overflow-hidden relative shadow-sm border border-neutral-100 group">
               <img
                 alt="Current Location Map"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover opacity-80"
                 src={mapImage}
               />
               {/* HUD Overlays */}
               <div className="absolute top-4 right-4 flex flex-col gap-2">
                 <button 
                   onClick={onLocation}
-                  className="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center text-primary shadow-lg">
+                  className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#1D3557] shadow-lg">
                   <span className="material-symbols-outlined" data-icon="my_location">
                     my_location
                   </span>
                 </button>
               </div>
-              <div className="absolute bottom-4 left-4 right-4 bg-primary/90 backdrop-blur-md p-3 rounded-2xl flex items-center justify-between text-white">
+              <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-2xl flex items-center justify-between text-[#1D3557] border border-neutral-100 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-400" data-icon="share_location">
+                  <span className="material-symbols-outlined text-[#D9483E]" data-icon="share_location">
                     share_location
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-widest">Active Zone</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#141414]">Active Zone</span>
                 </div>
-                <span className="text-xs font-medium">{activeZone}</span>
+                <span className="text-xs font-semibold">{activeZone}</span>
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-primary text-on-primary rounded-[2rem] p-6 flex items-center justify-between">
+            <div className="bg-[#1D3557] text-white rounded-[2rem] p-6 flex items-center justify-between shadow-sm border border-[#11233e]">
               <div>
-                <p className="text-on-primary-container text-xs font-bold uppercase tracking-wider">Rating</p>
+                <p className="text-blue-100 text-xs font-bold uppercase tracking-wider">Rating</p>
                 <div className="flex items-center gap-1 mt-1">
                   <span
-                    className="material-symbols-outlined text-yellow-400 text-sm"
+                    className="material-symbols-outlined text-yellow-500 text-sm"
                     data-icon="star"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
@@ -173,39 +170,39 @@ const DriverDashboard = ({
                   <span className="plusJakartaSans text-xl font-bold">{rating}</span>
                 </div>
               </div>
-              <div className="h-8 w-[1px] bg-on-primary-container/30"></div>
+              <div className="h-8 w-[1px] bg-blue-800/50"></div>
               <div>
-                <p className="text-on-primary-container text-xs font-bold uppercase tracking-wider">Trips</p>
+                <p className="text-blue-100 text-xs font-bold uppercase tracking-wider">Trips</p>
                 <p className="plusJakartaSans text-xl font-bold mt-1">{totalTrips}</p>
               </div>
             </div>
           </section>
 
           {/* Recent Activity */}
-          <section className="md:col-span-12 bg-surface-container-lowest rounded-[2rem] p-8 shadow-[0_4px_24px_rgba(3,22,54,0.04)]">
+          <section className="md:col-span-12 bg-white rounded-[2rem] p-8 shadow-sm border border-neutral-100">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="plusJakartaSans text-xl font-bold text-primary">Recent Activity</h3>
-              <button onClick={onViewAllActivity} className="text-primary-container font-bold text-sm hover:underline">View All</button>
+              <h3 className="plusJakartaSans text-xl font-bold text-[#1D3557]">Recent Activity</h3>
+              <button onClick={onViewAllActivity} className="text-[#D9483E] font-bold text-sm hover:underline">View All</button>
             </div>
             <div className="space-y-4">
               {recentActivity.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-center justify-between p-4 bg-surface-container-low/50 hover:bg-surface-container-low rounded-2xl transition-colors"
+                  className="flex items-center justify-between p-4 bg-neutral-50 hover:bg-neutral-100 rounded-2xl transition-colors border border-neutral-100"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary">
+                    <div className="w-12 h-12 bg-white border border-neutral-200 shadow-sm rounded-xl flex items-center justify-center text-[#1D3557]">
                       <span className="material-symbols-outlined" data-icon={activity.icon}>
                         {activity.icon}
                       </span>
                     </div>
                     <div>
-                      <p className="font-bold text-on-surface">{activity.title}</p>
-                      <p className="text-xs text-on-surface-variant">{activity.subtitle}</p>
+                      <p className="font-bold text-[#141414]">{activity.title}</p>
+                      <p className="text-xs text-neutral-500">{activity.subtitle}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-extrabold text-primary">{activity.amount}</p>
+                    <p className="font-extrabold text-[#1D3557]">{activity.amount}</p>
                     <p className={`text-[10px] font-bold uppercase ${activity.metaColor}`}>{activity.meta}</p>
                   </div>
                 </div>
@@ -218,7 +215,7 @@ const DriverDashboard = ({
       {/* SOS FAB */}
       <button 
         onClick={onSOS}
-        className="fixed right-6 bottom-28 w-14 h-14 rounded-full bg-tertiary-container text-white shadow-[0_12px_24px_rgba(95,0,5,0.3)] flex items-center justify-center z-40 active:scale-90 transition-transform">
+        className="fixed right-6 bottom-28 w-14 h-14 rounded-full bg-[#D9483E] text-white shadow-lg flex items-center justify-center z-40 active:scale-90 transition-transform">
         <span
           className="material-symbols-outlined"
           data-icon="sos"
@@ -229,19 +226,19 @@ const DriverDashboard = ({
       </button>
 
       {/* BottomNavBar */}
-      <nav className="fixed bottom-0 w-full z-50 bg-slate-50 dark:bg-slate-950 rounded-t-3xl shadow-[0_-4px_24px_rgba(3,22,54,0.06)] flex justify-around items-center px-4 pb-6 pt-3">
+      <nav className="fixed bottom-0 w-full z-50 bg-white rounded-t-3xl shadow-[0_-4px_24px_rgba(3,22,54,0.06)] border-t border-neutral-100 flex justify-around items-center px-4 pb-6 pt-3">
         {navItems.map((nav) => (
           <a
             key={nav.label}
             className={`flex flex-col items-center justify-center px-5 py-2 active:scale-90 transition-all ${
               nav.active
-                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 rounded-2xl'
-                : 'text-slate-500 dark:text-slate-400 hover:text-blue-700'
+                ? 'text-[#1D3557]'
+                : 'text-neutral-400 hover:text-[#1D3557]'
             }`}
             href="#"
           >
             <span
-              className="material-symbols-outlined"
+              className="material-symbols-outlined text-2xl"
               data-icon={nav.icon}
               style={nav.fill ? { fontVariationSettings: "'FILL' 1" } : {}}
             >
