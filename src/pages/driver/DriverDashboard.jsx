@@ -1,0 +1,236 @@
+import React from 'react';
+
+const DriverDashboard = () => {
+  return (
+    <div className="bg-surface text-on-surface">
+      {/* TopAppBar */}
+      <header className="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm dark:shadow-none h-16">
+        <div className="flex justify-between items-center px-6 py-4 w-full h-full relative">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border-2 border-primary-container/10">
+              <img
+                alt="Driver Profile Photo"
+                className="w-full h-full object-cover"
+                data-alt="Professional portrait of a middle-aged male driver with a friendly smile, wearing a clean polo shirt in soft studio lighting"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Uzozyg_eCMorbhLRnbEAos0EgecGGKS_PgyYG23F551US2rKvdbT9hjlQeGeaVnRXWnyyvDxIpSIYmrWRwS5loPwd2wTNY9bcyjGw0Wv0wj5twb8ILZbYZBdeCB_keKcACN-qQQXPwci2hjvd395gywucEpVs_t0s1IfYRYEIspm8xdVGAQt1Gs-8hxcLtn0pPIiHvlQbnIx0r3GMZBRj72eCqaplWvrtoBE2F2Oah9aX6yEsBQIKrxDGiqEB38qFrwQYj-vJv7R"
+              />
+            </div>
+            <h1 className="plusJakartaSans font-bold text-lg tracking-tight text-blue-900 dark:text-blue-100">
+              Navigator
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest flex items-center gap-2 active:scale-95 transition-transform duration-150">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+              ONLINE
+            </button>
+          </div>
+          <div className="bg-slate-200/50 dark:bg-slate-800/50 h-[1px] w-full absolute bottom-0 left-0"></div>
+        </div>
+      </header>
+
+      <main className="pt-20 pb-28 px-4 md:px-8 max-w-5xl mx-auto space-y-6">
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Earnings Summary (Large) */}
+          <section className="md:col-span-8 bg-surface-container-lowest rounded-[2rem] p-8 shadow-[0_4px_24px_rgba(3,22,54,0.04)] flex flex-col justify-between overflow-hidden relative border border-outline-variant/10">
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <p className="text-on-surface-variant font-medium text-sm">Weekly Earnings</p>
+                  <h2 className="plusJakartaSans text-4xl font-extrabold text-primary tracking-tighter mt-1">$1,284.50</h2>
+                </div>
+                <div className="bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold">
+                  +12% vs LW
+                </div>
+              </div>
+
+              {/* Simple Bar Chart */}
+              <div className="flex items-end justify-between gap-2 h-32 mt-4">
+                {[
+                  { day: 'MON', height: '40%', active: false },
+                  { day: 'TUE', height: '65%', active: false },
+                  { day: 'WED', height: '90%', active: true },
+                  { day: 'THU', height: '55%', active: false },
+                  { day: 'FRI', height: '75%', active: false },
+                  { day: 'SAT', height: '30%', active: false },
+                  { day: 'SUN', height: '20%', active: false },
+                ].map((item) => (
+                  <div key={item.day} className="flex-1 flex flex-col items-center gap-2">
+                    <div
+                      className={`w-full rounded-t-lg transition-all duration-500 ${
+                        item.active ? 'bg-primary' : 'bg-surface-container-high'
+                      }`}
+                      style={{ height: item.height }}
+                    ></div>
+                    <span
+                      className={`text-[10px] font-bold ${
+                        item.active ? 'text-primary' : 'text-on-surface-variant'
+                      }`}
+                    >
+                      {item.day}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Background Accent */}
+            <div className="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
+          </section>
+
+          {/* Status & Map HUD (Small) */}
+          <section className="md:col-span-4 space-y-6">
+            {/* Map Fragment */}
+            <div className="bg-surface-container-low rounded-[2rem] h-64 overflow-hidden relative shadow-[0_4px_24px_rgba(3,22,54,0.04)] group">
+              <img
+                alt="Current Location Map"
+                className="w-full h-full object-cover"
+                data-alt="Detailed GPS navigation map view with blue route line through urban city streets, dark mode aesthetic"
+                data-location="San Francisco"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSIZqE61Z3Zin4W7o4ff-yCCHyYENOTVTgadgSiTK0qK3ZYV-OwkP7-x8LDq8bzL_HDMcBs8b4QmhF0ftBNzCtBnJHg-IsdN-7xEN2ZL9KIKfSnEvtI-ABFg2fiUZmbUhDQ0m0OT14t0-x4bZCwVUM2nf5AWs2W31bO3D3uv8e4rd8ewj8Tz8spBDc-77CUj-RhzTSMIyF3PHrGnKWfk1PqItPN6Y-xAGo4YtbZDcTjhYHGkBrcsada-k-Zd584MsPS_acfoMHbm5p"
+              />
+              {/* HUD Overlays */}
+              <div className="absolute top-4 right-4 flex flex-col gap-2">
+                <button className="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center text-primary shadow-lg">
+                  <span className="material-symbols-outlined" data-icon="my_location">
+                    my_location
+                  </span>
+                </button>
+              </div>
+              <div className="absolute bottom-4 left-4 right-4 bg-primary/90 backdrop-blur-md p-3 rounded-2xl flex items-center justify-between text-white">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-400" data-icon="share_location">
+                    share_location
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-widest">Active Zone</span>
+                </div>
+                <span className="text-xs font-medium">Downtown SF</span>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="bg-primary text-on-primary rounded-[2rem] p-6 flex items-center justify-between">
+              <div>
+                <p className="text-on-primary-container text-xs font-bold uppercase tracking-wider">Rating</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <span
+                    className="material-symbols-outlined text-yellow-400 text-sm"
+                    data-icon="star"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    star
+                  </span>
+                  <span className="plusJakartaSans text-xl font-bold">4.98</span>
+                </div>
+              </div>
+              <div className="h-8 w-[1px] bg-on-primary-container/30"></div>
+              <div>
+                <p className="text-on-primary-container text-xs font-bold uppercase tracking-wider">Trips</p>
+                <p className="plusJakartaSans text-xl font-bold mt-1">142</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Recent Activity */}
+          <section className="md:col-span-12 bg-surface-container-lowest rounded-[2rem] p-8 shadow-[0_4px_24px_rgba(3,22,54,0.04)]">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="plusJakartaSans text-xl font-bold text-primary">Recent Activity</h3>
+              <button className="text-primary-container font-bold text-sm hover:underline">View All</button>
+            </div>
+            <div className="space-y-4">
+              {[
+                {
+                  icon: 'local_taxi',
+                  title: 'Airport Premium Express',
+                  subtitle: 'Completed • 14:20 PM',
+                  amount: '+$42.50',
+                  meta: 'Tip Included',
+                  metaColor: 'text-emerald-600',
+                },
+                {
+                  icon: 'speed',
+                  title: 'Rush Hour Boost',
+                  subtitle: 'Promotion • 12:45 PM',
+                  amount: '+$8.00',
+                  meta: 'Multiplier x1.4',
+                  metaColor: 'text-on-surface-variant',
+                },
+                {
+                  icon: 'person_pin_circle',
+                  title: 'City Center Drop-off',
+                  subtitle: 'Completed • 11:15 AM',
+                  amount: '+$18.25',
+                  meta: '8.2 miles',
+                  metaColor: 'text-on-surface-variant',
+                },
+              ].map((activity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-surface-container-low/50 hover:bg-surface-container-low rounded-2xl transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-primary">
+                      <span className="material-symbols-outlined" data-icon={activity.icon}>
+                        {activity.icon}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-on-surface">{activity.title}</p>
+                      <p className="text-xs text-on-surface-variant">{activity.subtitle}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-extrabold text-primary">{activity.amount}</p>
+                    <p className={`text-[10px] font-bold uppercase ${activity.metaColor}`}>{activity.meta}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* SOS FAB */}
+      <button className="fixed right-6 bottom-28 w-14 h-14 rounded-full bg-tertiary-container text-white shadow-[0_12px_24px_rgba(95,0,5,0.3)] flex items-center justify-center z-40 active:scale-90 transition-transform">
+        <span
+          className="material-symbols-outlined"
+          data-icon="sos"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
+          sos
+        </span>
+      </button>
+
+      {/* BottomNavBar */}
+      <nav className="fixed bottom-0 w-full z-50 bg-slate-50 dark:bg-slate-950 rounded-t-3xl shadow-[0_-4px_24px_rgba(3,22,54,0.06)] flex justify-around items-center px-4 pb-6 pt-3">
+        {[
+          { icon: 'navigation', label: 'Map', active: true, fill: true },
+          { icon: 'payments', label: 'Earnings', active: false },
+          { icon: 'history', label: 'History', active: false },
+          { icon: 'settings', label: 'Settings', active: false },
+        ].map((nav) => (
+          <a
+            key={nav.label}
+            className={`flex flex-col items-center justify-center px-5 py-2 active:scale-90 transition-all ${
+              nav.active
+                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 rounded-2xl'
+                : 'text-slate-500 dark:text-slate-400 hover:text-blue-700'
+            }`}
+            href="#"
+          >
+            <span
+              className="material-symbols-outlined"
+              data-icon={nav.icon}
+              style={nav.fill ? { fontVariationSettings: "'FILL' 1" } : {}}
+            >
+              {nav.icon}
+            </span>
+            <span className="plusJakartaSans font-semibold text-[11px] mt-1">{nav.label}</span>
+          </a>
+        ))}
+      </nav>
+    </div>
+  );
+};
+
+export default DriverDashboard;
