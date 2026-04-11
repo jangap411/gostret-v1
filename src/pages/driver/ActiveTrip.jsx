@@ -1,6 +1,22 @@
 import React from 'react';
 
-const ActiveTrip = () => {
+const ActiveTrip = ({
+  instructionDist = "In 450 meters",
+  instructionText = "Turn right onto Oak Avenue",
+  etaMins = "6",
+  riderName = "Marcus Thompson",
+  riderImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAXX57dqlxz3G07pGosgaWUs23NGCkLRxAyCyM4Sixluldt_SbFWivuQNVgzBF7NN9zlN3PNbmIMjZPUqMNKN_gh0FP7HMAmZD24Ikel16uAXLsfFtKjE_TAcHBX1MTYHkfUnc95qxPsID9HFhZT4MtGhu500Qtr22sX-IumKYkfGjhQrA2knZ7sJA6mCjkeOZ1McsRu3VvcokRDmYQhef-I6UHUvnfW6phrYKbrH9rIoC9xgzMoP1oRNgY56OQTfT5X4lSmYKJdWVx",
+  riderRating = "4.9",
+  riderMessage = "I'm at the north entrance",
+  tripDistance = "4.2 km",
+  estFare = "18.40",
+  pickupAddress = "1200 Metropolitan Pkwy, Building 4",
+  mapImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAWD8YAaDoaVuh0WVRA3A5cpKZeTVHzSAyrd_RX65SNw7dtVBTTyKZBBl6Eakkb8anEfmEjQbxDc0wL9_D_5PFdSJrxCgGyvlL-q0fJDe0WkqcgyjnC10dNlzQa1p1kn7cGNJixVSMaRYKJ5W1UVVcGR0Bjoz1vvTtNE1x7fICgzZ11-1jNdoZN3UaOpdm4vPQrsXEcR3ziazKhhlgxl6Wwj9g9ze4ylpPNAE0GH3pNaXacIbboDG9pi13Oqw3GZH2-hajK2zO2KltF",
+  onCallRider,
+  onMessageRider,
+  onSlideToPickup,
+  onEmergency,
+}) => {
   return (
     <div className="bg-surface font-body text-on-surface overflow-hidden h-screen w-screen flex flex-col">
       {/* Top Navigation Header (Instructions) */}
@@ -13,14 +29,14 @@ const ActiveTrip = () => {
           </div>
           <div className="flex-1">
             <p className="text-on-primary-container text-sm font-semibold tracking-wider uppercase mb-1">
-              In 450 meters
+              {instructionDist}
             </p>
             <h1 className="text-on-primary font-headline font-bold text-2xl leading-tight">
-              Turn right onto Oak Avenue
+              {instructionText}
             </h1>
           </div>
           <div className="bg-on-primary-container/20 px-3 py-2 rounded-xl text-center">
-            <p className="text-on-primary font-headline font-extrabold text-lg">6</p>
+            <p className="text-on-primary font-headline font-extrabold text-lg">{etaMins}</p>
             <p className="text-on-primary-container text-[10px] font-bold">MIN</p>
           </div>
         </div>
@@ -31,9 +47,7 @@ const ActiveTrip = () => {
         <div className="absolute inset-0 z-0 bg-surface-dim">
           <img
             className="w-full h-full object-cover"
-            data-alt="Modern dark-themed digital map interface with a clear blue navigation route line winding through city streets with minimalist labels"
-            data-location="Austin, Texas"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWD8YAaDoaVuh0WVRA3A5cpKZeTVHzSAyrd_RX65SNw7dtVBTTyKZBBl6Eakkb8anEfmEjQbxDc0wL9_D_5PFdSJrxCgGyvlL-q0fJDe0WkqcgyjnC10dNlzQa1p1kn7cGNJixVSMaRYKJ5W1UVVcGR0Bjoz1vvTtNE1x7fICgzZ11-1jNdoZN3UaOpdm4vPQrsXEcR3ziazKhhlgxl6Wwj9g9ze4ylpPNAE0GH3pNaXacIbboDG9pi13Oqw3GZH2-hajK2zO2KltF"
+            src={mapImage}
             alt="Map Canvas"
           />
 
@@ -46,7 +60,9 @@ const ActiveTrip = () => {
               <span className="material-symbols-outlined">layers</span>
             </button>
           </div>
-          <button className="absolute left-4 top-40 w-14 h-14 rounded-full bg-tertiary-container shadow-[0_0_24px_rgba(95,0,5,0.4)] flex items-center justify-center text-on-tertiary active:scale-90 transition-all z-10">
+          <button 
+            onClick={onEmergency}
+            className="absolute left-4 top-40 w-14 h-14 rounded-full bg-tertiary-container shadow-[0_0_24px_rgba(95,0,5,0.4)] flex items-center justify-center text-on-tertiary active:scale-90 transition-all z-10">
             <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
               emergency_home
             </span>
@@ -62,28 +78,31 @@ const ActiveTrip = () => {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <img
-                  alt="Rider"
+                  alt={`${riderName} Profile`}
                   className="w-16 h-16 rounded-2xl object-cover ring-4 ring-surface-container-low"
-                  data-alt="Close-up professional portrait of a friendly young man with short dark hair and a warm smile, soft natural outdoor lighting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXX57dqlxz3G07pGosgaWUs23NGCkLRxAyCyM4Sixluldt_SbFWivuQNVgzBF7NN9zlN3PNbmIMjZPUqMNKN_gh0FP7HMAmZD24Ikel16uAXLsfFtKjE_TAcHBX1MTYHkfUnc95qxPsID9HFhZT4MtGhu500Qtr22sX-IumKYkfGjhQrA2knZ7sJA6mCjkeOZ1McsRu3VvcokRDmYQhef-I6UHUvnfW6phrYKbrH9rIoC9xgzMoP1oRNgY56OQTfT5X4lSmYKJdWVx"
+                  src={riderImage}
                 />
                 <div className="absolute -bottom-1 -right-1 bg-primary text-on-primary text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                  4.9 <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  {riderRating} <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                 </div>
               </div>
               <div>
-                <h2 className="font-headline font-bold text-xl text-primary">Marcus Thompson</h2>
+                <h2 className="font-headline font-bold text-xl text-primary">{riderName}</h2>
                 <div className="flex items-center gap-2 text-on-surface-variant text-sm">
                   <span className="material-symbols-outlined text-sm">chat_bubble</span>
-                  <span className="font-medium">"I'm at the north entrance"</span>
+                  <span className="font-medium">"{riderMessage}"</span>
                 </div>
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="w-12 h-12 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary active:scale-90 transition-transform">
+              <button 
+                onClick={onCallRider}
+                className="w-12 h-12 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary active:scale-90 transition-transform">
                 <span className="material-symbols-outlined">call</span>
               </button>
-              <button className="w-12 h-12 rounded-2xl bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
+              <button 
+                onClick={onMessageRider}
+                className="w-12 h-12 rounded-2xl bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
                 <span className="material-symbols-outlined">message</span>
               </button>
             </div>
@@ -95,24 +114,26 @@ const ActiveTrip = () => {
               <p className="text-on-surface-variant text-[11px] font-bold uppercase tracking-wider mb-1">
                 Trip Distance
               </p>
-              <p className="font-headline font-bold text-lg text-primary">4.2 km</p>
+              <p className="font-headline font-bold text-lg text-primary">{tripDistance}</p>
             </div>
             <div className="bg-surface-container-low rounded-2xl p-4">
               <p className="text-on-surface-variant text-[11px] font-bold uppercase tracking-wider mb-1">
                 Est. Fare
               </p>
-              <p className="font-headline font-bold text-lg text-primary">$18.40</p>
+              <p className="font-headline font-bold text-lg text-primary">${estFare}</p>
             </div>
           </div>
 
           {/* Swipe Action Component */}
-          <div className="relative w-full h-20 bg-surface-container-highest rounded-full flex items-center p-2 overflow-hidden group">
+          <div 
+            onClick={onSlideToPickup}
+            className="relative w-full h-20 bg-surface-container-highest rounded-full flex items-center p-2 overflow-hidden group cursor-pointer">
             <div className="absolute inset-0 flex items-center justify-center w-full">
               <span className="font-headline font-extrabold text-on-primary-container/60 text-base tracking-tight pointer-events-none">
                 SLIDE TO PICK UP RIDER
               </span>
             </div>
-            <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-xl cursor-pointer z-10 transition-all hover:bg-primary-container hover:scale-95 active:scale-95">
+            <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-xl z-10 transition-all hover:bg-primary-container hover:scale-95 active:scale-95">
               <span className="material-symbols-outlined text-2xl">arrow_forward_ios</span>
             </div>
             <div
@@ -128,7 +149,7 @@ const ActiveTrip = () => {
               <p className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
                 Pickup Address
               </p>
-              <p className="text-sm font-semibold text-primary">1200 Metropolitan Pkwy, Building 4</p>
+              <p className="text-sm font-semibold text-primary">{pickupAddress}</p>
             </div>
           </div>
         </div>

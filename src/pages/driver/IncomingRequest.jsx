@@ -1,6 +1,24 @@
 import React from 'react';
 
-const IncomingRequest = () => {
+const IncomingRequest = ({
+  driverImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuDKAaphyozPUQHBXtLvzEeohHia64ndoQc-4WspjfAToVoU8cOohMrQt1Og9FAl_ly9fZBeursfeu-v8PH_aukxaZKhPc0WQGb3EedxeTdi1OfKIUY2MzH-c-RaSdVEPEDtf1CTF5OE-YYBpGe7fiGfLPlrBOQf2SV3Crc5-cuaAl5xtcRaqXr4lYjw5rj098-L_hCaifKdeC45GgwUib8wTZsoxTcfh9QGo2ziE8LBIu2u-2fygYBEzyxrSI4CeNOBQftRSnUPZzqb",
+  riderName = "Sarah Jenkins",
+  riderImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuAnLhjOnz5MmvHeIpcmD3l7k6KOr6F6l2GXtEf28n_MvlctiVt2zbKwdbsyWnJDeqoHZ8d9E8uY9-u2S1-bKrvNnjcOAu8yeY95ZQ51aW8jCsqglQb1aRACfdPrtOvz4JwXdA06ey-mssAHiroyJjz_V-KpPFHp7c3hktvuIQ4QZHR0tQUMSNYki5eUViwa1SycQacDkDM3eKLS7h6Y5XE7Wy4Ph56uFcGe2VMVXci_p_HZb9aNVEyTWmi8pFnVRd4NXeJkPTHgATzH",
+  riderRating = "4.9",
+  requestType = "New Request",
+  estFare = "15.50",
+  pickupTime = "3 min away",
+  pickupAddress = "1248 Market Street, SF",
+  dropoffTime = "14 min trip",
+  dropoffAddress = "Embarcadero Center, Pier 3",
+  secondsRemaining = "12",
+  mapImage = "https://lh3.googleusercontent.com/aida-public/AB6AXuBtgdYpPhjA3hUJFRHb5YEnsoPaIpS5kls02Ne5kSTGSqshxCP65hBdNkDFx3CXZonGNDLu5AosVV8iXAUHUSNopWs7M5qvm3uHrylh7Tkm5NbvlHlrzdsc_hWcXHGJazot_m96eJqIVNrOfK7uYfHf3_6WRVivWCAxxY2SgTq427nDUjvn9W5uKEO4ZSFvO8ULaOGQ1AYEPrX3C4u6ztNChNrgc8QC1cL14IVkkkmv2sKTXCVjUyUCH2n9FhQwJYT1kqUbZDiTOnKw",
+  onAccept,
+  onDecline,
+  onEmergency,
+  onLocation,
+  onExplore,
+}) => {
   return (
     <div className="bg-surface text-on-surface font-body selection:bg-secondary-container overflow-hidden h-screen w-screen relative">
       {/* Top Navigation Anchor */}
@@ -10,8 +28,7 @@ const IncomingRequest = () => {
             <img
               alt="Driver Profile Photo"
               className="w-full h-full object-cover"
-              data-alt="close-up portrait of a professional male driver in a clean white shirt, smiling warmly with soft sunlight filtering through car window"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKAaphyozPUQHBXtLvzEeohHia64ndoQc-4WspjfAToVoU8cOohMrQt1Og9FAl_ly9fZBeursfeu-v8PH_aukxaZKhPc0WQGb3EedxeTdi1OfKIUY2MzH-c-RaSdVEPEDtf1CTF5OE-YYBpGe7fiGfLPlrBOQf2SV3Crc5-cuaAl5xtcRaqXr4lYjw5rj098-L_hCaifKdeC45GgwUib8wTZsoxTcfh9QGo2ziE8LBIu2u-2fygYBEzyxrSI4CeNOBQftRSnUPZzqb"
+              src={driverImage}
             />
           </div>
           <span className="plusJakartaSans font-bold text-lg tracking-tight text-blue-900 dark:text-blue-100">
@@ -29,18 +46,20 @@ const IncomingRequest = () => {
       <div className="fixed inset-0 z-0">
         <img
           className="w-full h-full object-cover opacity-90"
-          data-alt="detailed city street map with navigation routes highlighted in glowing blue and pickup points marked with soft pulsing circles"
-          data-location="San Francisco"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtgdYpPhjA3hUJFRHb5YEnsoPaIpS5kls02Ne5kSTGSqshxCP65hBdNkDFx3CXZonGNDLu5AosVV8iXAUHUSNopWs7M5qvm3uHrylh7Tkm5NbvlHlrzdsc_hWcXHGJazot_m96eJqIVNrOfK7uYfHf3_6WRVivWCAxxY2SgTq427nDUjvn9W5uKEO4ZSFvO8ULaOGQ1AYEPrX3C4u6ztNChNrgc8QC1cL14IVkkkmv2sKTXCVjUyUCH2n9FhQwJYT1kqUbZDiTOnKw"
           alt="Map Background"
+          src={mapImage}
         />
 
         {/* Map HUDs (Floating UI elements) */}
         <div className="absolute top-24 right-6 flex flex-col gap-4">
-          <button className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
+          <button 
+            onClick={onLocation}
+            className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
             <span className="material-symbols-outlined">my_location</span>
           </button>
-          <button className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
+          <button 
+            onClick={onExplore}
+            className="w-12 h-12 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center shadow-lg text-primary active:scale-90 transition-all">
             <span className="material-symbols-outlined">explore</span>
           </button>
         </div>
@@ -63,20 +82,19 @@ const IncomingRequest = () => {
             <div className="flex gap-4">
               <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface-container-high ring-4 ring-surface-container-low shadow-inner">
                 <img
-                  alt="Rider Profile"
+                  alt={`${riderName} Profile`}
                   className="w-full h-full object-cover"
-                  data-alt="studio portrait of a young woman with a friendly expression, soft neutral background, professional lighting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnLhjOnz5MmvHeIpcmD3l7k6KOr6F6l2GXtEf28n_MvlctiVt2zbKwdbsyWnJDeqoHZ8d9E8uY9-u2S1-bKrvNnjcOAu8yeY95ZQ51aW8jCsqglQb1aRACfdPrtOvz4JwXdA06ey-mssAHiroyJjz_V-KpPFHp7c3hktvuIQ4QZHR0tQUMSNYki5eUViwa1SycQacDkDM3eKLS7h6Y5XE7Wy4Ph56uFcGe2VMVXci_p_HZb9aNVEyTWmi8pFnVRd4NXeJkPTHgATzH"
+                  src={riderImage}
                 />
               </div>
               <div className="flex flex-col justify-center">
-                <h2 className="plusJakartaSans font-extrabold text-2xl tracking-tight text-primary">Sarah Jenkins</h2>
+                <h2 className="plusJakartaSans font-extrabold text-2xl tracking-tight text-primary">{riderName}</h2>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="material-symbols-outlined text-amber-500 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
                     star
                   </span>
-                  <span className="font-bold text-on-surface">4.9</span>
-                  <span className="text-on-surface-variant text-sm ml-1">• New Request</span>
+                  <span className="font-bold text-on-surface">{riderRating}</span>
+                  <span className="text-on-surface-variant text-sm ml-1">• {requestType}</span>
                 </div>
               </div>
             </div>
@@ -85,7 +103,7 @@ const IncomingRequest = () => {
                 Estimated Fare
               </span>
               <div className="bg-primary-container text-on-primary rounded-2xl px-4 py-2">
-                <span className="plusJakartaSans font-extrabold text-3xl tracking-tighter">$15.50</span>
+                <span className="plusJakartaSans font-extrabold text-3xl tracking-tighter">${estFare}</span>
               </div>
             </div>
           </div>
@@ -104,9 +122,9 @@ const IncomingRequest = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
-                  Pickup • 3 min away
+                  Pickup • {pickupTime}
                 </span>
-                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">1248 Market Street, SF</p>
+                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">{pickupAddress}</p>
               </div>
             </div>
 
@@ -119,20 +137,24 @@ const IncomingRequest = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
-                  Drop-off • 14 min trip
+                  Drop-off • {dropoffTime}
                 </span>
-                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">Embarcadero Center, Pier 3</p>
+                <p className="plusJakartaSans font-bold text-lg text-primary leading-tight">{dropoffAddress}</p>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 mt-2">
-            <button className="flex-1 py-5 rounded-2xl bg-surface-container-high text-on-surface font-bold text-lg plusJakartaSans active:scale-95 transition-all flex items-center justify-center gap-2">
+            <button 
+              onClick={onDecline}
+              className="flex-1 py-5 rounded-2xl bg-surface-container-high text-on-surface font-bold text-lg plusJakartaSans active:scale-95 transition-all flex items-center justify-center gap-2">
               <span className="material-symbols-outlined">close</span>
               Decline
             </button>
-            <button className="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-extrabold text-xl plusJakartaSans active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
+            <button 
+              onClick={onAccept}
+              className="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-extrabold text-xl plusJakartaSans active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
               Accept
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
@@ -143,14 +165,16 @@ const IncomingRequest = () => {
             <div className="bg-on-tertiary-container h-full w-2/3 rounded-full"></div>
           </div>
           <p className="text-center text-on-surface-variant text-xs font-bold tracking-widest uppercase -mt-2">
-            12 Seconds Remaining
+            {secondsRemaining} Seconds Remaining
           </p>
         </div>
       </main>
 
       {/* Contextual FAB - SOS Button */}
       <div className="fixed bottom-10 right-6 z-50">
-        <button className="w-14 h-14 rounded-full bg-tertiary-container text-white flex items-center justify-center shadow-[0_8px_24px_rgba(95,0,5,0.4)] active:scale-90 transition-all">
+        <button 
+          onClick={onEmergency}
+          className="w-14 h-14 rounded-full bg-tertiary-container text-white flex items-center justify-center shadow-[0_8px_24px_rgba(95,0,5,0.4)] active:scale-90 transition-all">
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
             emergency
           </span>
