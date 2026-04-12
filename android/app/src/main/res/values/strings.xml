@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rides</string>
+    <string name="title_activity_main">Rides</string>
+    <string name="package_name">com.gostret.rides</string>
+    <string name="custom_url_scheme">com.gostret.rides</string>
+</resources>
