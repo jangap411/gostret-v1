@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { query } from '../config/db.js';
+import sql from '../config/db.js';
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
@@ -9,8 +9,11 @@ export const signup = async (req, res) => {
 
   try {
     // Check if user exists
-    const userExists = await query('SELECT * FROM users WHERE email = $1', [email]);
-    if (userExists.rows.length > 0) {
+    const users = await sql`
+      SELECT * FROM users WHERE email = ${email}
+    `;
+
+    if (users.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
@@ -19,20 +22,19 @@ export const signup = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     // Create user
-    const newUser = await query(
-      'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role, wallet_balance',
-      [name, email, passwordHash, role || 'rider']
-    );
-
-    const user = newUser.rows[0];
+    const [newUser] = await sql`
+      INSERT INTO users (name, email, password_hash, role)
+      VALUES (${name}, ${email}, ${passwordHash}, ${role || 'rider'})
+      RETURNING id, name, email, role, wallet_balance
+    `;
 
     // Generate JWT
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
       expiresIn: '30d',
     });
 
     res.status(201).json({
-      ...user,
+      ...newUser,
       token,
     });
   } catch (error) {
@@ -48,8 +50,9 @@ export const login = async (req, res) => {
 
   try {
     // Find user
-    const result = await query('SELECT * FROM users WHERE email = $1', [email]);
-    const user = result.rows[0];
+    const [user] = await sql`
+      SELECT * FROM users WHERE email = ${email}
+    `;
 
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       // Generate JWT

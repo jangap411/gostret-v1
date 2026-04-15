@@ -1,11 +1,13 @@
-import { query } from '../config/db.js';
+import sql from '../config/db.js';
 
 // @desc    Get user profile
 // @route   GET /api/user/profile
 export const getProfile = async (req, res) => {
   try {
-    const result = await query('SELECT id, name, email, role, wallet_balance, avatar_url FROM users WHERE id = $1', [req.user.id]);
-    const user = result.rows[0];
+    const [user] = await sql`
+      SELECT id, name, email, role, wallet_balance, avatar_url 
+      FROM users WHERE id = ${req.user.id}
+    `;
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -25,29 +27,28 @@ export const topUpWallet = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // Start transaction
-    await query('BEGIN');
+    const result = await sql.begin(async (sql) => {
+      // Update balance
+      const [updatedUser] = await sql`
+        UPDATE users SET wallet_balance = wallet_balance + ${amount} 
+        WHERE id = ${userId} 
+        RETURNING wallet_balance
+      `;
 
-    // Update balance
-    const updatedUser = await query(
-      'UPDATE users SET wallet_balance = wallet_balance + $1 WHERE id = $2 RETURNING wallet_balance',
-      [amount, userId]
-    );
+      // Record transaction
+      await sql`
+        INSERT INTO transactions (user_id, amount, type, status) 
+        VALUES (${userId}, ${amount}, 'top-up', 'completed')
+      `;
 
-    // Record transaction
-    await query(
-      'INSERT INTO transactions (user_id, amount, type, status) VALUES ($1, $2, $3, $4)',
-      [userId, amount, 'top-up', 'completed']
-    );
-
-    await query('COMMIT');
+      return updatedUser;
+    });
 
     res.json({
       message: 'Wallet topped up successfully',
-      wallet_balance: updatedUser.rows[0].wallet_balance,
+      wallet_balance: result.wallet_balance,
     });
   } catch (error) {
-    await query('ROLLBACK');
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
@@ -59,12 +60,11 @@ export const getTransactions = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const result = await query(
-      'SELECT * FROM transactions WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
-    );
+    const transactions = await sql`
+      SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC
+    `;
 
-    res.json(result.rows);
+    res.json(transactions);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -78,40 +78,26 @@ export const updateProfile = async (req, res) => {
   const { name, email, avatar_url } = req.body;
 
   try {
-    // Build dynamic SET clause for only provided fields
-    const fields = [];
-    const values = [];
-    let paramIndex = 1;
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
 
-    if (name !== undefined) {
-      fields.push(`name = $${paramIndex++}`);
-      values.push(name);
-    }
-    if (email !== undefined) {
-      fields.push(`email = $${paramIndex++}`);
-      values.push(email);
-    }
-    if (avatar_url !== undefined) {
-      fields.push(`avatar_url = $${paramIndex++}`);
-      values.push(avatar_url);
-    }
-
-    if (fields.length === 0) {
+    if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: 'No fields to update' });
     }
 
-    values.push(userId);
+    const [updatedUser] = await sql`
+      UPDATE users SET ${sql(updateData)} 
+      WHERE id = ${userId} 
+      RETURNING id, name, email, role, wallet_balance, avatar_url
+    `;
 
-    const result = await query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING id, name, email, role, wallet_balance, avatar_url`,
-      values
-    );
-
-    if (result.rows.length === 0) {
+    if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(updatedUser);
   } catch (error) {
     console.error(error);
     if (error.code === '23505') {

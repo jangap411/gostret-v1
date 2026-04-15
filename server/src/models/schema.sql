@@ -1,4 +1,4 @@
--- Schema for Rides App
+-- Schema for GoStret App
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
