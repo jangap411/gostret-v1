@@ -1,20 +1,12 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Creates a reusable transporter using SMTP credentials from .env
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true', // true for port 465, false for others
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Initialize Resend with the API key from environment variables
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
- * Sends a GoStret ride receipt email to the user.
+ * Sends a GoStret ride receipt email to the user using Resend.
  * @param {Object} options
  * @param {string} options.to - Recipient email address
  * @param {string} options.name - Recipient name
@@ -98,10 +90,23 @@ export const sendReceiptEmail = async ({ to, name, ride }) => {
     </html>
   `;
 
-  await transporter.sendMail({
-    from: `"GoStret 🥎" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `Your GoStret Receipt – PGK ${ride.fare}`,
-    html,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from: `GoStret 🥎 <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
+      to: [to],
+      subject: `Your GoStret Receipt – PGK ${ride.fare}`,
+      html,
+    });
+
+    if (error) {
+      console.error('Error sending receipt email with Resend:', error);
+      console.log(error)
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error('Unexpected error sending receipt email:', err);
+    return { success: false, error: err };
+  }
 };
