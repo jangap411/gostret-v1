@@ -94,7 +94,7 @@ export const sendReceiptEmail = async ({ to, name, ride }) => {
     const { data, error } = await resend.emails.send({
       from: `GoStret 🥎 <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
       to: [to],
-      subject: `Your GoStret Receipt – PGK ${ride.fare}`,
+      subject: `GoStret Receipt – PGK ${ride.fare}`,
       html,
     });
 
