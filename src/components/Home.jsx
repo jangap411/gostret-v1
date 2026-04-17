@@ -55,11 +55,6 @@ export default function Home() {
 
       {/* Top Left Overlay Controls */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
-        <button className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-            <path d="M224,128a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16H224A8,8,0,0,1,224,128ZM32,72H224a8,8,0,0,0,0-16H32a8,8,0,0,0,0,16ZM224,184H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16Z"></path>
-          </svg>
-        </button>
         <div className="flex flex-col items-center gap-1 cursor-pointer group" onClick={() => setShowSosModal(true)}>
           <button className="flex items-center justify-center w-12 h-12 bg-[#D9483E] rounded-full shadow-md text-white hover:bg-[#c53d34] group-hover:scale-105 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -72,11 +67,6 @@ export default function Home() {
 
       {/* Top Right Controls */}
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-4 items-center">
-        <button onClick={() => navigate('/account')} className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md text-[#111518] hover:bg-neutral-50 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-            <path d="M230.92,212-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
-          </svg>
-        </button>
         <div className="flex flex-col items-center bg-white rounded-lg shadow-md overflow-hidden w-10">
           <button className="flex items-center justify-center h-10 w-full border-b border-neutral-100 hover:bg-neutral-50 text-neutral-600">
             <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
