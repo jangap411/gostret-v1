@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileEarnings = ({
   onCashOut,
 }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
+  const isOnline = useSelector((state) => state.driver.isOnline);
+  const onToggleOnline = () => dispatch(toggleOnline());
   
   const driverName = user.name || "Marcus Chen";
   const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAcyFZMHjBHrf_ZO-rM6lzJYypBZKh_7XL3WBKDgYHNcQOCP8lVyfHWiHMSVNNgAthu7on4Zs5CaXlnHNrBLeMXADcKXK6h7ahhk6gszVjfIQJ6RA2Ufj65a4efj2477ckDXfMVjnOtwSZnWIa17zHCznLsUD5fbx5E2AaTwUGc4DCHeNc4VHouRxa_6XP8lMXG4Tv_9PrebfmcS7Lx38rRw-FxIV8guTWXAzxJM3l6tXw0CSm9NwfmfjDSqq1XvM85oq-_RS4XPwGS";
@@ -31,9 +36,6 @@ const ProfileEarnings = ({
     { icon: 'support_agent', title: 'Help & Support', subtitle: '24/7 Priority driver assistance' },
     { icon: 'security', title: 'Safety Center', subtitle: 'Emergency tools & training' },
   ];
-
-  const [isOnline, setIsOnline] = useState(true);
-  const onToggleOnline = () => setIsOnline(!isOnline);
 
   const onSignOut = () => {
     localStorage.removeItem('isAuthenticated'); 

@@ -6,6 +6,7 @@ import { rideService } from '../../services/api';
 import { socketService } from '../../services/socket';
 import { useDispatch } from 'react-redux';
 import { setActiveRide } from '../../store/rideSlice';
+import { useSelector } from 'react-redux';
 
 const IncomingRequest = () => {
   const navigate = useNavigate();
