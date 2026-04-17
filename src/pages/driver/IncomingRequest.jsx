@@ -4,9 +4,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { rideService } from '../../services/api';
 import { socketService } from '../../services/socket';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setActiveRide } from '../../store/rideSlice';
-import { useSelector } from 'react-redux';
+
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
+};
 
 const IncomingRequest = () => {
   const navigate = useNavigate();
@@ -67,14 +72,21 @@ const IncomingRequest = () => {
   }, [timeLeft]);
 
   return (
-    <div className="bg-[#FCFBF8] text-[#1D3557] font-body h-full relative overflow-hidden flex flex-col">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3 }}
+      className="bg-[#FCFBF8] text-[#1D3557] font-body h-full relative overflow-hidden flex flex-col"
+    >
       {/* Full-Screen Map Background */}
       <MapView center={mapCenter} zoom={15} className="absolute inset-0 w-full h-full z-0" />
       
       {/* Map Overlay Shade */}
       <div className="absolute inset-0 bg-black/10 z-[1] pointer-events-none"></div>
 
-      {/* Floating Header Consistency (Reduced for focus) */}
+      {/* Floating Header Consistency */}
       <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
         <div className="flex items-center gap-2 bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm pointer-events-auto">
           <span className="text-[10px] font-black tracking-widest uppercase opacity-80">Navigator</span>
@@ -95,12 +107,12 @@ const IncomingRequest = () => {
       </div>
 
       {/* Bottom Sheet Request Card */}
-      <AnimatePresence>
+      <div className="mt-auto relative z-30">
         <motion.div 
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="absolute inset-x-0 bottom-0 z-30 bg-white rounded-t-[40px] shadow-[0_-12px_48px_rgba(0,0,0,0.15)] flex flex-col max-h-[85vh] overflow-hidden border-t border-neutral-100"
+          className="bg-white rounded-t-[40px] shadow-[0_-12px_48px_rgba(0,0,0,0.15)] flex flex-col border-t border-neutral-100"
         >
           {/* Drag Handle */}
           <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mt-4 mb-6"></div>
@@ -145,7 +157,7 @@ const IncomingRequest = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-neutral-400 text-[10px] font-black tracking-widest uppercase">PICKUP</span>
                     <div className="bg-[#10B981] text-white px-2 py-0.5 rounded-lg text-[9px] font-black shadow-sm">
-                      {ride.pickup_time || '3 min away'}
+                      3 min away
                     </div>
                   </div>
                   <p className="text-lg font-black tracking-tight mt-1 leading-tight">{ride.pickup_address}</p>
@@ -161,7 +173,7 @@ const IncomingRequest = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-neutral-400 text-[10px] font-black tracking-widest uppercase">DROP-OFF</span>
                     <div className="bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded-lg text-[9px] font-black">
-                      {ride.duration || '14 min trip'}
+                      {ride.duration} trip
                     </div>
                   </div>
                   <p className="text-lg font-black tracking-tight mt-1 leading-tight">{ride.destination_address}</p>
@@ -202,8 +214,8 @@ const IncomingRequest = () => {
             </div>
           </div>
         </motion.div>
-      </AnimatePresence>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 

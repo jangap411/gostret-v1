@@ -2,6 +2,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
 import React,{ useState } from 'react';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.98 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 }
+};
 
 const DriverAccounts = () => {
   const navigate = useNavigate();
@@ -14,14 +21,21 @@ const DriverAccounts = () => {
   const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuB3Uzozyg_eCMorbhLRnbEAos0EgecGGKS_PgyYG23F551US2rKvdbT9hjlQeGeaVnRXWnyyvDxIpSIYmrWRwS5loPwd2wTNY9bcyjGw0Wv0wj5twb8ILZbYZBdeCB_keKcACN-qQQXPwci2hjvd395gywucEpVs_t0s1IfYRYEIspm8xdVGAQt1Gs-8hxcLtn0pPIiHvlQbnIx0r3GMZBRj72eCqaplWvrtoBE2F2Oah9aX6yEsBQIKrxDGiqEB38qFrwQYj-vJv7R";
 
   const onSignOut = () => {
-    localStorage.removeItem('isAuthenticated'); 
+    localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
   };
 
   return (
-    <div className="bg-[#FCFBF8] text-[#1D3557] font-body h-full flex flex-col relative">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3 }}
+      className="bg-[#FCFBF8] text-[#1D3557] font-body h-full flex flex-col relative"
+    >
       {/* Consistent Header */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
         <div className="flex justify-between items-center px-6 py-4 w-full h-full relative">
@@ -116,7 +130,7 @@ const DriverAccounts = () => {
             <p className="text-center text-neutral-400 text-[10px] font-bold mt-6 tracking-tight">App Version 2.8.4 (Driver Edition)</p>
         </section>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

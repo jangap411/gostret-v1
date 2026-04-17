@@ -3,6 +3,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { socketService } from '../../services/socket';
 import { rideService } from '../../services/api';
 import MapView from '../../components/MapView';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.98 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 }
+};
 
 const ActiveTrip = () => {
   const location = useLocation();
@@ -55,7 +62,14 @@ const ActiveTrip = () => {
   const currentStep = ride.status === 'accepted' ? 'pickup' : 'trip';
 
   return (
-    <div className="bg-neutral-50 font-body text-[#141414] h-full flex flex-col relative overflow-hidden">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3 }}
+      className="bg-neutral-50 font-body text-[#141414] h-full flex flex-col relative overflow-hidden"
+    >
       {/* Top Navigation Header (Instructions) */}
       <header className="fixed top-0 w-full z-50 px-4 pt-6 pb-8 bg-white/95 backdrop-blur-md border-b border-neutral-100 shadow-sm rounded-b-[2rem]">
         <div className="max-w-xl mx-auto flex items-center gap-4">
@@ -158,7 +172,7 @@ const ActiveTrip = () => {
           </div>
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 };
 

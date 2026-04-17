@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
 import { socketService } from '../../services/socket';
 import MapView from '../../components/MapView';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.98 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 }
+};
 
 const DriverDashboard = ({
   earningsGrowth = "+12% vs LW",
@@ -69,7 +76,14 @@ const DriverDashboard = ({
   const onToggleOnline = () => dispatch(toggleOnline());
 
   return (
-    <div className="bg-neutral-50 text-[#141414] font-body h-full relative overflow-hidden flex flex-col">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3 }}
+      className="bg-neutral-50 text-[#141414] font-body h-full relative overflow-hidden flex flex-col"
+    >
       {/* Full-Screen Map Background */}
         <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
         
@@ -137,7 +151,7 @@ const DriverDashboard = ({
           className="absolute right-4 bottom-32 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#1D3557] shadow-xl active:scale-90 transition-all border border-neutral-100">
           <span className="material-symbols-outlined">my_location</span>
         </button>
-      </div>
+      </motion.div>
   );
 };
 

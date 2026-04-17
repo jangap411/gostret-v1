@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.98 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 }
+};
 
 const ProfileEarnings = ({
   onCashOut,
@@ -58,7 +65,14 @@ const ProfileEarnings = ({
   };
 
   return (
-    <div className="bg-[#FCFBF8] text-[#1D3557] font-body h-full flex flex-col relative">
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={{ duration: 0.3 }}
+      className="bg-[#FCFBF8] text-[#1D3557] font-body h-full flex flex-col relative"
+    >
       {/* Success Overlay */}
       {showSuccess && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
@@ -157,7 +171,7 @@ const ProfileEarnings = ({
           </button>
         </section>
       </main>
-    </div>
+    </motion.div>
   );
 };
 
