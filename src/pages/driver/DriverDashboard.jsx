@@ -6,6 +6,8 @@ import { socketService } from '../../services/socket';
 import MapView from '../../components/MapView';
 import { motion } from 'framer-motion';
 
+import { locationService } from '../../services/location';
+
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
   animate: { opacity: 1, scale: 1 },
@@ -39,17 +41,13 @@ const DriverDashboard = ({
   const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuB3Uzozyg_eCMorbhLRnbEAos0EgecGGKS_PgyYG23F551US2rKvdbT9hjlQeGeaVnRXWnyyvDxIpSIYmrWRwS5loPwd2wTNY9bcyjGw0Wv0wj5twb8ILZbYZBdeCB_keKcACN-qQQXPwci2hjvd395gywucEpVs_t0s1IfYRYEIspm8xdVGAQt1Gs-8hxcLtn0pPIiHvlQbnIx0r3GMZBRj72eCqaplWvrtoBE2F2Oah9aX6yEsBQIKrxDGiqEB38qFrwQYj-vJv7R";
   const weeklyEarnings = user.wallet_balance || "1,284.50";
 
-  const handleLocateMe = () => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setMapCenter([position.coords.latitude, position.coords.longitude]);
-          setMapZoom(16);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
+  const handleLocateMe = async () => {
+    try {
+      const position = await locationService.getCurrentPosition();
+      setMapCenter([position.coords.latitude, position.coords.longitude]);
+      setMapZoom(16);
+    } catch (error) {
+      console.error("Error getting location:", error);
     }
   };
 

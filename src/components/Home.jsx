@@ -9,6 +9,8 @@ const pageVariants = {
   exit: { opacity: 0, scale: 0.98 }
 };
 
+import { locationService } from '../services/location';
+
 export default function Home() {
   const navigate = useNavigate();
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
@@ -16,23 +18,15 @@ export default function Home() {
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
 
-  
-
-  const handleLocateMe = () => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setMapCenter([position.coords.latitude, position.coords.longitude]);
-          setMapZoom(16);
-          console.log(position);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("Unable to fetch location. Please check your browser permissions.");
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by your browser");
+  const handleLocateMe = async () => {
+    try {
+      const position = await locationService.getCurrentPosition();
+      setMapCenter([position.coords.latitude, position.coords.longitude]);
+      setMapZoom(16);
+      console.log(position);
+    } catch (error) {
+      console.error("Error getting location:", error);
+      alert("Unable to fetch location. Please check your device settings.");
     }
   };
 

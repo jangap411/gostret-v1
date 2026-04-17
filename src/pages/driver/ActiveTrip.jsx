@@ -4,6 +4,7 @@ import { socketService } from '../../services/socket';
 import { rideService } from '../../services/api';
 import MapView from '../../components/MapView';
 import { motion } from 'framer-motion';
+import { locationService } from '../../services/location';
 
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
@@ -26,12 +27,13 @@ const ActiveTrip = () => {
     socketService.joinRide(ride.id);
 
     // Broadcast location periodically
-    const locationInterval = setInterval(() => {
+    const locationInterval = setInterval(async () => {
       if (ride.status === 'accepted' || ride.status === 'in_progress') {
-        if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            socketService.emitLocationUpdate(ride.id, position.coords.latitude, position.coords.longitude);
-          });
+        try {
+          const position = await locationService.getCurrentPosition();
+          socketService.emitLocationUpdate(ride.id, position.coords.latitude, position.coords.longitude);
+        } catch (error) {
+          console.error("Broadcasting location error:", error);
         }
       }
     }, 5000);
