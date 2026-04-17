@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
-import MapView from '../../components/MapView';
+import { useState,useEffect } from 'react';
 import { socketService } from '../../services/socket';
+import MapView from '../../components/MapView';
 
 const DriverDashboard = ({
   earningsGrowth = "+12% vs LW",
@@ -21,8 +23,9 @@ const DriverDashboard = ({
   onSOS,
 }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
-  const [isOnline, setIsOnline] = useState(true);
+  const isOnline = useSelector((state) => state.driver.isOnline);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
 
@@ -63,7 +66,7 @@ const DriverDashboard = ({
     };
   }, [isOnline, navigate]);
 
-  const onToggleOnline = () => setIsOnline(!isOnline);
+  const onToggleOnline = () => dispatch(toggleOnline());
 
   return (
     <div className="bg-neutral-50 text-[#141414] font-body h-full relative overflow-hidden flex flex-col">

@@ -11,6 +11,7 @@ const IncomingRequest = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const isOnline = useSelector((state) => state.driver.isOnline);
   
   // Get ride from navigation state or use defaults for solo viewing
   const ride = location.state?.ride || {
@@ -77,9 +78,9 @@ const IncomingRequest = () => {
         <div className="flex items-center gap-2 bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm pointer-events-auto">
           <span className="text-[10px] font-black tracking-widest uppercase opacity-80">Navigator</span>
         </div>
-        <div className="bg-[#10B981] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 pointer-events-auto border border-white/20">
-          <span className="size-1.5 bg-white rounded-full animate-pulse"></span>
-          <span className="text-[10px] font-black tracking-widest">ONLINE</span>
+        <div className={`${isOnline ? 'bg-[#10B981]' : 'bg-neutral-500'} text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 pointer-events-auto border border-white/20`}>
+          {isOnline && <span className="size-1.5 bg-white rounded-full animate-pulse"></span>}
+          <span className="text-[10px] font-black tracking-widest uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
         </div>
       </div>
 

@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
+import React,{ useState } from 'react';
 
 const DriverAccounts = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
-  const [isOnline, setIsOnline] = useState(true);
-  const onToggleOnline = () => setIsOnline(!isOnline);
+  const isOnline = useSelector((state) => state.driver.isOnline);
+  const onToggleOnline = () => dispatch(toggleOnline());
 
   const driverName = user.name || "Jed Moses";
   const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuB3Uzozyg_eCMorbhLRnbEAos0EgecGGKS_PgyYG23F551US2rKvdbT9hjlQeGeaVnRXWnyyvDxIpSIYmrWRwS5loPwd2wTNY9bcyjGw0Wv0wj5twb8ILZbYZBdeCB_keKcACN-qQQXPwci2hjvd395gywucEpVs_t0s1IfYRYEIspm8xdVGAQt1Gs-8hxcLtn0pPIiHvlQbnIx0r3GMZBRj72eCqaplWvrtoBE2F2Oah9aX6yEsBQIKrxDGiqEB38qFrwQYj-vJv7R";
