@@ -11,6 +11,7 @@ export default function RideInProgress() {
   const dispatch = useDispatch();
   const { activeRide } = useSelector((state) => state.ride);
   const [driverLocation, setDriverLocation] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (!activeRide) {
@@ -24,8 +25,11 @@ export default function RideInProgress() {
     socketService.onStatusUpdate((data) => {
       console.log('Ride progress status update:', data);
       if (data.status === 'completed') {
-        dispatch(clearRide());
-        navigate('/activity');
+        setShowSuccess(true);
+        setTimeout(() => {
+          dispatch(clearRide());
+          navigate('/activity');
+        }, 3000);
       }
     });
 
@@ -105,6 +109,21 @@ export default function RideInProgress() {
           </div>
         </div>
       </div>
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[32px] p-8 shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-neutral-100 flex flex-col items-center text-center gap-4 scale-in-center">
+              <div className="size-20 bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#10B981]/30">
+                <span className="material-symbols-outlined text-4xl font-black">check</span>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black tracking-tighter">Arrived at Destination</h3>
+                <p className="text-neutral-500 font-bold text-sm mt-1">We hope you had a pleasant journey! Your receipt is now available.</p>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

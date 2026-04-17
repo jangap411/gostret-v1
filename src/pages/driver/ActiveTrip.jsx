@@ -17,6 +17,7 @@ const ActiveTrip = () => {
   const navigate = useNavigate();
   const [ride, setRide] = useState(location.state?.ride);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (!ride) {
@@ -48,8 +49,10 @@ const ActiveTrip = () => {
       const updatedRide = await rideService.updateRideStatus(ride.id, newStatus, token);
       setRide(updatedRide);
       if (newStatus === 'completed') {
-        alert('Trip Completed! Great job navigator.');
-        navigate('/');
+        setShowSuccess(true);
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       }
     } catch (error) {
       console.error("Failed to update status:", error);
@@ -174,6 +177,21 @@ const ActiveTrip = () => {
           </div>
         </div>
       </section>
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[32px] p-8 shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-neutral-100 flex flex-col items-center text-center gap-4 scale-in-center">
+              <div className="size-20 bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#10B981]/30">
+                <span className="material-symbols-outlined text-4xl font-black">check</span>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black tracking-tighter">Ride Completed</h3>
+                <p className="text-neutral-500 font-bold text-sm mt-1">Great job! The fare has been added to your wallet.</p>
+              </div>
+           </div>
+        </div>
+      )}
     </motion.div>
   );
 };
