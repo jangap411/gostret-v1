@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MapView from '../../components/MapView';
 
 const DriverDashboard = ({
@@ -47,6 +48,7 @@ const DriverDashboard = ({
   onViewAllActivity,
   onSOS,
 }) => {
+  const navigate = useNavigate();
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
   const [isOnline, setIsOnline] = useState(true);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
@@ -76,12 +78,20 @@ const DriverDashboard = ({
   const onToggleOnline = () => setIsOnline(!isOnline);
 
   return (
-    <div className="bg-neutral-50 text-[#141414] font-body min-h-screen relative overflow-hidden flex flex-col">
+    <div className="bg-neutral-50 text-[#141414] font-body h-full relative overflow-hidden flex flex-col">
       {/* Full-Screen Map Background */}
         <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
         
         {/* Floating Minimal Header */}
-        <div className="absolute top-6 left-4 right-4 z-20 flex justify-end items-center pointer-events-none">
+        <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
+          <button 
+            onClick={() => navigate('/driver/incoming-request')}
+            className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/40 backdrop-blur-md text-[#1D3557] border border-white/20 shadow-sm active:scale-95 transition-all group"
+          >
+            <span className="material-symbols-outlined text-sm font-black group-hover:rotate-12 transition-transform">bolt</span>
+            <span className="text-[10px] font-black tracking-widest uppercase">TEST REQUEST</span>
+          </button>
+
           <button 
             onClick={onToggleOnline}
             className={`pointer-events-auto flex items-center gap-2 px-6 py-3 rounded-full shadow-lg transition-all active:scale-95 ${isOnline ? 'bg-[#10B981] text-white' : 'bg-neutral-500 text-white'} border border-white/20`}
@@ -137,7 +147,6 @@ const DriverDashboard = ({
           <span className="material-symbols-outlined">my_location</span>
         </button>
       </div>
-    </div>
   );
 };
 
