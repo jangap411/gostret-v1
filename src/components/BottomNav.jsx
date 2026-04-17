@@ -5,7 +5,10 @@ export default function BottomNav() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const tabs = [
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isDriver = user.role === 'driver';
+
+  const riderTabs = [
     { 
       name: 'Home', 
       path: '/', 
@@ -29,9 +32,38 @@ export default function BottomNav() {
     { 
       name: 'Account', 
       path: '/account', 
-      icon: <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+      icon: <path d="M230.92,212-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
     }
   ];
+
+  const driverTabs = [
+    { 
+      name: 'Map', 
+      path: '/', 
+      icon: 'navigation',
+      material: true
+    },
+    { 
+      name: 'Earnings', 
+      path: '/earnings', 
+      icon: 'payments',
+      material: true
+    },
+    { 
+      name: 'History', 
+      path: '/activity', 
+      icon: 'history',
+      material: true
+    },
+    { 
+      name: 'Account', 
+      path: '/account', 
+      icon: 'person', 
+      material: true
+    }
+  ];
+
+  const tabs = isDriver ? driverTabs : riderTabs;
 
   return (
     <div className="flex gap-2 border-t border-neutral-100 bg-white px-4 pb-3 pt-2 relative z-50 pointer-events-auto">
@@ -42,13 +74,25 @@ export default function BottomNav() {
             key={tab.path}
             to={tab.path}
             className={`just flex flex-1 flex-col items-center justify-end gap-1 transition-colors ${
-              isActive ? 'text-[#1D3557]' : 'text-[#637888] hover:text-[#1D3557]'
+              isActive 
+                ? (isDriver ? 'text-[#10B981]' : 'text-[#1D3557]') 
+                : 'text-[#637888] hover:text-[#1D3557]'
             }`}
           >
-            <div className={`flex h-8 items-center justify-center ${isActive ? 'text-[#1D3557]' : 'text-neutral-400'}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill={isActive ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isActive ? "0" : "12"} viewBox="0 0 256 256">
-                {tab.icon}
-              </svg>
+            <div className={`flex h-8 items-center justify-center ${
+              isActive 
+                ? (isDriver ? 'text-[#10B981]' : 'text-[#1D3557]') 
+                : 'text-neutral-400'
+            }`}>
+              {tab.material ? (
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "''" }}>
+                  {tab.icon}
+                </span>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill={isActive ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isActive ? "0" : "12"} viewBox="0 0 256 256">
+                  {tab.icon}
+                </svg>
+              )}
             </div>
             <p className="text-[11px] font-bold leading-normal tracking-wide">{tab.name}</p>
           </Link>

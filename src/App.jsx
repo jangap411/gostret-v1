@@ -20,6 +20,11 @@ import { useDispatch } from 'react-redux';
 import { rideService } from './services/api';
 import { setActiveRide } from './store/rideSlice';
 
+import DriverDashboard from './pages/driver/DriverDashboard';
+import ProfileEarnings from './pages/driver/ProfileEarnings';
+import ActiveTrip from './pages/driver/ActiveTrip';
+import IncomingRequest from './pages/driver/IncomingRequest';
+
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   if (!isAuthenticated) {
@@ -77,12 +82,15 @@ function App() {
 
   const showBottomNav = !['/login', '/signup', '/searching-driver'].includes(location.pathname);
 
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isDriver = user.role === 'driver';
+
   return (
     <div className="w-full max-w-md mx-auto h-screen flex flex-col shadow-2xl relative overflow-hidden bg-neutral-50">
       <div className="flex-1 relative overflow-hidden">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute>{isDriver ? <DriverDashboard /> : <Home />}</ProtectedRoute>} />
             <Route path="/ride-details" element={<ProtectedRoute><RideDetails /></ProtectedRoute>} />
             <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
             <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress /></ProtectedRoute>} />
@@ -90,7 +98,10 @@ function App() {
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute /></ProtectedRoute>} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="/account" element={<ProtectedRoute>{isDriver ? <ProfileEarnings /> : <Account />}</ProtectedRoute>} />
+            <Route path="/earnings" element={<ProtectedRoute><ProfileEarnings /></ProtectedRoute>} />
+            <Route path="/driver/active-trip" element={<ProtectedRoute><ActiveTrip /></ProtectedRoute>} />
+            <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
             <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
           </Routes>
