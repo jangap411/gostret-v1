@@ -21,51 +21,12 @@ export const requestRide = async (req, res) => {
       ) RETURNING *
     `;
 
-    // --- Driver Simulation for Demo ---
-    setTimeout(async () => {
-      try {
-        await sql`
-          UPDATE rides SET status = 'accepted' WHERE id = ${ride.id}
-        `;
-          
-        io.to(`ride_${ride.id}`).emit('status_update', { status: 'accepted' });
-        console.log(`Ride ${ride.id} accepted by simulated driver`);
-
-        setTimeout(async () => {
-          await sql`
-            UPDATE rides SET status = 'in_progress' WHERE id = ${ride.id}
-          `;
-            
-          io.to(`ride_${ride.id}`).emit('status_update', { status: 'in_progress' });
-          console.log(`Ride ${ride.id} in progress`);
-
-          // Simulate location updates during ride
-          let progress = 0;
-          const locationInterval = setInterval(() => {
-            progress += 0.1;
-            if (progress >= 1) {
-               clearInterval(locationInterval);
-               return;
-            }
-            // Simple interpolation for demo
-            const lat = pickup_lat + (destination_lat - pickup_lat) * progress;
-            const lng = pickup_lng + (destination_lng - pickup_lng) * progress;
-            io.to(`ride_${ride.id}`).emit('location_update', { lat, lng });
-          }, 3000);
-
-          setTimeout(async () => {
-            await sql`
-              UPDATE rides SET status = 'completed' WHERE id = ${ride.id}
-            `;
-              
-            io.to(`ride_${ride.id}`).emit('status_update', { status: 'completed' });
-            console.log(`Ride ${ride.id} completed`);
-          }, 20000);
-        }, 10000);
-      } catch (err) {
-        console.error('Simulation error:', err);
-      }
-    }, 5000);
+    // --- Broadcast to Drivers Pool ---
+    io.to('drivers').emit('new_ride', {
+      ...ride,
+      rider_name: req.user.name,
+      rider_rating: "4.9" // Mock rating for now
+    });
 
     res.status(201).json(ride);
   } catch (error) {

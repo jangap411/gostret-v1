@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MapView from '../../components/MapView';
+import { socketService } from '../../services/socket';
 
 const DriverDashboard = ({
   earningsGrowth = "+12% vs LW",
@@ -16,35 +17,6 @@ const DriverDashboard = ({
   activeZone = "Downtown SF",
   rating = "4.98",
   totalTrips = "142",
-  recentActivity = [
-    {
-      id: 1,
-      icon: 'local_taxi',
-      title: 'Airport Premium Express',
-      subtitle: 'Completed • 14:20 PM',
-      amount: '+$42.50',
-      meta: 'Tip Included',
-      metaColor: 'text-green-600',
-    },
-    {
-      id: 2,
-      icon: 'speed',
-      title: 'Rush Hour Boost',
-      subtitle: 'Promotion • 12:45 PM',
-      amount: '+$8.00',
-      meta: 'Multiplier x1.4',
-      metaColor: 'text-neutral-500',
-    },
-    {
-      id: 3,
-      icon: 'person_pin_circle',
-      title: 'City Center Drop-off',
-      subtitle: 'Completed • 11:15 AM',
-      amount: '+$18.25',
-      meta: '8.2 miles',
-      metaColor: 'text-neutral-500',
-    },
-  ],
   onViewAllActivity,
   onSOS,
 }) => {
@@ -74,6 +46,22 @@ const DriverDashboard = ({
   useEffect(() => {
     handleLocateMe();
   }, []);
+
+  // Socket Integration
+  useEffect(() => {
+    if (isOnline) {
+      socketService.joinDriversPool();
+      
+      socketService.onNewRide((ride) => {
+        console.log("New ride received:", ride);
+        navigate('/driver/incoming-request', { state: { ride } });
+      });
+    }
+
+    return () => {
+      socketService.off('new_ride');
+    };
+  }, [isOnline, navigate]);
 
   const onToggleOnline = () => setIsOnline(!isOnline);
 

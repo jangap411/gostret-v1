@@ -46,7 +46,12 @@ io.on('connection', (socket) => {
 
   socket.on('join_ride', (rideId) => {
     socket.join(`ride_${rideId}`);
-    console.log(`User joined ride: ride_${rideId}`);
+    console.log(`User ${socket.id} joined ride: ride_${rideId}`);
+  });
+
+  socket.on('join_drivers', () => {
+    socket.join('drivers');
+    console.log(`Driver ${socket.id} joined drivers pool`);
   });
 
   socket.on('update_location', (data) => {

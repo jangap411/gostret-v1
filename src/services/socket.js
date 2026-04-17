@@ -42,6 +42,16 @@ class SocketService {
     this.socket.emit('join_ride', rideId);
   }
 
+  joinDriversPool() {
+    if (!this.socket) this.connect();
+    this.socket.emit('join_drivers');
+  }
+
+  onNewRide(callback) {
+    if (!this.socket) this.connect();
+    this.socket.on('new_ride', callback);
+  }
+
   onStatusUpdate(callback) {
     if (!this.socket) this.connect();
     this.socket.on('status_update', callback);
@@ -50,6 +60,11 @@ class SocketService {
   onLocationUpdate(callback) {
     if (!this.socket) this.connect();
     this.socket.on('location_update', callback);
+  }
+
+  emitLocationUpdate(rideId, lat, lng) {
+    if (!this.socket) this.connect();
+    this.socket.emit('update_location', { rideId, lat, lng });
   }
 
   off(event) {

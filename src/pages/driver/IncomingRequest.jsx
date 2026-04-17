@@ -1,28 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import MapView from '../../components/MapView';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { rideService } from '../../services/api';
+import { socketService } from '../../services/socket';
+import { useDispatch } from 'react-redux';
+import { setActiveRide } from '../../store/rideSlice';
 
-const IncomingRequest = ({
-  riderName = "Sarah Jenkins",
-  riderImage = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-  riderRating = "4.9",
-  estFare = "15.50",
-  pickupTime = "3 min away",
-  pickupAddress = "1248 Market Street, SF",
-  dropoffTime = "14 min trip",
-  dropoffAddress = "Embarcadero Center, Pier 3",
-  secondsRemaining = 12,
-  onAccept = () => console.log('Accepted'),
-  onDecline = () => window.history.back(),
-  onEmergency = () => alert('SOS Alerted'),
-}) => {
+const IncomingRequest = () => {
   const navigate = useNavigate();
-  const [timeLeft, setTimeLeft] = useState(secondsRemaining);
+  const location = useLocation();
+  const dispatch = useDispatch();
+  
+  // Get ride from navigation state or use defaults for solo viewing
+  const ride = location.state?.ride || {
+    id: 1,
+    rider_name: "Sarah Jenkins",
+    rider_rating: "4.9",
+    fare: "15.50",
+    distance: "3.2km",
+    duration: "14 min",
+    pickup_address: "1248 Market Street, SF",
+    destination_address: "Embarcadero Center, Pier 3",
+  };
+
+  const [timeLeft, setTimeLeft] = useState(12);
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
+  const [isAccepting, setIsAccepting] = useState(false);
   
   // Simulated map center
-  const [mapCenter] = useState([-9.43869006941101, 147.1810054779053]);
+  const [mapCenter] = useState([ride.pickup_lat || -9.43869006941101, ride.pickup_lng || 147.1810054779053]);
+
+  useEffect(() => {
+    if (ride?.id) {
+        socketService.joinRide(ride.id);
+    }
+  }, [ride.id]);
+
+  const handleAccept = async () => {
+    setIsAccepting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const updatedRide = await rideService.updateRideStatus(ride.id, 'accepted', token, user.id);
+      dispatch(setActiveRide(updatedRide));
+      navigate('/driver/active-trip', { state: { ride: updatedRide } });
+    } catch (error) {
+      console.error("Failed to accept ride:", error);
+      alert("Could not accept ride. It might have been taken by another driver.");
+      navigate('/');
+    } finally {
+      setIsAccepting(false);
+    }
+  };
+
+  const onDecline = () => navigate('/');
+  const onEmergency = () => alert('SOS Alerted');
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -77,14 +109,14 @@ const IncomingRequest = ({
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="size-14 rounded-full overflow-hidden border-2 border-[#10B981]/20">
-                    <img src={riderImage} alt={riderName} className="w-full h-full object-cover" />
+                    <img src={ride.rider_avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"} alt={ride.rider_name} className="w-full h-full object-cover" />
                   </div>
                   <div className="absolute -bottom-1 -right-1 bg-white rounded-full size-6 shadow-sm border border-neutral-100 flex items-center justify-center">
-                     <span className="text-[10px] font-black">{riderRating}</span>
+                     <span className="text-[10px] font-black">{ride.rider_rating}</span>
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="text-xl font-black tracking-tighter leading-tight">{riderName}</h2>
+                  <h2 className="text-xl font-black tracking-tighter leading-tight">{ride.rider_name}</h2>
                   <div className="inline-flex items-center bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded-lg w-fit mt-1">
                     <span className="text-[10px] font-black tracking-widest uppercase">NEW REQUEST</span>
                   </div>
@@ -93,7 +125,7 @@ const IncomingRequest = ({
 
               <div className="text-right">
                 <p className="text-neutral-400 text-[9px] font-black tracking-widest uppercase mb-1">PRICE</p>
-                <p className="text-2xl font-black text-[#1D3557] tracking-tighter leading-none">PGK {estFare}</p>
+                <p className="text-2xl font-black text-[#1D3557] tracking-tighter leading-none">PGK {ride.fare}</p>
               </div>
             </div>
 
@@ -111,10 +143,10 @@ const IncomingRequest = ({
                   <div className="flex items-center gap-2">
                     <span className="text-neutral-400 text-[10px] font-black tracking-widest uppercase">PICKUP</span>
                     <div className="bg-[#10B981] text-white px-2 py-0.5 rounded-lg text-[9px] font-black shadow-sm">
-                      {pickupTime}
+                      {ride.pickup_time || '3 min away'}
                     </div>
                   </div>
-                  <p className="text-lg font-black tracking-tight mt-1 leading-tight">{pickupAddress}</p>
+                  <p className="text-lg font-black tracking-tight mt-1 leading-tight">{ride.pickup_address}</p>
                 </div>
               </div>
 
@@ -127,10 +159,10 @@ const IncomingRequest = ({
                   <div className="flex items-center gap-2">
                     <span className="text-neutral-400 text-[10px] font-black tracking-widest uppercase">DROP-OFF</span>
                     <div className="bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded-lg text-[9px] font-black">
-                      {dropoffTime}
+                      {ride.duration || '14 min trip'}
                     </div>
                   </div>
-                  <p className="text-lg font-black tracking-tight mt-1 leading-tight">{dropoffAddress}</p>
+                  <p className="text-lg font-black tracking-tight mt-1 leading-tight">{ride.destination_address}</p>
                 </div>
               </div>
             </div>
@@ -143,7 +175,7 @@ const IncomingRequest = ({
               <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
                 <motion.div 
                    initial={{ width: "100%" }}
-                   animate={{ width: `${(timeLeft / secondsRemaining) * 100}%` }}
+                   animate={{ width: `${(timeLeft / 12) * 100}%` }}
                    transition={{ duration: 1, ease: "linear" }}
                    className="bg-gradient-to-r from-[#D9483E] to-[#F59E0B] h-full rounded-full"
                 />
@@ -154,14 +186,16 @@ const IncomingRequest = ({
             <div className="flex gap-4 pt-2">
               <button 
                 onClick={onDecline}
-                className="flex-1 py-5 rounded-[20px] border-2 border-neutral-100 text-[#1D3557] font-black text-sm tracking-widest uppercase hover:bg-neutral-50 active:scale-95 transition-all">
+                disabled={isAccepting}
+                className="flex-1 py-5 rounded-[20px] border-2 border-neutral-100 text-[#1D3557] font-black text-sm tracking-widest uppercase hover:bg-neutral-50 active:scale-95 transition-all disabled:opacity-50">
                 DECLINE
               </button>
               <button 
-                onClick={onAccept}
-                className="flex-[2.5] py-5 rounded-[20px] bg-[#1D3557] text-white font-black text-lg tracking-tight shadow-xl shadow-[#1D3557]/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all">
-                Accept Request
-                <span className="material-symbols-outlined font-black">arrow_forward</span>
+                onClick={handleAccept}
+                disabled={isAccepting}
+                className="flex-[2.5] py-5 rounded-[20px] bg-[#1D3557] text-white font-black text-lg tracking-tight shadow-xl shadow-[#1D3557]/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all disabled:opacity-50 text-center">
+                {isAccepting ? 'Accepting...' : 'Accept Request'}
+                {!isAccepting && <span className="material-symbols-outlined font-black">arrow_forward</span>}
               </button>
             </div>
           </div>
