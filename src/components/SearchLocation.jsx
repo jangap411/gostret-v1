@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setPickup, setDestination } from '../store/rideSlice';
 import MapView from './MapView';
+import { locationService } from '../services/location';
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -38,6 +39,49 @@ export default function SearchLocation() {
       console.error("Search failed", error);
     }
   };
+
+  const reverseGeocode = async (lat, lng) => {
+    const coordString = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    let locationName = coordString;
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTE_API_KEY;
+      const res = await fetch(`https://api.openrouteservice.org/geocode/reverse?api_key=${apiKey}&point.lon=${lng}&point.lat=${lat}`);
+      const data = await res.json();
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        const label = feature.properties.name || feature.properties.label || feature.properties.street || "";
+        if (label) {
+          locationName = `${label} (${coordString})`;
+        }
+      }
+    } catch (error) {
+      console.error("Reverse geocoding failed", error);
+    }
+    return locationName;
+  };
+
+  const populateCurrentLocation = async () => {
+    try {
+      const position = await locationService.getCurrentPosition();
+      const { latitude, longitude } = position.coords;
+      const address = await reverseGeocode(latitude, longitude);
+      
+      setMapCenter([latitude, longitude]);
+      dispatch(setPickup({ 
+        query: address, 
+        marker: { position: [latitude, longitude], popup: address } 
+      }));
+    } catch (error) {
+      console.error("Error populating current location:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Only populate if pickup is empty or says "Current location"
+    if (!pickup.marker && (pickup.query === '' || pickup.query === 'Current location')) {
+      populateCurrentLocation();
+    }
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -79,25 +123,9 @@ export default function SearchLocation() {
   const handleMapClick = async (e) => {
     if (!isMapSelectionMode) return;
     const { lat, lng } = e.latlng;
-    const coordString = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     setMapCenter([lat, lng]);
     
-    let locationName = coordString;
-    try {
-      const apiKey = import.meta.env.VITE_OPENROUTE_API_KEY;
-      const res = await fetch(`https://api.openrouteservice.org/geocode/reverse?api_key=${apiKey}&point.lon=${lng}&point.lat=${lat}`);
-      const data = await res.json();
-      if (data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        const label = feature.properties.name || feature.properties.label || feature.properties.street || "";
-        if (label) {
-          locationName = `${label} (${coordString})`;
-        }
-      }
-    } catch (error) {
-      console.error("Reverse geocoding failed", error);
-    }
-
+    const locationName = await reverseGeocode(lat, lng);
     const newMarker = { position: [lat, lng], popup: locationName };
     
     if (activeField === 'pickup') {
