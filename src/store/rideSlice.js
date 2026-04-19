@@ -27,7 +27,10 @@ const rideSlice = createSlice({
     },
     updateRideStatus: (state, action) => {
       if (state.activeRide) {
-        state.activeRide.status = action.payload;
+        state.activeRide.status = action.payload.status;
+        if (action.payload.driver_id) {
+          state.activeRide.driver_id = action.payload.driver_id;
+        }
       }
     },
     clearRide: (state) => {

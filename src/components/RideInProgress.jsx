@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import MapView from './MapView';
-import { clearRide } from '../store/rideSlice';
+import { clearRide, updateRideStatus } from '../store/rideSlice';
 import { socketService } from '../services/socket';
 import { reviewService } from '../services/api';
 
@@ -25,6 +25,7 @@ export default function RideInProgress() {
     // Listen for status changes (completion)
     socketService.onStatusUpdate((data) => {
       console.log('Ride progress status update:', data);
+      dispatch(updateRideStatus(data)); // Save the updated status and driver_id to redux
       if (data.status === 'completed') {
         setShowSuccess(true);
         setTimeout(() => {

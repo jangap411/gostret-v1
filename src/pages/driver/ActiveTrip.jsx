@@ -19,6 +19,11 @@ const ActiveTrip = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  console.log('ride1')
+  console.log(ride)
+  console.log('ride2')
+  
+
   useEffect(() => {
     if (!ride) {
       navigate('/');
