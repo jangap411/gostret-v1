@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { userService } from '../../services/api';
 
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
@@ -25,7 +26,23 @@ const ProfileEarnings = ({
   const rating = "4.98"; // Mocked for now
   const totalTrips = "2,842"; // Mocked for now
   const yearsActive = "3.5"; // Mocked for now
-  const weeklyEarnings = user.wallet_balance || "0.00";
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const profile = await userService.getProfile(token);
+          setUser(profile);
+          localStorage.setItem('user', JSON.stringify(profile));
+        }
+      } catch (error) {
+        console.error("Failed to fetch balance", error);
+      }
+    };
+    fetchBalance();
+  }, []);
+
   const dateRange = "Oct 23 - Oct 29"; // Mocked
   
   const earningsData = [
@@ -82,7 +99,7 @@ const ProfileEarnings = ({
               </div>
               <div>
                 <h3 className="text-2xl font-black tracking-tighter">Transfer Successful</h3>
-                <p className="text-neutral-500 font-bold text-sm mt-1">PGK 210.00 is on its way to your bank account.</p>
+                <p className="text-neutral-500 font-bold text-sm mt-1">PGK {parseFloat(user.wallet_balance || 0).toFixed(2)} is on its way to your bank account.</p>
               </div>
            </div>
         </div>
@@ -136,9 +153,9 @@ const ProfileEarnings = ({
           <div className="flex justify-between items-start">
             <div>
               <h3 className="text-neutral-400 text-xs font-black tracking-widest uppercase mb-1">Weekly Earnings</h3>
-              <p className="text-[#1D3557] font-bold text-sm">Oct 23 - Oct 29</p>
+              <p className="text-[#1D3557] font-bold text-sm">Real-time Balance</p>
             </div>
-            <h4 className="text-3xl font-black text-[#1D3557] tracking-tighter">PGK 210.00</h4>
+            <h4 className="text-3xl font-black text-[#1D3557] tracking-tighter">PGK {parseFloat(user.wallet_balance || 0).toFixed(2)}</h4>
           </div>
 
           {/* Stylized Bar Chart */}

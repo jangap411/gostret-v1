@@ -1,3 +1,5 @@
+import sql from '../config/db.js';
+
 export const addReview = async (req, res) => {
   const reviewerId = req.user.id;
   const { ride_id, reviewee_id, rating, comment } = req.body;
