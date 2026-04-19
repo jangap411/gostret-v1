@@ -3,6 +3,7 @@ import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
 import React,{ useState } from 'react';
 import { motion } from 'framer-motion';
+import { userService } from '../../services/api';
 
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
@@ -25,6 +26,25 @@ const DriverAccounts = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  const [carModel, setCarModel] = useState(user.car_model || '');
+  const [carPlate, setCarPlate] = useState(user.car_plate || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const saveVehicleInfo = async () => {
+     setIsSaving(true);
+     try {
+        const token = localStorage.getItem('token');
+        if(!token) return;
+        const updatedUser = await userService.updateProfile({ car_model: carModel, car_plate: carPlate }, token);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        // Show success state
+     } catch(e) {
+        console.error(e);
+     } finally {
+        setIsSaving(false);
+     }
   };
 
   return (
@@ -90,6 +110,39 @@ const DriverAccounts = () => {
                 TOP RATED
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* Vehicle Information */}
+        <section className="space-y-4">
+          <h4 className="px-4 text-neutral-400 text-[10px] font-black tracking-widest uppercase">Vehicle Identity</h4>
+          <div className="bg-white p-6 rounded-[32px] overflow-hidden border border-neutral-100 shadow-sm flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-black tracking-widest text-[#1D3557] uppercase ml-2">Car Model</label>
+              <input 
+                type="text" 
+                value={carModel}
+                onChange={(e) => setCarModel(e.target.value)}
+                placeholder="e.g. Toyota Prius"
+                className="bg-neutral-50 border border-neutral-200 text-[#1D3557] font-bold rounded-2xl px-4 py-3 placeholder:text-neutral-400 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-black tracking-widest text-[#1D3557] uppercase ml-2">License Plate</label>
+              <input 
+                type="text" 
+                value={carPlate}
+                onChange={(e) => setCarPlate(e.target.value)}
+                placeholder="e.g. ABC 123"
+                className="bg-neutral-50 border border-neutral-200 text-[#1D3557] font-bold rounded-2xl px-4 py-3 placeholder:text-neutral-400 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all"
+              />
+            </div>
+            <button 
+              onClick={saveVehicleInfo}
+              disabled={isSaving}
+              className="mt-2 w-full py-4 bg-[#1D3557] text-white font-black rounded-2xl tracking-tight shadow-md hover:bg-[#152a48] active:scale-[0.98] transition-all disabled:opacity-50">
+              {isSaving ? 'Updating...' : 'Save Vehicle Info'}
+            </button>
           </div>
         </section>
 

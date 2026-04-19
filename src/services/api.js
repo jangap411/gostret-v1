@@ -150,3 +150,19 @@ export const userService = {
     return data;
   },
 };
+
+export const reviewService = {
+  addReview: async (reviewData, token) => {
+    const response = await fetch(`${API_BASE_URL}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to submit review');
+    return data;
+  },
+};

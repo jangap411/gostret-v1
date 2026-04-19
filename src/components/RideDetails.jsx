@@ -22,6 +22,7 @@ export default function RideDetails() {
   const [routeMeta, setRouteMeta] = useState(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [booking, setBooking] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -79,7 +80,8 @@ export default function RideDetails() {
       navigate('/searching-driver');
     } catch (error) {
       console.error("Booking failed", error);
-      alert("Failed to book ride: " + error.message);
+      setErrorMessage(error.message || "Failed to book ride due to an unexpected error.");
+      setTimeout(() => setErrorMessage(''), 4000);
     } finally {
       setBooking(false);
     }
@@ -186,7 +188,21 @@ export default function RideDetails() {
           ))}
         </div>
       </div>
-      <div className="bg-white border-t border-neutral-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+      
+      {/* Error Message Toast */}
+      {errorMessage && (
+        <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           exit={{ opacity: 0, y: 20 }}
+           className="absolute bottom-24 left-4 right-4 z-[60] bg-[#D9483E] text-white p-4 rounded-xl shadow-xl flex items-center gap-3"
+        >
+          <span className="material-symbols-outlined font-black">error</span>
+          <p className="font-bold text-sm tracking-tight">{errorMessage}</p>
+        </motion.div>
+      )}
+
+      <div className="bg-white border-t border-neutral-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] relative z-50">
         <div className="flex px-4 py-4">
           <button
             onClick={handleBookRide}

@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import MapView from './MapView';
 import { clearRide } from '../store/rideSlice';
 import { socketService } from '../services/socket';
+import { reviewService } from '../services/api';
 
 export default function RideInProgress() {
   const navigate = useNavigate();
@@ -27,8 +28,8 @@ export default function RideInProgress() {
       if (data.status === 'completed') {
         setShowSuccess(true);
         setTimeout(() => {
-          dispatch(clearRide());
-          navigate('/activity');
+          setShowSuccess(false);
+          setShowReview(true);
         }, 3000);
       }
     });
@@ -43,6 +44,32 @@ export default function RideInProgress() {
       socketService.off('location_update');
     };
   }, [activeRide, navigate, dispatch]);
+
+  const [showReview, setShowReview] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitReview = async () => {
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (token && activeRide?.driver_id) {
+        await reviewService.addReview({
+          ride_id: activeRide.id,
+          reviewee_id: activeRide.driver_id,
+          rating,
+          comment
+        }, token);
+      }
+    } catch(e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
+      dispatch(clearRide());
+      navigate('/activity');
+    }
+  };
 
   return (
     <div className="relative flex size-full h-full flex-col bg-white overflow-hidden" style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}>
@@ -121,6 +148,47 @@ export default function RideInProgress() {
                 <h3 className="text-2xl font-black tracking-tighter">Arrived at Destination</h3>
                 <p className="text-neutral-500 font-bold text-sm mt-1">We hope you had a pleasant journey! Your receipt is now available.</p>
               </div>
+           </div>
+        </div>
+      )}
+
+      {/* Review Overlay */}
+      {showReview && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white rounded-[32px] p-8 shadow-2xl flex flex-col items-center w-full max-w-sm scale-in-center">
+              <div className="size-20 rounded-2xl border-4 border-[#10B981]/20 overflow-hidden mb-4 shadow-sm">
+                <img src={activeRide?.driver_avatar || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&h=150&fit=crop"} alt="Driver" className="w-full h-full object-cover" />
+              </div>
+              <h3 className="text-2xl font-black tracking-tighter mb-1">Rate your trip</h3>
+              <p className="text-neutral-500 font-bold text-sm mb-6">How was {activeRide?.driver_name || 'your driver'}?</p>
+              
+              <div className="flex gap-2 mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button 
+                    key={star} 
+                    onClick={() => setRating(star)} 
+                    className="active:scale-90 transition-transform"
+                  >
+                    <span className={`material-symbols-outlined text-4xl ${rating >= star ? 'text-yellow-400' : 'text-neutral-200'}`} style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  </button>
+                ))}
+              </div>
+
+              <textarea 
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Add a comment... (optional)"
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl p-4 text-[#141414] font-medium placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#10B981] mb-6 resize-none"
+                rows="3"
+              ></textarea>
+
+              <button 
+                onClick={handleSubmitReview}
+                disabled={isSubmitting}
+                className="w-full py-4 bg-[#141414] text-white font-black rounded-2xl tracking-tight shadow-md disabled:opacity-50 active:scale-[0.98] transition-all"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Review'}
+              </button>
            </div>
         </div>
       )}
