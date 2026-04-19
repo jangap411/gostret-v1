@@ -1,17 +1,59 @@
 import sql from '../config/db.js';
 import { sendReceiptEmail } from '../utils/mailer.js';
+import { isPeakHour, getSurgeMultiplier, calculateFare } from '../utils/fareCalculator.js';
 
 
 // @route   POST /api/rides
 export const requestRide = async (req, res) => {
-  const { pickup_address, destination_address, pickup_lat, pickup_lng, destination_lat, destination_lng, fare, distance, duration } = req.body;
+  const {
+    pickup_address, destination_address,
+    pickup_lat, pickup_lng, destination_lat, destination_lng,
+    fare,            // client-estimated fare (used as fallback)
+    distance, duration,
+    hasAirportFee, hasTolls,
+  } = req.body;
   const rider_id = req.user.id;
   const io = req.app.get('io');
 
   try {
-    // Check rider's wallet balance
+    // ── Server-side fare calculation ────────────────────────
+    // Parse distance/duration numbers from the request
+    const distanceKm = parseFloat(distance) || 0;
+    const durationMin = parseFloat(duration) || 0;
+
+    let fareBreakdown = null;
+    let computedFare = parseFloat(fare) || 0;
+
+    // Only recalculate if we have valid distance/duration
+    if (distanceKm > 0 && durationMin > 0) {
+      // Fetch supply/demand for surge
+      const [demandResult] = await sql`
+        SELECT COUNT(*)::int AS count FROM rides WHERE status = 'pending'
+      `;
+      const [supplyResult] = await sql`
+        SELECT COUNT(*)::int AS count FROM users WHERE role = 'driver' AND is_online = true
+      `;
+      const activeRequests = demandResult?.count || 0;
+      const availableDrivers = supplyResult?.count || 0;
+
+      const surgeMultiplier = getSurgeMultiplier(activeRequests, availableDrivers);
+      const isPeak = isPeakHour(new Date());
+
+      fareBreakdown = calculateFare({
+        distanceKm,
+        durationMin,
+        surgeMultiplier,
+        isPeak,
+        hasTolls: !!hasTolls,
+        hasAirportFee: !!hasAirportFee,
+      });
+
+      computedFare = fareBreakdown.total;
+    }
+
+    // Check rider's wallet balance against the computed fare
     const [riderWallet] = await sql`SELECT wallet_balance FROM users WHERE id = ${rider_id}`;
-    if (!riderWallet || parseFloat(riderWallet.wallet_balance) < parseFloat(fare)) {
+    if (!riderWallet || parseFloat(riderWallet.wallet_balance) < computedFare) {
       return res.status(400).json({ message: 'Insufficient wallet balance for this ride.' });
     }
 
@@ -23,7 +65,7 @@ export const requestRide = async (req, res) => {
       ) VALUES (
         ${rider_id}, ${pickup_address}, ${destination_address}, 
         ${pickup_lat}, ${pickup_lng}, ${destination_lat}, ${destination_lng}, 
-        ${fare}, ${distance}, ${duration}
+        ${computedFare}, ${distance}, ${duration}
       ) RETURNING *
     `;
 
@@ -34,7 +76,11 @@ export const requestRide = async (req, res) => {
       rider_rating: "4.9" // Mock rating for now
     });
 
-    res.status(201).json(ride);
+    // Return ride + fare breakdown so the frontend can display the full receipt
+    res.status(201).json({
+      ...ride,
+      fareBreakdown,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

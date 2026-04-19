@@ -101,6 +101,20 @@ export const rideService = {
     if (!response.ok) throw new Error(data.message || 'Failed to send receipt');
     return data;
   },
+
+  estimateFare: async (fareData, token) => {
+    const response = await fetch(`${API_BASE_URL}/rides/estimate-fare`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(fareData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to estimate fare');
+    return data;
+  },
 };
 
 export const userService = {
