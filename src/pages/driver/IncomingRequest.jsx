@@ -34,6 +34,7 @@ const IncomingRequest = () => {
   const [timeLeft, setTimeLeft] = useState(12);
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
   const [isAccepting, setIsAccepting] = useState(false);
+  const [noticeMessage, setNoticeMessage] = useState('');
   
   // Simulated map center
   const [mapCenter] = useState([ride.pickup_lat || -9.43869006941101, ride.pickup_lng || 147.1810054779053]);
@@ -42,7 +43,17 @@ const IncomingRequest = () => {
     if (ride?.id) {
         socketService.joinRide(ride.id);
     }
-  }, [ride.id]);
+    
+    socketService.onStatusUpdate((data) => {
+      // If the back-end announces the ride is accepted, but it wasn't by this specific driver
+      if (data.status === 'accepted' && data.driver_id && data.driver_id !== user.id) {
+        setNoticeMessage("This request has already been picked up by another driver.");
+        setTimeout(() => navigate('/'), 3000);
+      }
+    });
+
+    return () => socketService.off('status_update');
+  }, [ride.id, user.id, navigate]);
 
   const handleAccept = async () => {
     setIsAccepting(true);
@@ -53,8 +64,8 @@ const IncomingRequest = () => {
       navigate('/driver/active-trip', { state: { ride: updatedRide } });
     } catch (error) {
       console.error("Failed to accept ride:", error);
-      alert("Could not accept ride. It might have been taken by another driver.");
-      navigate('/');
+      setNoticeMessage("This request has already been picked up by another driver.");
+      setTimeout(() => navigate('/'), 3000);
     } finally {
       setIsAccepting(false);
     }
@@ -85,6 +96,23 @@ const IncomingRequest = () => {
       
       {/* Map Overlay Shade */}
       <div className="absolute inset-0 bg-black/10 z-[1] pointer-events-none"></div>
+
+      {/* Clean Notice Overlay */}
+      <AnimatePresence>
+        {noticeMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="absolute top-24 left-4 right-4 z-50 bg-[#D9483E] text-white p-4 rounded-2xl shadow-[0_12px_24px_rgba(217,72,62,0.4)] flex items-center gap-4 border border-[#D9483E]/50 backdrop-blur-md"
+          >
+            <div className="size-10 min-w-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="material-symbols-outlined font-black">info</span>
+            </div>
+            <p className="font-bold text-sm leading-tight tracking-tight">{noticeMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Header Consistency */}
       <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">

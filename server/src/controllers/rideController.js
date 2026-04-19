@@ -69,7 +69,7 @@ export const updateRideStatus = async (req, res) => {
       }
     }
 
-    io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status });
+    io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status, driver_id: updatedRide.driver_id });
 
     res.json(updatedRide);
   } catch (error) {
