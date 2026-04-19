@@ -43,17 +43,30 @@ export const updateRideStatus = async (req, res) => {
   try {
     let updatedRide;
     if (driver_id) {
+      // Ensure the ride is either not yet accepted or already belongs to this driver
       [updatedRide] = await sql`
-        UPDATE rides SET status = ${status}, driver_id = ${driver_id} WHERE id = ${id} RETURNING *
+        UPDATE rides 
+        SET status = ${status}, driver_id = ${driver_id} 
+        WHERE id = ${id} AND (driver_id IS NULL OR driver_id = ${driver_id}) 
+        RETURNING *
       `;
+
+      if (!updatedRide) {
+        // Determine whether the ride doesn't exist or is already taken
+        const [existingRide] = await sql`SELECT * FROM rides WHERE id = ${id}`;
+        if (!existingRide) {
+          return res.status(404).json({ message: 'Ride not found' });
+        } else {
+          return res.status(400).json({ message: 'Ride already accepted by another driver' });
+        }
+      }
     } else {
       [updatedRide] = await sql`
         UPDATE rides SET status = ${status} WHERE id = ${id} RETURNING *
       `;
-    }
-
-    if (!updatedRide) {
-      return res.status(404).json({ message: 'Ride not found' });
+      if (!updatedRide) {
+        return res.status(404).json({ message: 'Ride not found' });
+      }
     }
 
     io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status });
