@@ -75,13 +75,16 @@ export const getTransactions = async (req, res) => {
 // @route   PUT /api/user/profile
 export const updateProfile = async (req, res) => {
   const userId = req.user.id;
-  const { name, email, avatar_url } = req.body;
+  const { name, email, avatar_url, car_model, car_plate, is_online } = req.body;
 
   try {
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
+    if (car_model !== undefined) updateData.car_model = car_model;
+    if (car_plate !== undefined) updateData.car_plate = car_plate;
+    if (is_online !== undefined) updateData.is_online = is_online;
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: 'No fields to update' });
@@ -90,7 +93,7 @@ export const updateProfile = async (req, res) => {
     const [updatedUser] = await sql`
       UPDATE users SET ${sql(updateData)} 
       WHERE id = ${userId} 
-      RETURNING id, name, email, role, wallet_balance, avatar_url
+      RETURNING id, name, email, role, wallet_balance, avatar_url, car_model, car_plate, is_online, average_rating
     `;
 
     if (!updatedUser) {

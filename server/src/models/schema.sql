@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) DEFAULT 'rider', -- 'rider' or 'driver'
     wallet_balance DECIMAL(10, 2) DEFAULT 0.00,
     avatar_url TEXT,
+    car_model VARCHAR(100),
+    car_plate VARCHAR(30),
+    is_online BOOLEAN DEFAULT false,
+    average_rating DECIMAL(3, 2) DEFAULT 5.00,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -40,6 +44,17 @@ CREATE TABLE IF NOT EXISTS transactions (
     amount DECIMAL(10, 2) NOT NULL,
     type VARCHAR(20) NOT NULL, -- 'top-up', 'payment', 'withdrawal'
     status VARCHAR(20) DEFAULT 'completed',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reviews Table
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    ride_id INTEGER REFERENCES rides(id),
+    reviewer_id INTEGER REFERENCES users(id),
+    reviewee_id INTEGER REFERENCES users(id),
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

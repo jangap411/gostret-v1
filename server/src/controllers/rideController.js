@@ -9,6 +9,12 @@ export const requestRide = async (req, res) => {
   const io = req.app.get('io');
 
   try {
+    // Check rider's wallet balance
+    const [riderWallet] = await sql`SELECT wallet_balance FROM users WHERE id = ${rider_id}`;
+    if (!riderWallet || parseFloat(riderWallet.wallet_balance) < parseFloat(fare)) {
+      return res.status(400).json({ message: 'Insufficient wallet balance for this ride.' });
+    }
+
     const [ride] = await sql`
       INSERT INTO rides (
         rider_id, pickup_address, destination_address, 
@@ -67,6 +73,30 @@ export const updateRideStatus = async (req, res) => {
       if (!updatedRide) {
         return res.status(404).json({ message: 'Ride not found' });
       }
+    }
+
+    // Process payment if ride is completed
+    if (updatedRide && updatedRide.status === 'completed' && updatedRide.driver_id) {
+        // Atomic transaction for payment processing
+        await sql.begin(async (tx) => {
+            const fareAmt = parseFloat(updatedRide.fare);
+            const driverCut = fareAmt * 0.90; // 10% commission
+
+            // Deduct from Rider
+            await tx`UPDATE users SET wallet_balance = wallet_balance - ${fareAmt} WHERE id = ${updatedRide.rider_id}`;
+            // Add to Driver
+            await tx`UPDATE users SET wallet_balance = wallet_balance + ${driverCut} WHERE id = ${updatedRide.driver_id}`;
+
+            // Create Transaction Logs
+            await tx`
+              INSERT INTO transactions (user_id, ride_id, amount, type, status) 
+              VALUES (${updatedRide.rider_id}, ${updatedRide.id}, -${fareAmt}, 'payment', 'completed')
+            `;
+            await tx`
+              INSERT INTO transactions (user_id, ride_id, amount, type, status) 
+              VALUES (${updatedRide.driver_id}, ${updatedRide.id}, ${driverCut}, 'earning', 'completed')
+            `;
+        });
     }
 
     io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status, driver_id: updatedRide.driver_id });
