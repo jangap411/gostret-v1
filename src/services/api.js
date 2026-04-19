@@ -72,16 +72,20 @@ export const rideService = {
     return data;
   },
 
-  updateRideStatus: async (id, status, token) => {
+  updateRideStatus: async (id, status, token, driverId = null) => {
+    const payload = { status };
+    if (driverId) payload.driver_id = driverId;
+
     const response = await fetch(`${API_BASE_URL}/rides/${id}/status`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
+    console.log(data);
     if (!response.ok) throw new Error(data.message || 'Status update failed');
     return data;
   },

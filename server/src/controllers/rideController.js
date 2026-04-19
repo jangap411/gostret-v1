@@ -90,7 +90,7 @@ export const updateRideStatus = async (req, res) => {
             // Create Transaction Logs
             await tx`
               INSERT INTO transactions (user_id, ride_id, amount, type, status) 
-              VALUES (${updatedRide.rider_id}, ${updatedRide.id}, -${fareAmt}, 'payment', 'completed')
+              VALUES (${updatedRide.rider_id}, ${updatedRide.id}, ${-fareAmt}, 'payment', 'completed')
             `;
             await tx`
               INSERT INTO transactions (user_id, ride_id, amount, type, status) 
