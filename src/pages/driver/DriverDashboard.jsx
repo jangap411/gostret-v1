@@ -3,6 +3,7 @@ import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
 import { useState,useEffect } from 'react';
 import { socketService } from '../../services/socket';
+import { notificationService } from '../../services/localNotifications';
 import MapView from '../../components/MapView';
 import { motion } from 'framer-motion';
 
@@ -60,8 +61,9 @@ const DriverDashboard = ({
     if (isOnline) {
       socketService.joinDriversPool();
       
-      socketService.onNewRide((ride) => {
+      socketService.onNewRide(async (ride) => {
         console.log("New ride received:", ride);
+        await notificationService.scheduleRideRequest(ride);
         navigate('/driver/incoming-request', { state: { ride } });
       });
     }
@@ -71,7 +73,12 @@ const DriverDashboard = ({
     };
   }, [isOnline, navigate]);
 
-  const onToggleOnline = () => dispatch(toggleOnline());
+  const onToggleOnline = async () => {
+    if (!isOnline) {
+      await notificationService.requestPermissions();
+    }
+    dispatch(toggleOnline());
+  };
 
   return (
     <motion.div 
