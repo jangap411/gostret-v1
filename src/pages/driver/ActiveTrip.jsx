@@ -5,6 +5,7 @@ import { rideService } from '../../services/api';
 import MapView from '../../components/MapView';
 import { motion } from 'framer-motion';
 import { locationService } from '../../services/location';
+import SlideButton from '../../components/SlideButton';
 
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
@@ -18,13 +19,10 @@ const ActiveTrip = () => {
   const [ride, setRide] = useState(location.state?.ride);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  console.log('ride1')
-  console.log(ride)
-  console.log('ride2')
-  
+  const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   useEffect(() => {
+    console.log('ActiveTrip: Mounted or ride updated', ride);
     if (!ride) {
       navigate('/');
       return;
@@ -48,19 +46,26 @@ const ActiveTrip = () => {
   }, [ride, navigate]);
 
   const handleUpdateStatus = async (newStatus) => {
+    console.log(`ActiveTrip: Initiating status update to ${newStatus}...`);
     setIsUpdating(true);
     try {
       const token = localStorage.getItem('token');
-      const updatedRide = await rideService.updateRideStatus(ride.id, newStatus, token);
-      setRide(updatedRide);
+      const updatedRide = await rideService.updateRideStatus(ride.id, newStatus, token, user.id);
+      console.log('ActiveTrip: Status update API response:', updatedRide);
+      
+      // Force status update in case API response is delayed or slightly different
+      const finalRide = updatedRide || { ...ride, status: newStatus };
+      setRide(finalRide);
+      
       if (newStatus === 'completed') {
         setShowSuccess(true);
+        console.log('ActiveTrip: Ride completed, showing success overlay');
         setTimeout(() => {
           navigate('/');
         }, 3000);
       }
     } catch (error) {
-      console.error("Failed to update status:", error);
+      console.error("ActiveTrip: Failed to update status:", error);
       alert("Status update failed. Please check your connection.");
     } finally {
       setIsUpdating(false);
@@ -107,7 +112,7 @@ const ActiveTrip = () => {
       <main className="flex-1 w-full relative">
         <div className="absolute inset-0 z-0 bg-neutral-100">
           <MapView 
-            center={[ride.pickup_lat, ride.pickup_lng]} 
+            center={ride.status === 'accepted' ? [ride.pickup_lat, ride.pickup_lng] : [ride.destination_lat, ride.destination_lng]} 
             zoom={15} 
             className="w-full h-full" 
           />
@@ -162,18 +167,13 @@ const ActiveTrip = () => {
           </div>
 
           {/* Action Button */}
-          <div 
-            onClick={() => handleUpdateStatus(ride.status === 'accepted' ? 'in_progress' : 'completed')}
-            className={`relative w-full h-16 ${ride.status === 'accepted' ? 'bg-[#F3F0E7]' : 'bg-green-50'} border border-neutral-200 rounded-full flex items-center p-1.5 overflow-hidden group cursor-pointer shadow-inner ${isUpdating ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="absolute inset-0 flex items-center justify-center w-full">
-              <span className="font-headline font-extrabold text-[#1D3557]/60 text-sm tracking-widest pointer-events-none uppercase">
-                {isUpdating ? 'Updating...' : ride.status === 'accepted' ? 'Slide to Pick Up Rider' : 'Slide to Complete Trip'}
-              </span>
-            </div>
-            <div className={`h-13 w-13 ${ride.status === 'accepted' ? 'bg-[#1D3557]' : 'bg-[#10B981]'} rounded-full flex items-center justify-center text-white shadow-lg z-10 transition-all hover:scale-[0.98] active:scale-95 aspect-square`}>
-              <span className="material-symbols-outlined text-2xl">arrow_forward_ios</span>
-            </div>
-          </div>
+          <SlideButton 
+            onComplete={() => handleUpdateStatus(ride.status === 'accepted' ? 'in_progress' : 'completed')}
+            text={ride.status === 'accepted' ? 'Slide to Pick Up Rider' : 'Slide to Complete Trip'}
+            color={ride.status === 'accepted' ? '#1D3557' : '#10B981'}
+            isLoading={isUpdating}
+            icon={ride.status === 'accepted' ? 'person_pin_circle' : 'verified'}
+          />
 
           <div className="mt-6 flex items-start gap-3 px-2">
              <span className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider">
