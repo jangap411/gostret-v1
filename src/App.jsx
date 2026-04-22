@@ -47,19 +47,34 @@ function App() {
       const token = localStorage.getItem('token');
       const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
-      if (token && isAuthenticated) {
+        if (token && isAuthenticated) {
         socketService.connect();
         try {
           const activeRide = await rideService.getActiveRide(token);
+          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const isDriver = storedUser.role === 'driver';
+
           if (activeRide) {
             dispatch(setActiveRide(activeRide));
             socketService.joinRide(activeRide.id);
-            
+
             const currentPath = window.location.pathname;
-            if (currentPath === '/' || currentPath === '/searching-driver') {
-              if (activeRide.status === 'pending') navigate('/searching-driver');
-              else if (activeRide.status === 'accepted') navigate('/driver-en-route');
-              else if (activeRide.status === 'in_progress') navigate('/ride-in-progress');
+
+            if (isDriver) {
+              // Driver: redirect to active trip if they have an ongoing ride
+              if (
+                currentPath === '/' &&
+                (activeRide.status === 'accepted' || activeRide.status === 'in_progress')
+              ) {
+                navigate('/driver/active-trip', { state: { ride: activeRide } });
+              }
+            } else {
+              // Rider: restore to the appropriate rider-facing page
+              if (currentPath === '/' || currentPath === '/searching-driver') {
+                if (activeRide.status === 'pending') navigate('/searching-driver');
+                else if (activeRide.status === 'accepted') navigate('/driver-en-route');
+                else if (activeRide.status === 'in_progress') navigate('/ride-in-progress');
+              }
             }
           }
         } catch (error) {
