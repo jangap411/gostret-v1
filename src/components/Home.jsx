@@ -80,10 +80,10 @@ export default function Home() {
           animate={isSheetExpanded ? "expanded" : "collapsed"}
           variants={{
             collapsed: { height: 'auto' },
-            expanded: { height: '400px' }
+            expanded: { height: '460px' }
           }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="bg-surface rounded-[48px] shadow-premium p-8 pt-6 pointer-events-auto flex flex-col border border-white/20 overflow-hidden relative"
+          className="bg-surface rounded-[48px] shadow-premium p-8 pt-6 pb-12 pointer-events-auto flex flex-col border border-white/20 overflow-hidden relative"
         >
           {/* Animated Background Element */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
