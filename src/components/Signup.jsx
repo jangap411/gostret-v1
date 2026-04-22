@@ -69,7 +69,6 @@ export default function Signup() {
             <h1 className="text-4xl font-extrabold tracking-tight">
               <span className="text-[#1D3557]">Go</span><span className="text-[#D9483E]">Stret</span>
             </h1>
-            <span className="text-3xl">🥎</span>
           </div>
           <h2 className="text-[#1c170d] tracking-tight text-[28px] font-bold leading-tight px-4 text-center mt-2 max-w-[480px] mx-auto w-full">Create your account</h2>
         </div>

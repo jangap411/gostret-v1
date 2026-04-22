@@ -14,7 +14,6 @@ const SplashScreen = () => {
           <h1 className="text-5xl font-extrabold tracking-tight">
             <span className="text-[#1D3557]">Go</span><span className="text-[#D9483E]">Stret</span>
           </h1>
-          <span className="text-4xl">🥎</span>
         </div>
         <p className="text-neutral-500 font-medium tracking-wide">GoStret, Go Seif</p>
       </motion.div>

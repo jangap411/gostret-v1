@@ -110,7 +110,6 @@ export default function Home() {
                   <h1 className="text-5xl font-black tracking-tighter leading-none">
                     <span className="text-primary">Go</span><span className="text-accent">Stret</span>
                   </h1>
-                  <span className="text-4xl">⚽</span>
                 </div>
                 <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em] opacity-60">Tap to plan your journey</p>
               </motion.div>
@@ -124,7 +123,6 @@ export default function Home() {
               >
                 <div className="flex items-center justify-between mb-10">
                    <h2 className="text-3xl font-black text-primary tracking-tighter">Plan your ride</h2>
-                   <span className="text-2xl">🥎</span>
                 </div>
                 
                 <div className="space-y-6 relative">
