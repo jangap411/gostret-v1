@@ -35,6 +35,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 import { socketService } from './services/socket';
+import { notificationService } from './services/localNotifications';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,8 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Initialize notifications
+    notificationService.init();
     const initializeApp = async () => {
       const token = localStorage.getItem('token');
       const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
