@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
@@ -7,9 +7,18 @@ import { rideService } from '../services/api';
 import { setActiveRide } from '../store/rideSlice';
 
 const pageVariants = {
-  initial: { opacity: 0, x: 50 },
+  initial: { opacity: 0, x: 20 },
   animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50 }
+  exit: { opacity: 0, x: -20 }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.3 }
+  })
 };
 
 export default function RideDetails() {
@@ -23,6 +32,7 @@ export default function RideDetails() {
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [booking, setBooking] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedOption, setSelectedOption] = useState('regular');
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -70,7 +80,7 @@ export default function RideDetails() {
         pickup_lng: pickup.marker.position[1],
         destination_lat: destination.marker.position[0],
         destination_lng: destination.marker.position[1],
-        fare: 12.34, // Mock fare for selected car
+        fare: selectedOption === 'regular' ? 12.34 : (selectedOption === 'premium' ? 18.51 : 22.78),
         distance: routeMeta?.distance,
         duration: routeMeta?.duration,
       };
@@ -80,7 +90,7 @@ export default function RideDetails() {
       navigate('/searching-driver');
     } catch (error) {
       console.error("Booking failed", error);
-      setErrorMessage(error.message || "Failed to book ride due to an unexpected error.");
+      setErrorMessage(error.message || "Failed to book ride.");
       setTimeout(() => setErrorMessage(''), 4000);
     } finally {
       setBooking(false);
@@ -93,6 +103,12 @@ export default function RideDetails() {
 
   const mapCenter = destination?.marker?.position || pickup?.marker?.position || [-9.43869006941101, 147.1810054779053];
 
+  const rideOptions = [
+    { id: 'regular', name: 'GoStret Regular', time: '4 min', price: 'PGK 12.34', icon: 'directions_car' },
+    { id: 'premium', name: 'GoStret Premium', time: '6 min', price: 'PGK 18.51', icon: 'auto_awesome' },
+    { id: 'xl', name: 'GoStret XL', time: '8 min', price: 'PGK 22.78', icon: 'airport_shuttle' }
+  ];
+
   return (
     <motion.div
       initial="initial"
@@ -100,49 +116,56 @@ export default function RideDetails() {
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="relative flex size-full h-full flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden"
-      style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
+      className="relative flex size-full h-full flex-col bg-background justify-between group/design-root overflow-x-hidden font-body"
     >
-      <div>
-        <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between relative z-50">
-          <button onClick={() => navigate(-1)} className="text-[#141414] flex size-12 shrink-0 items-center justify-center hover:bg-neutral-200 transition rounded-full cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path>
-            </svg>
-          </button>
-          <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Ride details</h2>
+      <div className="flex-1 flex flex-col h-full overflow-y-auto no-scrollbar pb-32">
+        {/* Sticky Header */}
+        <div className="glass-surface flex items-center p-4 justify-between sticky top-0 z-50 border-b border-white/20">
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => navigate(-1)} 
+            className="text-primary flex size-11 shrink-0 items-center justify-center hover:bg-white/40 transition rounded-full cursor-pointer"
+          >
+            <span className="material-symbols-outlined font-black">arrow_back</span>
+          </motion.button>
+          <h2 className="text-primary text-xl font-black leading-tight tracking-tighter flex-1 text-center pr-11 uppercase">
+            Ride Details
+          </h2>
         </div>
-        
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 relative z-50">
-          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="#D9483E" viewBox="0 0 256 256">
-                <circle cx="128" cy="128" r="40"></circle>
-            </svg>
-          </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-[#141414] text-sm font-bold uppercase tracking-wider opacity-60">Pickup</p>
-            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">
-              {pickup?.query || 'Not selected'}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 relative z-50">
-          <div className="text-[#141414] flex items-center justify-center rounded-lg bg-[#ededed] shrink-0 size-12 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"></path>
-            </svg>
-          </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-[#141414] text-sm font-bold uppercase tracking-wider opacity-60">Destination</p>
-            <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">
-              {destination?.query || 'Not selected'}
-            </p>
+
+        {/* Route Summary Card */}
+        <div className="px-4 pt-6 flex flex-col gap-3">
+          <div className="glass-surface rounded-[32px] p-5 shadow-premium border border-white/40 flex flex-col gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 blur-2xl" />
+            
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <div className="size-2.5 bg-primary rounded-full shadow-sm border-2 border-white"></div>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-60">PICKUP</span>
+                <p className="text-primary font-bold truncate tracking-tight">{pickup?.query || 'Not selected'}</p>
+              </div>
+            </div>
+
+            <div className="absolute left-[24px] top-[48px] bottom-[48px] w-0.5 bg-slate-100/50 z-0"></div>
+
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="size-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                 <span className="material-symbols-outlined text-accent text-xl font-black">location_on</span>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-60">DESTINATION</span>
+                <p className="text-primary font-bold truncate tracking-tight">{destination?.query || 'Not selected'}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex px-4 py-3">
-          <div className="w-full aspect-square rounded-2xl overflow-hidden relative z-0 border-2 border-neutral-200/50 shadow-md">
+        {/* Map Visualization */}
+        <div className="px-4 py-6">
+          <div className="w-full aspect-[4/3] rounded-[32px] overflow-hidden relative z-0 border-4 border-white shadow-premium bg-slate-100">
             <MapView 
               center={mapCenter} 
               zoom={13} 
@@ -151,67 +174,115 @@ export default function RideDetails() {
               routeMeta={routeMeta}
               className="absolute inset-0 w-full h-full z-0" 
             />
-            {(loadingRoute || booking) && (
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-20 flex items-center justify-center">
-                <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-xl">
-                  <div className="w-5 h-5 border-2 border-[#D9483E] border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-[#141414] font-bold text-sm">
-                    {booking ? 'Booking ride...' : 'Calculating route...'}
-                  </span>
-                </div>
-              </div>
+            
+            <AnimatePresence>
+              {(loadingRoute || booking) && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-20 flex items-center justify-center"
+                >
+                  <div className="flex items-center gap-4 glass-surface px-6 py-4 rounded-full shadow-premium border border-white/40">
+                    <div className="size-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-primary font-black text-sm tracking-tight">
+                      {booking ? 'SECURELY BOOKING...' : 'PLOTTING ROUTE...'}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {routeMeta && !loadingRoute && (
+               <div className="absolute top-4 right-4 glass-surface px-4 py-2 rounded-2xl shadow-premium border border-white/40 z-10 flex flex-col items-end">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">EST. TRIP</span>
+                  <p className="text-primary font-black text-lg tracking-tighter leading-none">{routeMeta.distance} · {routeMeta.duration}</p>
+               </div>
             )}
           </div>
         </div>
         
-        <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Ride options</h3>
-        <div className="overflow-y-auto max-h-[250px] scrollbar-hide pb-2">
-          {[
-            { id: 'uberx', name: 'GoStret Regular', time: '4 min', price: 'PGK 12.34', icon: 'Car' },
-            { id: 'uberxl', name: 'GoStret Premium', time: '6 min', price: 'PGK 18.51', icon: 'Car' },
-            { id: 'comfort', name: 'GoStret XL', time: '8 min', price: 'PGK 22.78', icon: 'Car' }
-          ].map((option) => (
-            <div key={option.id} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition-colors duration-200 active:scale-[0.98]">
-              <div className="flex items-center gap-4">
-                <div className="text-[#141414] flex items-center justify-center rounded-lg bg-white border border-neutral-200 shrink-0 size-12 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                    <path d="M240,112H229.2L201.42,49.5A16,16,0,0,0,186.8,40H69.2a16,16,0,0,0-14.62,9.5L26.8,112H16a8,8,0,0,0,0,16h8v80a16,16,0,0,0,16,16H64a16,16,0,0,0,16-16V192h96v16a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16V128h8a8,8,0,0,0,0-16ZM69.2,56H186.8l24.89,56H44.31ZM64,208H40V192H64Zm128,0V192h24v16Zm24-32H40V128H216ZM56,152a8,8,0,0,1,8-8H80a8,8,0,0,1,0,16H64A8,8,0,0,1,56,152Zm112,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,152Z"></path>
-                  </svg>
+        {/* Ride Options Section */}
+        <div className="px-4">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.25em] opacity-60">Choose your ride</h3>
+            <div className="size-2 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {rideOptions.map((option, i) => (
+              <motion.div 
+                key={option.id} 
+                custom={i}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ scale: 1.01, x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedOption(option.id)}
+                className={`flex items-center gap-4 px-5 h-[84px] justify-between cursor-pointer transition-all rounded-3xl border ${
+                  selectedOption === option.id 
+                    ? 'bg-white border-primary shadow-premium ring-4 ring-primary/5' 
+                    : 'bg-surface border-border-subtle hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`size-14 flex items-center justify-center rounded-2xl transition-colors ${
+                    selectedOption === option.id ? 'bg-primary text-white shadow-premium' : 'bg-slate-50 text-slate-400'
+                  }`}>
+                    <span className="material-symbols-outlined text-2xl font-black">{option.icon}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-primary text-lg font-black leading-none tracking-tight">{option.name}</p>
+                    <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider mt-2 opacity-80">{option.time} away · Friendly</p>
+                  </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                  <p className="text-[#141414] text-base font-bold leading-normal">{option.name}</p>
-                  <p className="text-neutral-500 text-sm font-normal leading-normal">{option.time} wait · Friendly drivers</p>
+                <div className="text-right">
+                  <p className="text-primary text-xl font-black tracking-tighter leading-none">{option.price}</p>
                 </div>
-              </div>
-              <div className="shrink-0"><p className="text-[#141414] text-lg font-bold leading-normal">{option.price}</p></div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
       
       {/* Error Message Toast */}
-      {errorMessage && (
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           exit={{ opacity: 0, y: 20 }}
-           className="absolute bottom-24 left-4 right-4 z-[60] bg-[#D9483E] text-white p-4 rounded-xl shadow-xl flex items-center gap-3"
-        >
-          <span className="material-symbols-outlined font-black">error</span>
-          <p className="font-bold text-sm tracking-tight">{errorMessage}</p>
-        </motion.div>
-      )}
-
-      <div className="bg-white border-t border-neutral-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] relative z-50">
-        <div className="flex px-4 py-4">
-          <button
-            onClick={handleBookRide}
-            disabled={booking || loadingRoute}
-            className={`flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] shadow-lg shadow-red-200 active:scale-95 transition-all ${booking || loadingRoute ? 'opacity-70 cursor-not-allowed' : ''}`}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             exit={{ opacity: 0, y: 20 }}
+             className="fixed bottom-28 left-4 right-4 z-[100] bg-accent text-white p-5 rounded-[24px] shadow-premium flex items-center gap-4 backdrop-blur-md border border-white/20"
           >
-            <span className="truncate">{booking ? 'Booking...' : 'Book GoStret Regular'}</span>
-          </button>
-        </div>
+            <div className="size-10 min-w-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="material-symbols-outlined font-black">warning</span>
+            </div>
+            <p className="font-black text-sm tracking-tight">{errorMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Booking Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 glass-surface border-t border-white/20 z-[60]">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleBookRide}
+          disabled={booking || loadingRoute}
+          className={`w-full h-16 flex items-center justify-center gap-3 rounded-[24px] bg-accent text-white font-black tracking-tight transition-all text-lg shadow-premium border-b-4 border-accent-hover ${
+            booking || loadingRoute ? 'opacity-70 cursor-not-allowed' : 'hover:bg-accent-hover'
+          }`}
+        >
+          {booking ? (
+            <div className="size-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+          ) : (
+            <>
+              <span className="material-symbols-outlined">bolt</span>
+              <span>Book {rideOptions.find(o => o.id === selectedOption)?.name}</span>
+            </>
+          )}
+        </motion.button>
       </div>
 
     </motion.div>

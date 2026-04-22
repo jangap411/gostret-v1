@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 
-const SlideButton = ({ onComplete, text, icon, color = '#1D3557', isLoading = false }) => {
+const SlideButton = ({ onComplete, text, icon, color = 'var(--color-primary)', isLoading = false }) => {
   const containerRef = useRef(null);
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
   const [hasCompleted, setHasCompleted] = useState(false);
@@ -41,25 +41,21 @@ const SlideButton = ({ onComplete, text, icon, color = '#1D3557', isLoading = fa
     const threshold = constraints.right * 0.75;
 
     if (constraints.right > 0 && currentX >= threshold && !hasCompleted) {
-      // Lock so it can't fire twice
       setHasCompleted(true);
-      // Snap to end
       animate(x, constraints.right, { type: 'spring', stiffness: 400, damping: 30 });
-      // Small delay so user sees the snap before parent re-renders
       setTimeout(() => {
         onComplete();
       }, 200);
     } else {
-      // Snap back to start
       animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
     }
   };
 
   if (isLoading) {
     return (
-      <div className="relative w-full h-16 bg-neutral-100 border border-neutral-200 rounded-full flex items-center justify-center gap-3 overflow-hidden">
-        <div className="w-5 h-5 border-2 border-[#1D3557] border-t-transparent rounded-full animate-spin flex-shrink-0" />
-        <span className="font-bold text-[#1D3557]/50 text-xs tracking-[0.2em] uppercase">
+      <div className="relative w-full h-16 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center gap-3 overflow-hidden shadow-inner">
+        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin flex-shrink-0" />
+        <span className="font-bold text-primary/40 text-[10px] tracking-[0.25em] uppercase">
           Updating...
         </span>
       </div>
@@ -69,8 +65,8 @@ const SlideButton = ({ onComplete, text, icon, color = '#1D3557', isLoading = fa
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-16 bg-neutral-50 border border-neutral-200 rounded-full flex items-center p-1.5 overflow-hidden"
-      style={{ boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.04)' }}
+      className="relative w-full h-16 bg-surface border border-border-subtle rounded-full flex items-center p-1.5 overflow-hidden shadow-premium"
+      style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}
     >
       {/* Filled track that grows as thumb slides */}
       <motion.div
@@ -78,29 +74,29 @@ const SlideButton = ({ onComplete, text, icon, color = '#1D3557', isLoading = fa
         style={{
           width: x,
           backgroundColor: color,
-          opacity: 0.12,
+          opacity: 0.1,
         }}
       />
 
       {/* Label text — fades as user slides */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <motion.span
-          style={{ opacity: textOpacity, color: `${color}99` }}
-          className="text-xs font-bold tracking-[0.18em] uppercase select-none px-16 text-center"
+          style={{ opacity: textOpacity }}
+          className="text-[11px] font-bold tracking-[0.2em] uppercase select-none px-16 text-center text-slate-400"
         >
           {text}
         </motion.span>
       </div>
 
-      {/* Draggable thumb — x and backgroundColor must be in the same style prop */}
+      {/* Draggable thumb */}
       <motion.div
         drag="x"
         dragConstraints={constraints}
         dragElastic={0.05}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
-        whileHover={{ scale: 1.04 }}
-        whileTap={{ scale: 0.96 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         style={{
           x,
           width: 52,
@@ -108,11 +104,11 @@ const SlideButton = ({ onComplete, text, icon, color = '#1D3557', isLoading = fa
           backgroundColor: color,
           touchAction: 'none',
         }}
-        className="relative z-10 flex-shrink-0 rounded-full flex items-center justify-center text-white cursor-grab active:cursor-grabbing select-none shadow-lg"
+        className="relative z-10 flex-shrink-0 rounded-full flex items-center justify-center text-white cursor-grab active:cursor-grabbing select-none shadow-premium border border-white/20"
         aria-label={text}
       >
         <span
-          className="material-symbols-outlined text-xl"
+          className="material-symbols-outlined text-2xl"
           style={{ fontVariationSettings: "'FILL' 1" }}
         >
           {icon || 'arrow_forward_ios'}

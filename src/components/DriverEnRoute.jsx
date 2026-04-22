@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import MapView from './MapView';
 import { setActiveRide } from '../store/rideSlice';
 import { socketService } from '../services/socket';
+
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
+};
 
 export default function DriverEnRoute() {
   const navigate = useNavigate();
@@ -20,7 +26,6 @@ export default function DriverEnRoute() {
 
     socketService.joinRide(activeRide.id);
 
-    // Listen for status changes
     socketService.onStatusUpdate((data) => {
       if (data.status === 'in_progress') {
         const updatedRide = { ...activeRide, status: 'in_progress' };
@@ -29,7 +34,6 @@ export default function DriverEnRoute() {
       }
     });
 
-    // Listen for driver movement
     socketService.onLocationUpdate((data) => {
       setDriverLocation(data);
     });
@@ -41,70 +45,110 @@ export default function DriverEnRoute() {
   }, [activeRide, navigate, dispatch]);
 
   return (
-    <div className="relative flex size-full h-full flex-col bg-white overflow-hidden" style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}>
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      className="relative flex size-full h-full flex-col bg-background overflow-hidden font-body"
+    >
+      {/* Background Map */}
       <div className="absolute inset-0 z-0">
         <MapView 
             center={activeRide?.pickup_lat ? [activeRide.pickup_lat, activeRide.pickup_lng] : null} 
             driverLocation={driverLocation}
-            zoom={14} 
+            zoom={15} 
             className="w-full h-full" 
         />
+        {/* Map Gradient Overlays */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-900/10 to-transparent z-[1] pointer-events-none"></div>
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-slate-900/10 to-transparent z-[1] pointer-events-none"></div>
       </div>
 
-      <div className="absolute top-0 left-0 right-0 p-4 z-10">
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-lg border border-neutral-100">
-           <div className="flex items-center gap-3">
-              <div className="size-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 animate-pulse">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M232,128a104,104,0,1,1-104-104A104.11,104.11,0,0,1,232,128Z" opacity="0.2"></path>
-                  <path d="M128,24a104,104,0,1,0,104,104A104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,0,128,216Zm45.66-93.66a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-16-16a8,8,0,0,1,11.32-11.32L136,148.69l26.34-26.35A8,8,0,0,1,173.66,122.34Z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-[#141414] text-lg font-bold">Driver is en route</h3>
-                <p className="text-neutral-500 text-sm font-medium">Arriving in approx. 3 mins</p>
-              </div>
+      {/* Floating Status Bar - TOP */}
+      <div className="absolute top-6 left-4 right-4 z-20">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="glass-surface px-6 py-4 rounded-[28px] shadow-premium border border-white/40 flex items-center gap-4"
+        >
+           <div className="size-11 rounded-full bg-success/10 flex items-center justify-center text-success relative">
+              <span className="material-symbols-outlined font-black">check_circle</span>
+              <span className="absolute inset-0 size-full bg-success/20 rounded-full animate-ping"></span>
            </div>
-        </div>
+           <div className="flex flex-col">
+              <h3 className="text-primary text-[15px] font-black tracking-tight leading-tight uppercase">Driver is en route</h3>
+              <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest opacity-80 mt-1">Arriving in approx. 3 mins</p>
+           </div>
+        </motion.div>
       </div>
 
-      <div className="mt-auto relative z-10 p-4">
-        <div className="bg-white p-6 rounded-[32px] shadow-2xl space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="size-14 bg-neutral-100 rounded-2xl overflow-hidden border-2 border-neutral-50 shadow-sm relative group">
-                <img 
-                  src={activeRide?.driver_avatar || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop"} 
-                  alt="Driver" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                />
-                <div className="absolute bottom-0 right-0 size-4 bg-green-500 border-2 border-white rounded-full"></div>
+      {/* Driver Identity Card - BOTTOM */}
+      <div className="mt-auto relative z-20 p-4 pb-8">
+        <motion.div 
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="bg-surface p-7 rounded-[40px] shadow-premium space-y-8 border border-white/20 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl opacity-50" />
+          
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-5">
+              <div className="relative">
+                <div className="size-16 rounded-[24px] overflow-hidden border-4 border-slate-50 shadow-sm relative group bg-slate-100">
+                  <img 
+                    src={activeRide?.driver_avatar || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop"} 
+                    alt="Driver" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                  />
+                </div>
+                <div className="absolute -bottom-1 -right-1 size-6 bg-success border-4 border-white rounded-xl shadow-sm"></div>
               </div>
-              <div>
-                <h4 className="text-[#141414] text-lg font-extrabold tracking-tight">{activeRide?.driver_name || 'James K.'}</h4>
-                <div className="flex items-center gap-1">
-                  <span className="text-yellow-500">★</span>
-                  <span className="text-sm font-bold text-[#141414]">4.9</span>
-                  <span className="text-neutral-300 mx-1">|</span>
-                  <span className="text-sm font-bold text-neutral-400">Toyota Corolla (PNG 123)</span>
+              <div className="flex flex-col min-w-0">
+                <h4 className="text-primary text-xl font-black tracking-tighter leading-none">{activeRide?.driver_name || 'James K.'}</h4>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-0.5 rounded-lg border border-yellow-400/10">
+                    <span className="text-yellow-500 text-[10px]">★</span>
+                    <span className="text-[10px] font-black text-primary">4.9</span>
+                  </div>
+                  <span className="text-slate-300 font-bold">·</span>
+                  <span className="text-[11px] font-bold text-slate-400 truncate tracking-tight uppercase">Toyota Corolla (PNG 123)</span>
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button className="size-12 rounded-2xl bg-neutral-100 flex items-center justify-center text-[#141414] hover:bg-neutral-200 transition active:scale-90">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L143.16,155.3c-15.42-7.38-31.39-23.25-38.76-38.63l16.03-16.03a8.11,8.11,0,0,0,.56-.76,16,16,0,0,0,1.41-15.22l-.06-.13L101.24,47.41a16,16,0,0,0-14.47-9.41A16.14,16.14,0,0,0,70.51,49.25C64.67,61.12,47,101.48,82.46,155c32.74,49.43,71.19,69.56,99.54,69.56a47.58,47.58,0,0,0,15.63-2.52A16,16,0,0,0,207.29,207C207.29,207,222.37,158.46,222.37,158.46Z"></path>
-                </svg>
-              </button>
-              <button className="size-12 rounded-2xl bg-[#D9483E] flex items-center justify-center text-white hover:bg-[#c43d35] transition shadow-lg shadow-red-100 active:scale-90">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M216,40H40A16,16,0,0,0,24,56V184a16,16,0,0,0,16,16H72.83l38,38a8,8,0,0,0,11.34,0l38-38H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,184H156.69l-28.69,28.69L99.31,184H40V56H216V184Z"></path>
-                </svg>
-              </button>
+            
+            <div className="flex gap-3">
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="size-14 rounded-2xl bg-slate-50 flex items-center justify-center text-primary shadow-sm hover:bg-slate-100 transition border border-border-subtle"
+              >
+                <span className="material-symbols-outlined font-black">call</span>
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="size-14 rounded-2xl bg-accent flex items-center justify-center text-white shadow-premium transition border-b-4 border-accent-hover"
+              >
+                <span className="material-symbols-outlined font-black">chat_bubble</span>
+              </motion.button>
             </div>
           </div>
-        </div>
+
+          {/* Action Hint */}
+          <div className="pt-2">
+            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+               <motion.div 
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                className="w-1/3 h-full bg-success/40 rounded-full"
+               />
+            </div>
+            <p className="text-center text-[9px] font-black text-slate-400 tracking-[0.25em] uppercase mt-3 opacity-60">Meeting at pickup point</p>
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -5,7 +5,7 @@ import { useState,useEffect } from 'react';
 import { socketService } from '../../services/socket';
 import { notificationService } from '../../services/localNotifications';
 import MapView from '../../components/MapView';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { locationService } from '../../services/location';
 
@@ -18,18 +18,14 @@ const pageVariants = {
 const DriverDashboard = ({
   earningsGrowth = "+12% vs LW",
   earningsData = [
-    { day: 'MON', height: '40%', active: false },
-    { day: 'TUE', height: '65%', active: false },
-    { day: 'WED', height: '90%', active: true },
-    { day: 'THU', height: '55%', active: false },
-    { day: 'FRI', height: '75%', active: false },
-    { day: 'SAT', height: '30%', active: false },
-    { day: 'SUN', height: '20%', active: false },
+    { day: 'M', active: false },
+    { day: 'T', active: false },
+    { day: 'W', active: true },
+    { day: 'T', active: false },
+    { day: 'F', active: false },
+    { day: 'S', active: false },
+    { day: 'S', active: false },
   ],
-  activeZone = "Downtown SF",
-  rating = "4.98",
-  totalTrips = "142",
-  onViewAllActivity,
   onSOS,
 }) => {
   const navigate = useNavigate();
@@ -39,7 +35,6 @@ const DriverDashboard = ({
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
 
-  const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuB3Uzozyg_eCMorbhLRnbEAos0EgecGGKS_PgyYG23F551US2rKvdbT9hjlQeGeaVnRXWnyyvDxIpSIYmrWRwS5loPwd2wTNY9bcyjGw0Wv0wj5twb8ILZbYZBdeCB_keKcACN-qQQXPwci2hjvd395gywucEpVs_t0s1IfYRYEIspm8xdVGAQt1Gs-8hxcLtn0pPIiHvlQbnIx0r3GMZBRj72eCqaplWvrtoBE2F2Oah9aX6yEsBQIKrxDGiqEB38qFrwQYj-vJv7R";
   const weeklyEarnings = user.wallet_balance || "1,284.50";
 
   const handleLocateMe = async () => {
@@ -87,76 +82,94 @@ const DriverDashboard = ({
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="bg-neutral-50 text-[#141414] font-body h-full relative overflow-hidden flex flex-col"
+      className="bg-background text-primary h-full relative overflow-hidden flex flex-col font-body"
     >
       {/* Full-Screen Map Background */}
-        <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
-        
-        {/* Floating Minimal Header */}
-        <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
-          <button 
-            onClick={() => navigate('/driver/incoming-request')}
-            className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/40 backdrop-blur-md text-[#1D3557] border border-white/20 shadow-sm active:scale-95 transition-all group"
-          >
-            <span className="material-symbols-outlined text-sm font-black group-hover:rotate-12 transition-transform">bolt</span>
-            <span className="text-[10px] font-black tracking-widest uppercase">TEST REQUEST</span>
-          </button>
+      <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
+      
+      {/* Subtle Gradient Overlays */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-900/10 to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-slate-900/10 to-transparent z-10 pointer-events-none"></div>
 
-          <button 
-            onClick={onToggleOnline}
-            className={`pointer-events-auto flex items-center gap-2 px-6 py-3 rounded-full shadow-lg transition-all active:scale-95 ${isOnline ? 'bg-[#10B981] text-white' : 'bg-neutral-500 text-white'} border border-white/20`}
-          >
-            {isOnline && <span className="size-2 bg-white rounded-full animate-pulse"></span>}
-            <span className="text-[11px] font-black tracking-widest uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
-          </button>
-        </div>
-
-        {/* Floating Earnings Card */}
-        <div className="absolute bottom-6 left-4 right-4 z-20 pointer-events-none">
-          <div 
+      {/* COMPACT TOP HEADER */}
+      <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
+        <div className="flex flex-col gap-3 pointer-events-auto">
+          {/* Compact Earnings Pill */}
+          <motion.div 
             onClick={() => navigate('/earnings')}
-            className="bg-white/90 backdrop-blur-lg rounded-[32px] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/40 pointer-events-auto max-w-sm mx-auto cursor-pointer active:scale-[0.98] transition-all"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="glass-surface px-4 py-2.5 rounded-2xl shadow-premium border border-white/40 flex flex-col gap-0.5 cursor-pointer"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-neutral-500 text-[10px] font-bold uppercase tracking-widest mb-1 font-mono">Weekly Earnings</p>
-                <div className="flex items-baseline gap-1">
-                  <h2 className="text-3xl font-black text-[#1D3557] tracking-tighter">PGK {weeklyEarnings}</h2>
-                </div>
-              </div>
-              <div className="bg-[#1D3557] text-white px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm">
-                +12% vs LW
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest opacity-70">EARNINGS</span>
+              <span className="text-[9px] font-black text-success uppercase tracking-tight">{earningsGrowth}</span>
             </div>
-
-            {/* Day Selector */}
-            <div className="flex justify-between items-center mt-6 px-1">
-              {earningsData.map((day) => (
-                <div key={day.day} className="flex flex-col items-center gap-1.5">
-                  <div className={`size-1.5 rounded-full ${day.active ? 'bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-neutral-200'}`}></div>
-                  <span className={`text-[10px] font-bold tracking-tight ${day.active ? 'text-[#10B981]' : 'text-neutral-400'}`}>
-                    {day.day}
-                  </span>
-                </div>
+            <h2 className="text-xl font-black text-primary tracking-tighter leading-none">PGK {weeklyEarnings}</h2>
+            
+            {/* Minimal Day Track */}
+            <div className="flex gap-1.5 mt-2">
+              {earningsData.map((d, i) => (
+                <div key={i} className={`size-1 rounded-full ${d.active ? 'bg-success shadow-[0_0_4px_rgba(16,185,129,0.5)]' : 'bg-slate-200'}`} />
               ))}
             </div>
-          </div>
+          </motion.div>
+
+          {/* Demo Button */}
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/driver/incoming-request')}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl glass-surface text-primary shadow-sm border border-white/20 group w-fit"
+          >
+            <span className="material-symbols-outlined text-[14px] font-black text-accent group-hover:rotate-12 transition-transform">bolt</span>
+            <span className="text-[9px] font-black tracking-widest uppercase">TEST</span>
+          </motion.button>
         </div>
 
-        {/* SOS FAB */}
-        <button 
+        {/* Online Status Toggle */}
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onToggleOnline}
+          className={`pointer-events-auto flex items-center gap-3 px-6 py-3 rounded-[24px] shadow-premium transition-all border-b-4 ${
+            isOnline 
+              ? 'bg-success text-white border-green-700' 
+              : 'bg-slate-700 text-white border-slate-900'
+          }`}
+        >
+          {isOnline && <span className="size-2 bg-white rounded-full block animate-pulse"></span>}
+          <span className="text-[10px] font-black tracking-[0.2em] uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
+        </motion.button>
+      </div>
+
+      {/* COMPACT MAP CONTROLS */}
+      <div className="absolute right-4 bottom-24 z-20 flex flex-col gap-3">
+        <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={onSOS}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-[#D9483E] text-white shadow-xl flex items-center justify-center active:scale-90 transition-transform border-4 border-white/20">
-          <span className="material-symbols-outlined font-black text-xl">sos</span>
-        </button>
+          className="w-14 h-14 rounded-2xl bg-accent text-white shadow-premium flex items-center justify-center border-b-4 border-red-800 active:border-b-0 active:translate-y-1 transition-all">
+          <span className="material-symbols-outlined font-black text-2xl">sos</span>
+        </motion.button>
         
-        {/* Recenter button */}
-        <button 
+        <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={handleLocateMe}
-          className="absolute right-4 bottom-32 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#1D3557] shadow-xl active:scale-90 transition-all border border-neutral-100">
-          <span className="material-symbols-outlined">my_location</span>
-        </button>
-      </motion.div>
+          className="w-14 h-14 rounded-2xl glass-surface flex items-center justify-center text-primary shadow-premium border border-white/40 active:bg-white/60 transition-all">
+          <span className="material-symbols-outlined text-xl font-black">my_location</span>
+        </motion.button>
+      </div>
+
+      {/* COMPACT STATUS OVERLAYS */}
+      <div className="absolute left-4 bottom-24 z-20 pointer-events-none flex flex-col gap-2">
+        <div className="glass-surface px-3 py-2 rounded-xl border border-white/40 shadow-sm flex items-center gap-2 pointer-events-auto">
+           <div className="size-1.5 bg-success rounded-full animate-ping"></div>
+           <span className="text-[8px] font-black text-slate-500 tracking-widest uppercase">BUSY AREA</span>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
