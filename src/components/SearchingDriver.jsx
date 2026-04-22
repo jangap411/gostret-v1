@@ -154,7 +154,7 @@ export default function SearchingDriver() {
         </div>
       </div>
 
-      {/* Tip Card - Premium Glassmorphism */}
+      {/* Tip Card - Premium Glassmorphism
       <div className="mt-auto p-8 z-20">
         <motion.div 
           initial={{ y: 50, opacity: 0 }}
@@ -170,7 +170,7 @@ export default function SearchingDriver() {
                 <p className="text-primary text-sm font-bold leading-snug tracking-tight">Drivers prefer exact pin locations. It helps them find you faster!</p>
             </div>
         </motion.div>
-      </div>
+      </div> */}
 
     </motion.div>
   );
