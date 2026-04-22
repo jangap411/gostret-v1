@@ -3,14 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { socketService } from '../../services/socket';
 import { rideService } from '../../services/api';
 import MapView from '../../components/MapView';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { locationService } from '../../services/location';
 import SlideButton from '../../components/SlideButton';
 
 const pageVariants = {
-  initial: { opacity: 0, scale: 0.98 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.98 }
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
 };
 
 const ActiveTrip = () => {
@@ -22,15 +22,21 @@ const ActiveTrip = () => {
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   useEffect(() => {
-    console.log('ActiveTrip: Mounted or ride updated', ride);
+    console.log("ActiveTrip: Component mounted. Ride data:", ride);
     if (!ride) {
-      navigate('/');
+      console.warn("ActiveTrip: No ride data found in location state. Redirecting...");
+      // Try to recover from local storage if available, or just redirect
+      const storedRide = localStorage.getItem('activeRide');
+      if (storedRide) {
+        setRide(JSON.parse(storedRide));
+      } else {
+        navigate('/');
+      }
       return;
     }
 
     socketService.joinRide(ride.id);
 
-    // Broadcast location periodically
     const locationInterval = setInterval(async () => {
       if (ride.status === 'accepted' || ride.status === 'in_progress') {
         try {
@@ -46,33 +52,31 @@ const ActiveTrip = () => {
   }, [ride, navigate]);
 
   const handleUpdateStatus = async (newStatus) => {
-    console.log(`ActiveTrip: Initiating status update to ${newStatus}...`);
+    console.log(`ActiveTrip: Updating status to ${newStatus}`);
     setIsUpdating(true);
     try {
       const token = localStorage.getItem('token');
       const updatedRide = await rideService.updateRideStatus(ride.id, newStatus, token, user.id);
-      console.log('ActiveTrip: Status update API response:', updatedRide);
-      
-      // Force status update in case API response is delayed or slightly different
       const finalRide = updatedRide || { ...ride, status: newStatus };
       setRide(finalRide);
       
       if (newStatus === 'completed') {
         setShowSuccess(true);
-        console.log('ActiveTrip: Ride completed, showing success overlay');
         setTimeout(() => {
           navigate('/');
         }, 3000);
       }
     } catch (error) {
       console.error("ActiveTrip: Failed to update status:", error);
-      alert("Status update failed. Please check your connection.");
+      alert("Status update failed.");
     } finally {
       setIsUpdating(false);
     }
   };
 
   const onEmergency = () => alert("SOS Triggered");
+
+  if (!ride) return null;
 
   const currentStep = ride.status === 'accepted' ? 'pickup' : 'trip';
 
@@ -82,121 +86,139 @@ const ActiveTrip = () => {
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      transition={{ duration: 0.3 }}
-      className="bg-neutral-50 font-body text-[#141414] h-full flex flex-col relative overflow-hidden"
+      className="bg-background font-body text-primary h-full flex flex-col relative overflow-hidden"
     >
-      {/* Top Navigation Header (Instructions) */}
-      <header className="fixed top-0 w-full z-50 px-4 pt-6 pb-8 bg-white/95 backdrop-blur-md border-b border-neutral-100 shadow-sm rounded-b-[2rem]">
-        <div className="max-w-xl mx-auto flex items-center gap-4">
-          <div className="bg-[#1D3557] p-3 rounded-2xl flex items-center justify-center shadow-md">
-            <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+      {/* HEADER - ABSOLUTE (To stay within App container) */}
+      <header className="absolute top-0 left-0 right-0 z-[60] px-4 pt-6 pb-8 glass-surface border-b border-white/20 rounded-b-[40px] shadow-premium">
+        <div className="flex items-center gap-4">
+          <div className="size-12 bg-primary rounded-2xl flex items-center justify-center shadow-premium shrink-0">
+            <span className="material-symbols-outlined text-white text-2xl font-black">
               {currentStep === 'pickup' ? 'person_pin_circle' : 'navigation'}
             </span>
           </div>
-          <div className="flex-1">
-            <p className="text-neutral-500 text-sm font-semibold tracking-wider uppercase mb-1">
+          <div className="flex-1 min-w-0">
+            <p className="text-slate-400 text-[9px] font-black tracking-[0.2em] uppercase mb-1 opacity-80">
               {currentStep === 'pickup' ? 'Heading to pickup' : 'Heading to destination'}
             </p>
-            <h1 className="text-[#141414] font-headline font-bold text-xl leading-tight">
+            <h1 className="text-primary font-black text-base leading-tight tracking-tighter truncate">
               {currentStep === 'pickup' ? ride.pickup_address : ride.destination_address}
             </h1>
           </div>
-          <div className="bg-green-50 border border-green-100 px-3 py-2 rounded-xl text-center shadow-sm">
-            <p className="text-green-700 font-headline font-extrabold text-lg">{ride.duration || '6'}</p>
-            <p className="text-green-800/70 text-[10px] font-bold">MIN</p>
+          <div className="glass-surface px-3 py-1.5 rounded-xl text-center border border-white/40 shrink-0">
+            <p className="text-success font-black text-lg tracking-tighter leading-none">{ride.duration || '4'}</p>
+            <p className="text-[8px] font-black text-slate-400 mt-0.5 uppercase tracking-widest leading-none">MIN</p>
           </div>
         </div>
       </header>
 
-      {/* Main Map Canvas */}
-      <main className="flex-1 w-full relative">
-        <div className="absolute inset-0 z-0 bg-neutral-100">
-          <MapView 
-            center={ride.status === 'accepted' ? [ride.pickup_lat, ride.pickup_lng] : [ride.destination_lat, ride.destination_lng]} 
-            zoom={15} 
-            className="w-full h-full" 
-          />
+      {/* MAP */}
+      <main className="flex-1 w-full relative z-0">
+        <MapView 
+          center={ride.status === 'accepted' ? [ride.pickup_lat, ride.pickup_lng] : [ride.destination_lat, ride.destination_lng]} 
+          zoom={15} 
+          className="w-full h-full" 
+        />
 
-          {/* Map Overlay UI Elements */}
-          <div className="absolute right-4 top-40 flex flex-col gap-3 z-10">
-            <button className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-md border border-neutral-100 text-[#1D3557] active:scale-95 transition-transform">
-              <span className="material-symbols-outlined">my_location</span>
-            </button>
-          </div>
-          <button 
+        {/* CONTROLS */}
+        <div className="absolute right-4 top-36 flex flex-col gap-3 z-10">
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="size-11 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center shadow-premium border border-white/40 text-primary"
+          >
+            <span className="material-symbols-outlined font-black text-xl">my_location</span>
+          </motion.button>
+          
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={onEmergency}
-            className="absolute left-4 top-40 w-14 h-14 rounded-full bg-[#D9483E] shadow-lg border-2 border-white flex items-center justify-center text-white active:scale-90 transition-all z-10">
-            <span className="material-symbols-outlined text-3xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>
-              sos
-            </span>
-          </button>
+            className="size-11 rounded-xl bg-accent shadow-premium flex items-center justify-center text-white border-b-2 border-accent-hover"
+          >
+            <span className="material-symbols-outlined font-black text-xl">sos</span>
+          </motion.button>
         </div>
       </main>
 
-      {/* Bottom Rider Information Card */}
-      <section className="fixed bottom-0 w-full z-50">
-        <div className="max-w-xl mx-auto bg-white rounded-t-[2.5rem] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] border-t border-neutral-100 p-6 pb-8">
-          <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mb-6"></div>
-          
-          {/* Rider Profile & Details */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="relative">
+      {/* RIDER CARD - ABSOLUTE BOTTOM (Stay within App, above BottomNav) */}
+      <section className="absolute bottom-6 left-0 right-0 z-50 px-4">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-surface rounded-[32px] shadow-premium border border-white/20 p-5 overflow-hidden relative"
+        >
+          {/* Handle */}
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-slate-100 rounded-full opacity-50"></div>
+
+          <div className="flex items-center justify-between mb-5 mt-2">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="relative shrink-0">
                 <img
                   alt="Rider"
-                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-neutral-50 shadow-sm"
-                  src={ride.rider_avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuAXX57dqlxz3G07pGosgaWUs23NGCkLRxAyCyM4Sixluldt_SbFWivuQNVgzBF7NN9zlN3PNbmIMjZPUqMNKN_gh0FP7HMAmZD24Ikel16uAXLsfFtKjE_TAcHBX1MTYHkfUnc95qxPsID9HFhZT4MtGhu500Qtr22sX-IumKYkfGjhQrA2knZ7sJA6mCjkeOZ1McsRu3VvcokRDmYQhef-I6UHUvnfW6phrYKbrH9rIoC9xgzMoP1oRNgY56OQTfT5X4lSmYKJdWVx"}
+                  className="size-12 rounded-xl object-cover border-2 border-slate-50 shadow-sm"
+                  src={ride.rider_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"}
                 />
-                <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-900 border-2 border-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                  {ride.rider_rating || '4.9'} <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <div className="absolute -bottom-1 -right-1 bg-yellow-400 text-primary border-2 border-white text-[8px] font-black px-1 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm">
+                  {ride.rider_rating || '4.9'} <span className="material-symbols-outlined text-[8px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                 </div>
               </div>
-              <div>
-                <h2 className="font-headline font-extrabold text-xl text-[#141414]">{ride.rider_name}</h2>
-                <div className="flex items-center gap-2 text-neutral-500 text-sm mt-0.5">
-                  <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
-                  <span className="font-medium truncate max-w-[150px]">"I'm at the pickup point"</span>
+              <div className="min-w-0">
+                <h2 className="font-black text-base text-primary tracking-tighter leading-none truncate">{ride.rider_name}</h2>
+                <div className="flex items-center gap-2 text-slate-400 text-[10px] mt-1 font-bold uppercase tracking-tight opacity-80">
+                  <span className="material-symbols-outlined text-[12px]">chat_bubble</span>
+                  <span className="truncate">"I'm at the pickup point"</span>
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button className="w-12 h-12 rounded-2xl bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[#1D3557] active:scale-90 transition-transform">
-                <span className="material-symbols-outlined">call</span>
-              </button>
-            </div>
+            <motion.button 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="size-11 rounded-xl bg-slate-50 border border-border-subtle flex items-center justify-center text-primary shadow-sm"
+            >
+              <span className="material-symbols-outlined font-black text-xl">call</span>
+            </motion.button>
           </div>
 
-          {/* Action Button */}
           <SlideButton 
             onComplete={() => handleUpdateStatus(ride.status === 'accepted' ? 'in_progress' : 'completed')}
-            text={ride.status === 'accepted' ? 'Slide to Pick Up Rider' : 'Slide to Complete Trip'}
+            text={ride.status === 'accepted' ? 'Slide to Pick Up' : 'Slide to Complete'}
             color={ride.status === 'accepted' ? '#1D3557' : '#10B981'}
             isLoading={isUpdating}
             icon={ride.status === 'accepted' ? 'person_pin_circle' : 'verified'}
           />
 
-          <div className="mt-6 flex items-start gap-3 px-2">
-             <span className="text-neutral-500 text-[11px] font-bold uppercase tracking-wider">
-                Price: PGK {ride.fare} • {ride.distance}
-             </span>
+          <div className="mt-4 flex items-center justify-between px-1 text-[9px] font-black text-slate-400 uppercase tracking-widest opacity-50">
+             <span>FARE: PGK {ride.fare}</span>
+             <span>{ride.distance}</span>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Success Overlay */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="bg-white rounded-[32px] p-8 shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-neutral-100 flex flex-col items-center text-center gap-4 scale-in-center">
-              <div className="size-20 bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#10B981]/30">
+      {/* SUCCESS MODAL */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-surface rounded-[40px] p-8 shadow-premium border border-white/20 flex flex-col items-center text-center gap-5 max-w-[280px]"
+            >
+              <div className="size-20 bg-success rounded-[24px] flex items-center justify-center text-white shadow-premium relative">
                 <span className="material-symbols-outlined text-4xl font-black">check</span>
               </div>
               <div>
-                <h3 className="text-2xl font-black tracking-tighter">Ride Completed</h3>
-                <p className="text-neutral-500 font-bold text-sm mt-1">Great job! The fare has been added to your wallet.</p>
+                <h3 className="text-2xl font-black tracking-tighter text-primary">Ride Completed</h3>
+                <p className="text-slate-500 font-bold text-xs mt-2 leading-relaxed opacity-80">Excellent work! Trip finished.</p>
               </div>
-           </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

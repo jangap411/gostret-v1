@@ -2,30 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleOnline } from '../../store/driverSlice';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../../services/api';
 
 const pageVariants = {
-  initial: { opacity: 0, scale: 0.98 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.98 }
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
 };
 
-const ProfileEarnings = ({
-  onCashOut,
-}) => {
+const ProfileEarnings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
   const isOnline = useSelector((state) => state.driver.isOnline);
   const onToggleOnline = () => dispatch(toggleOnline());
   
-  const driverName = user.name || "Marcus Chen";
-  const profileImage = user.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAcyFZMHjBHrf_ZO-rM6lzJYypBZKh_7XL3WBKDgYHNcQOCP8lVyfHWiHMSVNNgAthu7on4Zs5CaXlnHNrBLeMXADcKXK6h7ahhk6gszVjfIQJ6RA2Ufj65a4efj2477ckDXfMVjnOtwSZnWIa17zHCznLsUD5fbx5E2AaTwUGc4DCHeNc4VHouRxa_6XP8lMXG4Tv_9PrebfmcS7Lx38rRw-FxIV8guTWXAzxJM3l6tXw0CSm9NwfmfjDSqq1XvM85oq-_RS4XPwGS";
-  const sinceYear = "2021"; // Mocked for now
-  const rating = "4.98"; // Mocked for now
-  const totalTrips = "2,842"; // Mocked for now
-  const yearsActive = "3.5"; // Mocked for now
+  const profileImage = user.avatar_url || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop";
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -43,37 +36,21 @@ const ProfileEarnings = ({
     fetchBalance();
   }, []);
 
-  const dateRange = "Oct 23 - Oct 29"; // Mocked
-  
   const earningsData = [
     { day: 'MON', height: '60%', isToday: false },
     { day: 'TUE', height: '45%', isToday: false },
     { day: 'WED', height: '85%', isToday: false },
     { day: 'THU', height: '70%', isToday: false },
-    { day: 'FRI', height: '100%', isToday: true, colorClass: 'bg-[#D9483E]' },
+    { day: 'FRI', height: '100%', isToday: true },
     { day: 'SAT', height: '40%', isToday: false },
     { day: 'SUN', height: '25%', isToday: false },
   ];
   
-  const quickActions = [
-    { icon: 'description', title: 'Vehicle Documents', subtitle: 'Insurance, Registration, Permits' },
-    { icon: 'support_agent', title: 'Help & Support', subtitle: '24/7 Priority driver assistance' },
-    { icon: 'security', title: 'Safety Center', subtitle: 'Emergency tools & training' },
-  ];
-
-  const onSignOut = () => {
-    localStorage.removeItem('isAuthenticated'); 
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
   const [isTransferring, setIsTransferring] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleTransfer = () => {
     setIsTransferring(true);
-    // Simulate API call
     setTimeout(() => {
       setIsTransferring(false);
       setShowSuccess(true);
@@ -87,106 +64,166 @@ const ProfileEarnings = ({
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      transition={{ duration: 0.3 }}
-      className="bg-[#FCFBF8] text-[#1D3557] font-body h-full flex flex-col relative"
+      className="bg-background text-primary font-body h-full flex flex-col relative overflow-hidden"
     >
-      {/* Success Overlay */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="bg-white rounded-[32px] p-8 shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-neutral-100 flex flex-col items-center text-center gap-4 scale-in-center animate-out fade-out duration-1000">
-              <div className="size-20 bg-[#10B981] rounded-full flex items-center justify-center text-white shadow-lg shadow-[#10B981]/30">
-                <span className="material-symbols-outlined text-4xl font-black">check</span>
+      {/* Success Modal Overlay */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-surface rounded-[48px] p-10 shadow-premium border border-white/20 flex flex-col items-center text-center gap-6 max-w-sm"
+            >
+              <div className="size-24 bg-success rounded-[32px] flex items-center justify-center text-white shadow-premium relative">
+                <span className="material-symbols-outlined text-5xl font-black">check</span>
+                <span className="absolute inset-0 size-full bg-success/20 rounded-[32px] animate-ping"></span>
               </div>
               <div>
-                <h3 className="text-2xl font-black tracking-tighter">Transfer Successful</h3>
-                <p className="text-neutral-500 font-bold text-sm mt-1">PGK {parseFloat(user.wallet_balance || 0).toFixed(2)} is on its way to your bank account.</p>
+                <h3 className="text-3xl font-black tracking-tighter text-primary">Transfer Initiated</h3>
+                <p className="text-slate-500 font-bold text-sm mt-3 leading-relaxed opacity-80">
+                  PGK {parseFloat(user.wallet_balance || 0).toFixed(2)} is being securely transferred to your linked bank account.
+                </p>
               </div>
-           </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Consistent Header */}
-      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
-        <div className="flex justify-between items-center px-6 py-4 w-full h-full relative">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-              <img
-                className="w-full h-full object-cover"
-                src={profileImage}
-                alt={driverName}
-              />
-            </div>
-            <span className="font-black text-[#1D3557] tracking-tighter">Navigator</span>
+      {/* PREMIUM HEADER - GLASSMORPHISM */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-surface border-b border-white/20 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <div className="size-11 rounded-2xl overflow-hidden border-2 border-white shadow-sm bg-slate-100">
+            <img className="w-full h-full object-cover" src={profileImage} alt="Profile" />
           </div>
-          
-          <button 
-            onClick={onToggleOnline}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full shadow-sm transition-all active:scale-95 ${isOnline ? 'bg-[#10B981] text-white' : 'bg-neutral-500 text-white'}`}
-          >
-            {isOnline && <span className="size-2 bg-white rounded-full animate-pulse"></span>}
-            <span className="text-[10px] font-black tracking-widest uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
-          </button>
+          <span className="font-black text-primary tracking-tighter text-lg uppercase">Earnings</span>
         </div>
+        
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onToggleOnline}
+          className={`flex items-center gap-2.5 px-5 py-2 rounded-full shadow-sm transition-all border ${
+            isOnline 
+              ? 'bg-success/10 border-success/20 text-success' 
+              : 'bg-slate-100 border-slate-200 text-slate-500'
+          }`}
+        >
+          {isOnline && <span className="size-2 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>}
+          <span className="text-[10px] font-black tracking-[0.2em] uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
+        </motion.button>
       </header>
 
-      <main className="flex-1 pt-24 pb-32 px-6 max-w-lg mx-auto w-full space-y-8 overflow-y-auto">
-        {/* Page Title */}
-        <div className="flex flex-col gap-1 px-1">
-          <h2 className="text-3xl font-black text-[#1D3557] tracking-tighter">Earnings Summary</h2>
-          <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest">Financial Performance</p>
-        </div>
+      <main className="flex-1 pt-28 pb-32 px-6 overflow-y-auto no-scrollbar max-w-lg mx-auto w-full">
+        {/* WALLET BALANCE CARD */}
+        <section className="bg-surface rounded-[40px] p-8 shadow-premium border border-white/20 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+          
+          <div className="flex flex-col gap-2 relative z-10">
+            <h3 className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Available Balance</h3>
+            <div className="flex items-baseline gap-2 mt-1">
+               <span className="text-2xl font-black text-primary opacity-40 tracking-tighter uppercase">PGK</span>
+               <h4 className="text-5xl font-black text-primary tracking-tighter leading-none">
+                 {parseFloat(user.wallet_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+               </h4>
+            </div>
+            
+            <p className="text-slate-400 text-[11px] font-bold mt-4 uppercase tracking-widest opacity-80">Ready for instant cashout</p>
+          </div>
 
-        {/* Stats Row */}
-        <section className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-neutral-100 flex flex-col justify-between">
-            <p className="text-neutral-400 text-[10px] font-black tracking-widest uppercase mb-1 font-mono">TOTAL TRIPS</p>
-            <p className="text-2xl font-black text-[#1D3557] tracking-tighter">2,842</p>
-          </div>
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-neutral-100 flex flex-col justify-between">
-            <p className="text-neutral-400 text-[10px] font-black tracking-widest uppercase mb-1 font-mono">YEARS ACTIVE</p>
-            <p className="text-2xl font-black text-[#1D3557] tracking-tighter">3.5</p>
-          </div>
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleTransfer}
+            disabled={isTransferring}
+            className={`w-full mt-10 h-16 rounded-[24px] font-black text-lg shadow-premium flex items-center justify-center gap-3 transition-all border-b-4 ${
+              isTransferring 
+                ? 'bg-slate-100 text-slate-400 border-slate-200' 
+                : 'bg-primary text-white border-slate-900'
+            }`}
+          >
+            {isTransferring ? (
+              <div className="size-6 border-4 border-slate-300 border-t-slate-500 rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <span className="material-symbols-outlined font-black">account_balance_wallet</span>
+                <span>Transfer to Bank</span>
+              </>
+            )}
+          </motion.button>
         </section>
 
-        {/* Weekly Earnings Section */}
-        <section className="bg-white rounded-[32px] p-8 shadow-sm border border-neutral-100 space-y-8">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-neutral-400 text-xs font-black tracking-widest uppercase mb-1">Weekly Earnings</h3>
-              <p className="text-[#1D3557] font-bold text-sm">Real-time Balance</p>
-            </div>
-            <h4 className="text-3xl font-black text-[#1D3557] tracking-tighter">PGK {parseFloat(user.wallet_balance || 0).toFixed(2)}</h4>
+        {/* WEEKLY ACTIVITY SECTION */}
+        <section className="bg-white/40 rounded-[40px] p-8 border border-white/40 shadow-sm mb-8">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Weekly Activity</h3>
+            <div className="px-3 py-1 bg-slate-50 rounded-lg text-[9px] font-black text-slate-400 uppercase tracking-widest">OCT 23 - 29</div>
           </div>
 
           {/* Stylized Bar Chart */}
-          <div className="flex items-end justify-between h-32 gap-3 px-1">
+          <div className="flex items-end justify-between h-40 gap-3 px-2">
              {earningsData.map((day) => (
-                <div key={day.day} className="flex-1 flex flex-col items-center gap-3 group">
-                  <div className="w-full bg-neutral-50 rounded-full h-full relative overflow-hidden">
-                    <div 
-                      className={`absolute bottom-0 w-full rounded-full transition-all duration-700 ${day.isToday ? 'bg-[#10B981] shadow-[0_-4px_12px_rgba(16,185,129,0.3)]' : 'bg-[#1D3557]/10 group-hover:bg-[#1D3557]/20'}`}
-                      style={{ height: day.height }}
-                    ></div>
+                <div key={day.day} className="flex-1 flex flex-col items-center gap-4 group h-full">
+                  <div className="w-full bg-slate-100/50 rounded-full flex-1 relative overflow-hidden border border-slate-50">
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      animate={{ height: day.height }}
+                      transition={{ duration: 1, ease: "circOut" }}
+                      className={`absolute bottom-0 w-full rounded-full transition-all ${
+                        day.isToday ? 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.4)]' : 'bg-primary/10 group-hover:bg-primary/20'
+                      }`}
+                    ></motion.div>
                    </div>
-                  <span className={`text-[10px] font-black tracking-tight ${day.isToday ? 'text-[#10B981]' : 'text-neutral-400'}`}>
+                  <span className={`text-[9px] font-black tracking-tight ${day.isToday ? 'text-success' : 'text-slate-300'}`}>
                     {day.day}
                   </span>
                 </div>
              ))}
           </div>
-
-          <button 
-            onClick={handleTransfer}
-            disabled={isTransferring}
-            className={`w-full py-5 text-[#FCFBF8] rounded-2xl font-black text-lg shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isTransferring ? 'bg-neutral-400' : 'bg-[#1D3557] shadow-[#1D3557]/20'}`}>
-            {isTransferring ? (
-              <span className="animate-spin material-symbols-outlined font-black">progress_activity</span>
-            ) : (
-              <span className="material-symbols-outlined font-black">account_balance_wallet</span>
-            )}
-            {isTransferring ? 'Processing...' : 'Transfer to Bank'}
-          </button>
         </section>
+
+        {/* STATS GRID */}
+        <div className="grid grid-cols-2 gap-5 mb-8">
+          <div className="bg-surface rounded-3xl p-6 border border-white/20 shadow-sm">
+             <span className="material-symbols-outlined text-primary/30 text-2xl mb-4 font-black">local_taxi</span>
+             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 opacity-60">Total Trips</p>
+             <p className="text-2xl font-black text-primary tracking-tighter">2,842</p>
+          </div>
+          <div className="bg-surface rounded-3xl p-6 border border-white/20 shadow-sm">
+             <span className="material-symbols-outlined text-primary/30 text-2xl mb-4 font-black">verified_user</span>
+             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 opacity-60">Years Active</p>
+             <p className="text-2xl font-black text-primary tracking-tighter">3.5</p>
+          </div>
+        </div>
+
+        {/* QUICK LINKS */}
+        <div className="space-y-3">
+          {[
+            { icon: 'description', label: 'Vehicle Documents' },
+            { icon: 'support_agent', label: 'Help & Support' },
+            { icon: 'security', label: 'Safety Center' }
+          ].map((item, i) => (
+            <motion.button
+              key={i}
+              whileHover={{ scale: 1.01, x: 4 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-between p-5 bg-surface rounded-[24px] border border-white/20 shadow-sm hover:border-slate-300 transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <div className="size-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                   <span className="material-symbols-outlined text-xl font-black">{item.icon}</span>
+                </div>
+                <span className="text-sm font-black text-primary tracking-tight uppercase opacity-80">{item.label}</span>
+              </div>
+              <span className="material-symbols-outlined text-slate-300 font-black">chevron_right</span>
+            </motion.button>
+          ))}
+        </div>
       </main>
     </motion.div>
   );

@@ -1,25 +1,23 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { userService } from '../services/api';
 
 const pageVariants = {
-  initial: { opacity: 0, x: 50 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50 }
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
 };
 
 const INITIAL_METHODS = [
-  { id: '1', type: 'Credit', brand: 'Visa', last4: '4567', icon: 'visa', bg: 'bg-blue-100', text: 'text-blue-800' },
-  { id: '2', type: 'Credit', brand: 'Mastercard', last4: '1234', icon: 'mastercard', bg: 'bg-orange-100', text: 'text-orange-600' },
+  { id: '1', type: 'Credit Card', brand: 'Visa', last4: '4567', icon: 'payments', color: 'text-blue-500', bg: 'bg-blue-50' },
+  { id: '2', type: 'Debit Card', brand: 'Mastercard', last4: '1234', icon: 'credit_card', color: 'text-orange-500', bg: 'bg-orange-50' },
 ];
 
 const DIGITAL_WALLETS = [
-  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-100', identifier: '+675 7000 1234', status: 'Linked' },
-  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-100', identifier: '+675 7100 5678', status: 'Linked' },
-  { id: 'w3', name: 'Wantok Wallet', icon: 'Wa', bg: 'bg-yellow-100', identifier: 'wantok.user@bsp.com.pg', status: 'Linked' },
+  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-50', color: 'text-green-600', identifier: '+675 7000 1234' },
+  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-50', color: 'text-red-600', identifier: '+675 7100 5678' },
 ];
-
-import { userService } from '../services/api';
 
 export default function PaymentMethods() {
   const navigate = useNavigate();
@@ -28,8 +26,8 @@ export default function PaymentMethods() {
   const [editingWallet, setEditingWallet] = useState(null); 
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState('');
-  const [walletBalance, setWalletBalance] = useState(100);
-  const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit' });
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [formData, setFormData] = useState({ brand: '', last4: '', type: 'Credit Card' });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -53,7 +51,7 @@ export default function PaymentMethods() {
 
   const handleAdd = () => {
     setEditingMethod('new');
-    setFormData({ brand: '', last4: '', type: 'Credit' });
+    setFormData({ brand: '', last4: '', type: 'Credit Card' });
   };
 
   const handleSave = () => {
@@ -61,8 +59,9 @@ export default function PaymentMethods() {
       const newMethod = {
         id: Date.now().toString(),
         ...formData,
-        bg: 'bg-neutral-100',
-        text: 'text-neutral-800'
+        icon: 'credit_card',
+        color: 'text-slate-400',
+        bg: 'bg-slate-50'
       };
       setMethods([...methods, newMethod]);
     } else {
@@ -83,7 +82,6 @@ export default function PaymentMethods() {
       setWalletBalance(data.wallet_balance);
       setIsTopUpOpen(false);
       setTopUpAmount('');
-      alert("Wallet topped up successfully!");
     } catch (error) {
       alert(error.message);
     } finally {
@@ -96,275 +94,321 @@ export default function PaymentMethods() {
     setEditingMethod(null);
   };
 
+  const getTitle = () => {
+    if (editingMethod) return editingMethod === 'new' ? 'ADD CARD' : 'EDIT CARD';
+    if (editingWallet) return 'WALLET INFO';
+    if (isTopUpOpen) return 'TOP UP';
+    return 'PAYMENTS';
+  };
+
   return (
     <motion.div
       initial="initial"
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      transition={{ duration: 0.3 }}
-      className="relative flex size-full h-full flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden"
-      style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
+      className="bg-background text-primary font-body h-full flex flex-col relative overflow-hidden"
     >
-      <div className="flex-1 flex flex-col">
-        <div className="flex items-center bg-neutral-50 p-4 pb-2 justify-between sticky top-0 z-50">
-          <button 
-            onClick={() => {
-              if (editingMethod) setEditingMethod(null);
-              else if (editingWallet) setEditingWallet(null);
-              else if (isTopUpOpen) setIsTopUpOpen(false);
-              else navigate(-1);
-            }} 
-            className="text-[#141414] flex size-12 shrink-0 items-center cursor-pointer hover:bg-neutral-200 rounded-full justify-center transition"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path>
-            </svg>
-          </button>
-          <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
-            {editingMethod ? (editingMethod === 'new' ? 'Add card' : 'Edit card') : (editingWallet ? 'Wallet details' : (isTopUpOpen ? 'Top up wallet' : 'Payment methods'))}
-          </h2>
-        </div>
+      {/* PREMIUM HEADER - GLASSMORPHISM */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-surface border-b border-white/20 px-6 py-4 flex items-center justify-between">
+        <motion.button 
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            if (editingMethod) setEditingMethod(null);
+            else if (editingWallet) setEditingWallet(null);
+            else if (isTopUpOpen) setIsTopUpOpen(false);
+            else navigate(-1);
+          }} 
+          className="size-11 rounded-2xl bg-surface border border-white/20 flex items-center justify-center text-primary shadow-sm"
+        >
+          <span className="material-symbols-outlined font-black">arrow_back</span>
+        </motion.button>
+        <h2 className="text-sm font-black tracking-[0.2em] uppercase text-primary">
+          {getTitle()}
+        </h2>
+        <div className="size-11"></div> {/* Spacer */}
+      </header>
 
+      <main className="flex-1 pt-24 pb-32 px-6 overflow-y-auto no-scrollbar max-w-lg mx-auto w-full">
         <AnimatePresence mode="wait">
           {!editingMethod && !editingWallet && !isTopUpOpen ? (
             <motion.div 
-              key="list"
+              key="main-list"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex-1 flex flex-col"
+              className="space-y-8"
             >
-              <div className="mx-4 mt-4 p-6 bg-gradient-to-br from-[#1D3557] to-[#141414] rounded-3xl shadow-xl shadow-blue-950/20 text-white flex flex-col gap-1">
-                <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Available Balance</p>
-                <div className="flex items-end gap-2">
-                  <h3 className="text-4xl font-extrabold tracking-tight">PGK {walletBalance}</h3>
-                  <span className="text-sm font-medium text-blue-300 pb-1.5">PGK</span>
+              {/* WALLET BALANCE CARD */}
+              <section className="bg-primary rounded-[40px] p-8 shadow-premium border border-slate-800 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+                
+                <div className="relative z-10">
+                  <p className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Digital Wallet</p>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="text-xl font-black text-white/40 tracking-tighter uppercase">PGK</span>
+                    <h3 className="text-5xl font-black text-white tracking-tighter leading-none">
+                      {parseFloat(walletBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </h3>
+                  </div>
+                  
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setIsTopUpOpen(true)}
+                    className="w-full mt-10 h-16 bg-accent text-white rounded-[24px] font-black text-lg shadow-premium flex items-center justify-center gap-3 border-b-4 border-accent-hover"
+                  >
+                    <span className="material-symbols-outlined font-black">add</span>
+                    <span>Top Up Wallet</span>
+                  </motion.button>
                 </div>
-                <button 
-                  onClick={() => setIsTopUpOpen(true)}
-                  className="mt-4 h-12 bg-[#D9483E] rounded-xl text-white font-bold text-sm shadow-lg shadow-red-950/20 active:scale-95 transition flex items-center justify-center gap-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256">
-                    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-                  </svg>
-                  Top Up Now
-                </button>
-              </div>
+              </section>
 
-              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-8">Credit and debit cards</h3>
-              
-              {methods.map((method) => (
-                <div 
-                  key={method.id} 
-                  onClick={() => handleEdit(method)}
-                  className="flex items-center gap-4 bg-neutral-50 px-4 min-h-[72px] py-2 justify-between hover:bg-neutral-100 cursor-pointer transition border-b border-neutral-100 last:border-b-0"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 ${method.bg || 'bg-neutral-100'} rounded flex items-center justify-center text-[10px] font-bold ${method.text || 'text-neutral-800'}`}>
-                      {method.brand?.toUpperCase() || 'CARD'}
-                    </div>
-                    <div className="flex flex-col justify-center">
-                      <p className="text-[#141414] text-base font-medium leading-normal">{method.type}</p>
-                      <p className="text-neutral-500 text-sm font-normal leading-normal">{method.brand} ... {method.last4}</p>
-                    </div>
-                  </div>
-                  <div className="shrink-0 text-neutral-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-                    </svg>
-                  </div>
+              {/* CARD LIST */}
+              <section>
+                <div className="flex items-center justify-between mb-5 px-2">
+                  <h4 className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Saved Cards</h4>
+                  <div className="size-2 bg-primary/20 rounded-full"></div>
                 </div>
-              ))}
+                
+                <div className="bg-surface rounded-[40px] border border-white/20 shadow-premium overflow-hidden divide-y divide-slate-100">
+                  {methods.map((method) => (
+                    <motion.button 
+                      key={method.id} 
+                      whileTap={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
+                      onClick={() => handleEdit(method)}
+                      className="w-full flex items-center justify-between p-6 transition-all group"
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className={`size-12 rounded-[18px] ${method.bg} flex items-center justify-center ${method.color} shadow-sm`}>
+                          <span className="material-symbols-outlined font-black text-2xl">{method.icon}</span>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[11px] font-black text-primary tracking-[0.1em] uppercase">{method.type}</p>
+                          <p className="text-slate-400 font-bold text-xs mt-1">{method.brand} •••• {method.last4}</p>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined text-slate-200 group-hover:text-primary transition-colors">chevron_right</span>
+                    </motion.button>
+                  ))}
 
-              <div 
-                onClick={handleAdd}
-                className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition mt-2"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-[#D9483E] flex items-center justify-center rounded-lg bg-red-50 shrink-0 size-10 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-                    </svg>
-                  </div>
-                  <p className="text-[#D9483E] text-base font-bold leading-normal flex-1">Add payment method</p>
-                </div>
-              </div>
-
-              <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-6">Digital wallets</h3>
-              {DIGITAL_WALLETS.map((wallet) => (
-                <div key={wallet.id} onClick={() => setEditingWallet(wallet)} className="flex items-center gap-4 bg-neutral-50 px-4 min-h-14 justify-between hover:bg-neutral-100 cursor-pointer transition">
-                  <div className="flex items-center gap-4">
-                    <div className={`bg-center bg-no-repeat aspect-video bg-contain h-6 w-10 shrink-0 ${wallet.bg} rounded flex items-center justify-center text-[10px] font-bold text-[#141414]`}>
-                      {wallet.icon}
+                  <motion.button 
+                    onClick={handleAdd}
+                    whileTap={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
+                    className="w-full flex items-center gap-5 p-6 transition-all group"
+                  >
+                    <div className="size-12 rounded-[18px] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
+                      <span className="material-symbols-outlined font-black">add</span>
                     </div>
-                    <p className="text-[#141414] text-base font-normal leading-normal">{wallet.name}</p>
-                  </div>
-                  <div className="shrink-0 text-neutral-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
-                    </svg>
-                  </div>
+                    <span className="font-black text-primary tracking-[0.1em] uppercase text-[11px]">Add New Card</span>
+                  </motion.button>
                 </div>
-              ))}
+              </section>
+
+              {/* DIGITAL WALLETS */}
+              <section>
+                <h4 className="px-2 mb-5 text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Other Methods</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  {DIGITAL_WALLETS.map((wallet) => (
+                    <motion.button
+                      key={wallet.id}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setEditingWallet(wallet)}
+                      className="bg-surface p-6 rounded-[32px] border border-white/20 shadow-sm flex flex-col items-center gap-4 text-center"
+                    >
+                      <div className={`size-14 rounded-2xl ${wallet.bg} flex items-center justify-center ${wallet.color} font-black text-xl shadow-sm`}>
+                        {wallet.icon}
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-black text-primary text-[10px] uppercase tracking-widest">{wallet.name}</p>
+                        <p className="text-slate-400 font-bold text-[9px] opacity-60">Linked</p>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </section>
             </motion.div>
           ) : isTopUpOpen ? (
             <motion.div 
-              key="topup"
+              key="top-up-flow"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="flex-1 flex flex-col px-4 pt-6 gap-8"
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
             >
-              <div className="flex flex-col gap-3">
-                <label className="text-sm font-bold text-neutral-500 uppercase tracking-widest pl-1">Amount to Top Up</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-neutral-400">$</span>
-                  <input 
-                    type="number"
-                    placeholder="0.00"
-                    value={topUpAmount}
-                    onChange={(e) => setTopUpAmount(e.target.value)}
-                    className="w-full h-20 bg-white border border-neutral-200 rounded-[28px] pl-10 pr-6 text-3xl font-extrabold text-[#141414] focus:ring-4 focus:ring-[#D9483E]/10 focus:border-[#D9483E] outline-none transition"
-                  />
+              <div className="bg-surface rounded-[40px] p-8 shadow-premium border border-white/20 space-y-8">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase ml-2 opacity-80">Enter Amount</label>
+                  <div className="relative">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300">PGK</span>
+                    <input 
+                      type="number"
+                      placeholder="0.00"
+                      value={topUpAmount}
+                      onChange={(e) => setTopUpAmount(e.target.value)}
+                      className="w-full h-24 bg-slate-50/50 border border-border-subtle rounded-[32px] pl-20 pr-6 text-4xl font-black text-primary focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {[20, 50, 100, 200, 500, 1000].map(amt => (
+                    <motion.button 
+                      key={amt}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setTopUpAmount(amt.toString())}
+                      className={`h-14 rounded-2xl font-black text-xs transition-all border-b-2 ${
+                        topUpAmount === amt.toString() 
+                          ? 'bg-primary text-white border-slate-900 shadow-md' 
+                          : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                      }`}
+                    >
+                      {amt}
+                    </motion.button>
+                  ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                {[10, 20, 50, 100, 200, 500].map(amt => (
-                  <button 
-                    key={amt}
-                    onClick={() => setTopUpAmount(amt.toString())}
-                    className={`h-14 rounded-2xl font-bold transition flex items-center justify-center border-2 ${topUpAmount === amt.toString() ? 'bg-[#D9483E] border-[#D9483E] text-white shadow-lg shadow-red-200' : 'bg-white border-neutral-100 text-[#1D3557] hover:border-neutral-200'}`}
-                  >
-                    PGK {amt}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-auto flex flex-col gap-3 pb-8">
-                <button 
+              <div className="space-y-4">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   disabled={loading}
                   onClick={handleTopUp}
-                  className={`w-full h-16 bg-[#D9483E] text-white font-bold rounded-2xl shadow-xl shadow-red-100 active:scale-95 transition flex items-center justify-center gap-3 ${loading ? 'opacity-70' : ''}`}
+                  className="w-full h-18 bg-accent text-white font-black rounded-[28px] text-xl shadow-premium flex items-center justify-center gap-3 border-b-4 border-accent-hover"
                 >
-                  {loading ? 'Processing...' : 'Confirm Top Up'}
-                </button>
+                  {loading ? (
+                    <div className="size-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : 'Confirm Deposit'}
+                </motion.button>
                 <button 
                   onClick={() => setIsTopUpOpen(false)}
-                  className="w-full h-14 bg-neutral-100 text-neutral-600 font-bold rounded-2xl hover:bg-neutral-200 transition"
+                  className="w-full h-14 text-slate-400 font-black text-[10px] tracking-[0.2em] uppercase"
                 >
-                  Cancel
+                  CANCEL TRANSACTION
                 </button>
               </div>
             </motion.div>
           ) : editingMethod ? (
             <motion.div 
-              key="form"
+              key="edit-card-flow"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="flex-1 flex flex-col px-4 pt-4 gap-6"
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
             >
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Card Brand</label>
-                <input 
-                  type="text"
-                  placeholder="Visa, Mastercard, etc."
-                  value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  className="w-full h-14 bg-white border border-neutral-200 rounded-xl px-4 text-[#141414] font-medium focus:ring-2 focus:ring-[#D9483E]/20 focus:border-[#D9483E] outline-none transition"
-                />
+              <div className="bg-surface p-8 rounded-[40px] shadow-premium border border-white/20 space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase ml-2">Card Network</label>
+                  <input 
+                    type="text"
+                    placeholder="Visa, Mastercard, etc."
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    className="w-full h-16 bg-slate-50/50 border border-border-subtle rounded-2xl px-6 text-primary font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase ml-2">Last 4 Digits</label>
+                  <input 
+                    type="text"
+                    placeholder="4567"
+                    maxLength={4}
+                    value={formData.last4}
+                    onChange={(e) => setFormData({ ...formData, last4: e.target.value.replace(/\D/g, '') })}
+                    className="w-full h-16 bg-slate-50/50 border border-border-subtle rounded-2xl px-6 text-primary font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Last 4 Digits</label>
-                <input 
-                  type="text"
-                  placeholder="4567"
-                  maxLength={4}
-                  value={formData.last4}
-                  onChange={(e) => setFormData({ ...formData, last4: e.target.value.replace(/\D/g, '') })}
-                  className="w-full h-14 bg-white border border-neutral-200 rounded-xl px-4 text-[#141414] font-medium focus:ring-2 focus:ring-[#D9483E]/20 focus:border-[#D9483E] outline-none transition"
-                />
-              </div>
-
-              <div className="mt-auto flex flex-col gap-3 pb-8">
-                <button 
+              <div className="space-y-4">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleSave}
-                  className="w-full h-14 bg-[#D9483E] text-white font-bold rounded-2xl shadow-lg shadow-red-100 active:scale-95 transition"
+                  className="w-full h-18 bg-primary text-white font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-900"
                 >
-                  Save Payment Method
-                </button>
+                  Save Method
+                </motion.button>
                 {editingMethod !== 'new' && (
-                  <button 
+                  <motion.button 
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => handleDelete(editingMethod)}
-                    className="w-full h-14 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition"
+                    className="w-full h-14 bg-accent/5 text-accent font-black text-[10px] tracking-[0.25em] uppercase rounded-2xl border border-accent/10"
                   >
-                    Delete Method
-                  </button>
+                    Delete Card
+                  </motion.button>
                 )}
                 <button 
                   onClick={() => setEditingMethod(null)}
-                  className="w-full h-14 bg-neutral-100 text-neutral-600 font-bold rounded-2xl hover:bg-neutral-200 transition"
+                  className="w-full h-14 text-slate-400 font-black text-[10px] tracking-[0.2em] uppercase"
                 >
-                  Cancel
+                  CANCEL
                 </button>
               </div>
             </motion.div>
           ) : (
             <motion.div 
-              key="wallet-details"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="flex-1 flex flex-col px-4 pt-4 gap-8"
+              key="wallet-info-flow"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-12 py-6"
             >
-              <div className="flex flex-col items-center gap-4 py-8 bg-white rounded-3xl shadow-sm border border-neutral-100">
-                <div className={`bg-center bg-no-repeat aspect-video bg-contain h-16 w-24 ${editingWallet.bg} rounded-xl flex items-center justify-center text-xl font-bold text-[#141414] shadow-sm`}>
+              <div className="flex flex-col items-center gap-6 text-center">
+                <div className={`size-32 rounded-[40px] ${editingWallet.bg} flex items-center justify-center ${editingWallet.color} font-black text-4xl shadow-premium border border-white/20`}>
                   {editingWallet.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-[#141414]">{editingWallet.name}</h3>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1 px-2">
-                  <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Linked Account</label>
-                  <div className="w-full h-16 bg-white border border-neutral-100 rounded-2xl flex items-center px-4 shadow-sm">
-                    <p className="text-[#141414] font-semibold text-lg">{editingWallet.identifier}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1 px-2">
-                  <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-1">Status</label>
-                  <div className="w-full h-16 bg-white border border-neutral-100 rounded-2xl flex items-center px-4 shadow-sm justify-between">
-                    <p className="text-[#141414] font-semibold text-lg">{editingWallet.status}</p>
-                    <div className="size-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                  </div>
+                <div>
+                  <h3 className="text-3xl font-black text-primary tracking-tighter">{editingWallet.name}</h3>
+                  <p className="text-slate-400 font-bold text-sm mt-1 uppercase tracking-widest opacity-60">Connected Wallet</p>
                 </div>
               </div>
 
-              <div className="mt-auto flex flex-col gap-3 pb-8">
-                <button 
+              <div className="bg-surface rounded-[40px] p-8 border border-white/20 shadow-sm space-y-8">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Linked Account</label>
+                  <div className="w-full h-16 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center px-6">
+                    <p className="text-primary font-black text-lg">{editingWallet.identifier}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Status</label>
+                  <div className="w-full h-16 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center px-6 justify-between">
+                    <p className="text-success font-black text-lg">Verified</p>
+                    <div className="size-2.5 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    alert(`${editingWallet.name} unlinked successfully`);
+                    alert(`${editingWallet.name} unlinked`);
                     setEditingWallet(null);
                   }}
-                  className="w-full h-14 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition shadow-sm"
+                  className="w-full h-16 bg-accent/5 text-accent font-black text-[11px] tracking-[0.25em] uppercase rounded-[28px] border border-accent/10"
                 >
-                  Unlink Wallet
-                </button>
-                <button 
+                  Unlink Account
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setEditingWallet(null)}
-                  className="w-full h-14 bg-[#141414] text-white font-bold rounded-2xl hover:bg-neutral-800 transition shadow-lg"
+                  className="w-full h-18 bg-primary text-white font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-900"
                 >
                   Back to Payments
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </main>
     </motion.div>
   );
 }
