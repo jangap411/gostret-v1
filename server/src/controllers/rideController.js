@@ -149,7 +149,23 @@ export const updateRideStatus = async (req, res) => {
         });
     }
 
-    io.to(`ride_${id}`).emit('status_update', { status: updatedRide.status, driver_id: updatedRide.driver_id });
+    // Fetch driver details if ride is accepted
+    let driverInfo = {};
+    if (updatedRide.status === 'accepted' && updatedRide.driver_id) {
+      const [driver] = await sql`SELECT name, avatar_url FROM users WHERE id = ${updatedRide.driver_id}`;
+      if (driver) {
+        driverInfo = {
+          driver_name: driver.name,
+          driver_avatar: driver.avatar_url
+        };
+      }
+    }
+
+    io.to(`ride_${id}`).emit('status_update', { 
+      status: updatedRide.status, 
+      driver_id: updatedRide.driver_id,
+      ...driverInfo
+    });
 
     res.json(updatedRide);
   } catch (error) {
