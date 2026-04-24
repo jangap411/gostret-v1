@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useRideHistory } from '../hooks/useRides';
 import { rideService } from '../services/api';
 
 const pageVariants = {
@@ -24,26 +25,10 @@ const listItemVariants = {
 
 export default function Activity() {
   const navigate = useNavigate();
-  const [rides, setRides] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedRide, setSelectedRide] = useState(null);
   const [sendingReceipt, setSendingReceipt] = useState(false);
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const data = await rideService.getRideHistory(token);
-        setRides(data);
-      } catch (error) {
-        console.error("Failed to fetch history", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
-  }, []);
+  const { data: rides = [], isLoading: loading } = useRideHistory();
 
   const getStatusColor = (status) => {
     switch (status) {

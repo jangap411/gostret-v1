@@ -37,61 +37,54 @@ const ProtectedRoute = ({ children }) => {
 import { socketService } from './services/socket';
 import { notificationService } from './services/localNotifications';
 
+import { useActiveRide } from './hooks/useRides';
+
 function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { data: activeRide, isLoading: isRideLoading } = useActiveRide();
+
   useEffect(() => {
     // Initialize notifications
     notificationService.init();
-    const initializeApp = async () => {
-      const token = localStorage.getItem('token');
-      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    
+    const token = localStorage.getItem('token');
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
-        if (token && isAuthenticated) {
-        socketService.connect();
-        try {
-          const activeRide = await rideService.getActiveRide(token);
-          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-          const isDriver = storedUser.role === 'driver';
+    if (token && isAuthenticated) {
+      socketService.connect();
+    }
+    
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+  }, []);
 
-          if (activeRide) {
-            dispatch(setActiveRide(activeRide));
-            socketService.joinRide(activeRide.id);
+  useEffect(() => {
+    if (activeRide) {
+      dispatch(setActiveRide(activeRide));
+      socketService.joinRide(activeRide.id);
 
-            const currentPath = window.location.pathname;
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const isDriver = user.role === 'driver';
+      const currentPath = window.location.pathname;
 
-            if (isDriver) {
-              // Driver: redirect to active trip if they have an ongoing ride
-              if (
-                currentPath === '/' &&
-                (activeRide.status === 'accepted' || activeRide.status === 'in_progress')
-              ) {
-                navigate('/driver/active-trip', { state: { ride: activeRide } });
-              }
-            } else {
-              // Rider: restore to the appropriate rider-facing page
-              if (currentPath === '/' || currentPath === '/searching-driver') {
-                if (activeRide.status === 'pending') navigate('/searching-driver');
-                else if (activeRide.status === 'accepted') navigate('/driver-en-route');
-                else if (activeRide.status === 'in_progress') navigate('/ride-in-progress');
-              }
-            }
-          }
-        } catch (error) {
-          console.error("App initialization error", error);
+      if (isDriver) {
+        if (currentPath === '/' && (activeRide.status === 'accepted' || activeRide.status === 'in_progress')) {
+          navigate('/driver/active-trip', { state: { ride: activeRide } });
+        }
+      } else {
+        if (currentPath === '/' || currentPath === '/searching-driver') {
+          if (activeRide.status === 'pending') navigate('/searching-driver');
+          else if (activeRide.status === 'accepted') navigate('/driver-en-route');
+          else if (activeRide.status === 'in_progress') navigate('/ride-in-progress');
         }
       }
-      
-      setTimeout(() => {
-        setLoading(false);
-      }, 1500);
-    };
-
-    initializeApp();
-  }, [dispatch]);
+    }
+  }, [activeRide, dispatch]);
 
 
   if (loading) {
