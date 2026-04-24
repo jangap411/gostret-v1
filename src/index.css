@@ -9,72 +9,62 @@
 */
 
 @theme {
-  /* --- Primitives --- */
-  --color-brand-blue: #1D3557;
-  --color-brand-red: #D9483E;
-  --color-brand-red-dark: #C53D34;
+  /* --- Kinetic Noir Palette --- */
+  --color-base: #131313;
+  --color-surface: #1C1B1B;
+  --color-surface-container: #201F1F;
+  --color-surface-bright: #353534;
   
+  --color-primary: #46F1C5;
+  --color-primary-container: #00D4AA;
+  --color-secondary: #FFB95A;
+  --color-accent: #46F1C5;
+  
+  --color-background: #131313;
+  --color-on-background: #E5E2E1;
+  --color-on-surface: #E5E2E1;
+  --color-on-surface-variant: #BACAC2;
+  
+  /* --- UI Primitives --- */
   --color-slate-50: #F8FAFC;
   --color-slate-100: #F1F5F9;
   --color-slate-200: #E2E8F0;
-  --color-slate-300: #CBD5E1;
   --color-slate-400: #94A3B8;
   --color-slate-500: #64748B;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1E293B;
   --color-slate-900: #0F172A;
-  --color-slate-950: #020617;
 
-  /* --- Semantic Tokens --- */
-  --color-primary: var(--color-brand-blue);
-  --color-accent: var(--color-brand-red);
-  --color-accent-hover: var(--color-brand-red-dark);
-  
-  --color-background: var(--color-slate-50);
-  --color-surface: #FFFFFF;
-  --color-surface-muted: var(--color-slate-100);
-  
-  --color-text-main: var(--color-slate-900);
-  --color-text-muted: var(--color-slate-500);
-  --color-text-on-primary: #FFFFFF;
-  
-  --color-border-subtle: var(--color-slate-200);
-  --color-border-strong: var(--color-slate-300);
-
-  /* --- Success/Error/Warning (UX Best Practices) --- */
+  /* --- Success/Error/Warning --- */
   --color-success: #10B981;
-  --color-error: #EF4444;
-  --color-warning: #F59E0B;
-  --color-info: #3B82F6;
+  --color-error: #FFB4AB;
+  --color-warning: #FFB95A;
 
   /* --- Typography --- */
-  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui;
+  --font-heading: "Inter", ui-sans-serif, system-ui;
   --font-body: "Inter", ui-sans-serif, system-ui;
 
-  /* --- Shadows (Premium Elevation) --- */
-  --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.08);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.12);
+  /* --- Luminous Shadows & Glass --- */
+  --shadow-premium: 0 12px 24px rgba(0, 0, 0, 0.4);
+  --shadow-teal-glow: 0px 12px 24px rgba(0, 212, 170, 0.15);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* --- Radii --- */
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
+  --radius-pill: 3rem;
 }
 
 @layer base {
   :root {
-    --color-neutral-50: var(--color-slate-50);
-    --color-neutral-100: var(--color-slate-100);
-    --color-neutral-200: var(--color-slate-200);
-    --color-neutral-300: var(--color-slate-300);
-    --color-neutral-500: var(--color-slate-500);
-    --color-neutral-800: var(--color-slate-800);
+    --color-neutral-50: #E5E2E1;
+    --color-neutral-100: #BACAC2;
+    --color-neutral-500: #85948D;
+    --color-neutral-800: #1C1B1B;
   }
 
   body {
     background-color: var(--color-background);
-    color: var(--color-text-main);
+    color: var(--color-on-background);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -84,26 +74,32 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    letter-spacing: -0.04em;
   }
 }
 
-/* Glassmorphism Utilities */
 @layer utilities {
   .glass-surface {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(28, 27, 27, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
   
-  .glass-dark {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .teal-pulse-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
   }
 
-  .text-shadow-sm {
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-teal-glow);
   }
 }
+

@@ -45,62 +45,71 @@ export default function Login() {
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="relative flex size-full min-h-screen flex-col bg-white justify-between group/design-root overflow-x-hidden"
-      style={{ fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}
+      className="relative flex size-full min-h-screen flex-col bg-base justify-between group/design-root overflow-x-hidden font-body text-on-surface"
     >
-      <div>
-        <div className="flex flex-col items-center justify-center pt-16 pb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-4xl font-extrabold tracking-tight">
-              <span className="text-[#1D3557]">Go</span><span className="text-[#D9483E]">Stret</span>
+      <div className="flex-1 flex flex-col justify-center">
+        <div className="flex flex-col items-center justify-center pt-12 pb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <h1 className="text-6xl font-black tracking-tighter">
+              <span className="text-primary">Go</span><span className="text-on-surface">Stret</span>
             </h1>
           </div>
-          <h2 className="text-[#1c170d] text-2xl font-bold mt-4 tracking-tight">Login to Your Account</h2>
+          <p className="text-on-surface-variant font-black text-[10px] uppercase tracking-[0.5em] opacity-60">Authentication Portal</p>
         </div>
         
-        <form onSubmit={handleLogin} className="flex max-w-[480px] flex-col gap-5 px-6 py-4 mx-auto w-full mt-4">
+        <form onSubmit={handleLogin} className="flex max-w-[420px] flex-col gap-6 px-8 py-4 mx-auto w-full">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-semibold border border-red-100 mb-2">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-error/10 text-error p-4 rounded-2xl text-xs font-bold border border-error/20 mb-2 text-center"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
           
-          <label className="flex flex-col flex-1 gap-2">
-            <span className="text-sm font-semibold text-neutral-700">Email</span>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1c170d] focus:outline-none focus:ring-2 focus:ring-[#D9483E] border border-neutral-200 bg-white h-14 placeholder:text-neutral-400 p-4 text-base font-normal leading-normal transition"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          <label className="flex flex-col flex-1 gap-2">
-            <span className="text-sm font-semibold text-neutral-700">Password</span>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1c170d] focus:outline-none focus:ring-2 focus:ring-[#D9483E] border border-neutral-200 bg-white h-14 placeholder:text-neutral-400 p-4 text-base font-normal leading-normal transition"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </label>
-          <div className="flex py-3 w-full mt-2">
-            <button
+          <div className="space-y-5">
+            <label className="flex flex-col gap-2.5">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant ml-1">Email Address</span>
+              <input
+                type="email"
+                placeholder="name@example.com"
+                className="form-input w-full rounded-2xl text-on-surface focus:outline-none bg-surface-container h-16 placeholder:text-on-surface/20 px-6 text-base font-bold transition-all border border-white/5 focus:border-primary/30"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-2.5">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant ml-1">Password</span>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="form-input w-full rounded-2xl text-on-surface focus:outline-none bg-surface-container h-16 placeholder:text-on-surface/20 px-6 text-base font-bold transition-all border border-white/5 focus:border-primary/30"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
+          </div>
+
+          <div className="flex py-4 w-full mt-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className={`flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 flex-1 bg-[#D9483E] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#C53D34] shadow-md hover:shadow-lg transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className="w-full teal-pulse-gradient text-base/90 text-on-background font-black rounded-pill h-16 shadow-teal-glow uppercase tracking-[0.2em] disabled:opacity-50 transition-all"
             >
-              <span className="truncate">{loading ? 'Logging in...' : 'Login'}</span>
-            </button>
+              {loading ? 'Verifying...' : 'Sign In'}
+            </motion.button>
           </div>
         </form>
       </div>
-      <div>
-        <p className="text-neutral-500 text-[15px] font-normal leading-normal pb-8 pt-8 px-4 text-center mb-4">
-          Don't have an account? <span onClick={() => navigate('/signup')} className="text-[#D9483E] font-semibold cursor-pointer hover:text-[#C53D34] transition-colors">Register</span>
+
+      <div className="pb-12 pt-8 px-4 text-center">
+        <p className="text-on-surface-variant text-[11px] font-black uppercase tracking-[0.2em]">
+          New to GoStret? <span onClick={() => navigate('/signup')} className="text-primary cursor-pointer hover:opacity-80 transition-opacity ml-2">Create Account</span>
         </p>
       </div>
     </motion.div>
