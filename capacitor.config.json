@@ -1,6 +1,6 @@
 {
   "appId": "com.gostret.rides",
-  "appName": "Rides",
+  "appName": "GoStret",
   "webDir": "dist",
   "server": {
     "cleartext": true,

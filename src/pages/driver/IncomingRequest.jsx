@@ -19,16 +19,8 @@ const IncomingRequest = () => {
   const dispatch = useDispatch();
   const isOnline = useSelector((state) => state.driver.isOnline);
   
-  const ride = location.state?.ride || {
-    id: 1,
-    rider_name: "Sarah Jenkins",
-    rider_rating: "4.9",
-    fare: "15.50",
-    distance: "3.2km",
-    duration: "14 min",
-    pickup_address: "1248 Market Street, SF",
-    destination_address: "Embarcadero Center, Pier 3",
-  };
+  // Use real data from navigation state, fallback to empty if missing (though it shouldn't be)
+  const ride = location.state?.ride || {};
 
   const [timeLeft, setTimeLeft] = useState(12);
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
@@ -79,20 +71,23 @@ const IncomingRequest = () => {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  if (!ride.id) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <motion.div 
       initial="initial"
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      className="bg-background text-primary font-body h-full relative overflow-hidden flex flex-col"
+      className="bg-base text-on-surface font-body h-full relative overflow-hidden flex flex-col"
     >
       {/* Full-Screen Map Background */}
-      <MapView center={mapCenter} zoom={15} className="absolute inset-0 w-full h-full z-0" />
+      <MapView center={mapCenter} zoom={15} className="absolute inset-0 w-full h-full z-0 opacity-40 grayscale contrast-125" />
       
       {/* Map Gradient Overlays */}
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-900/10 to-transparent z-[1] pointer-events-none"></div>
-      <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-slate-900/10 to-transparent z-[1] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-base via-base/40 to-transparent z-[1] pointer-events-none"></div>
 
       {/* Notice Message Overlay */}
       <AnimatePresence>
@@ -101,148 +96,143 @@ const IncomingRequest = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-24 left-4 right-4 z-50 bg-accent text-white p-5 rounded-[28px] shadow-premium flex items-center gap-4 backdrop-blur-md border border-white/20"
+            className="absolute top-24 left-6 right-6 z-50 bg-error/90 text-on-error p-5 rounded-3xl shadow-premium flex items-center gap-4 backdrop-blur-md border border-white/10"
           >
-            <div className="size-11 min-w-11 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="material-symbols-outlined font-black">warning</span>
+            <div className="size-10 min-w-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="material-symbols-outlined font-black text-xl">warning</span>
             </div>
-            <p className="font-black text-[15px] leading-tight tracking-tight">{noticeMessage}</p>
+            <p className="font-bold text-sm tracking-tight">{noticeMessage}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* PREMIUM HEADER - GLASSMORPHISM */}
-      <div className="absolute top-6 left-4 right-4 z-20 flex justify-between items-center">
-        <div className="flex items-center gap-2 glass-surface px-5 py-3 rounded-full border border-white/20 shadow-premium">
-          <span className="text-[10px] font-black tracking-[0.25em] uppercase text-primary opacity-80">Navigator</span>
+      {/* PREMIUM HEADER */}
+      <div className="absolute top-8 left-6 right-6 z-20 flex justify-between items-center">
+        <div className="flex items-center gap-2 bg-surface-container/80 backdrop-blur-md px-5 py-3 rounded-full border border-white/5 shadow-premium">
+          <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Navigator</span>
         </div>
         
-        <div className={`px-5 py-3 rounded-full shadow-premium flex items-center gap-3 border border-white/20 transition-colors ${
-          isOnline ? 'bg-success text-white' : 'bg-slate-500 text-white'
+        <div className={`px-5 py-3 rounded-full shadow-premium flex items-center gap-3 border border-white/5 transition-colors backdrop-blur-md ${
+          isOnline ? 'bg-primary/10 text-primary' : 'bg-surface-container text-on-surface-variant'
         }`}>
-          {isOnline && <span className="size-2 bg-white rounded-full animate-pulse shadow-sm"></span>}
+          {isOnline && <span className="size-2 bg-primary rounded-full animate-pulse shadow-glow"></span>}
           <span className="text-[10px] font-black tracking-widest uppercase">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
         </div>
       </div>
 
       {/* ERGONOMIC SOS */}
-      <div className="absolute right-4 top-[35%] z-20">
+      <div className="absolute right-6 top-[35%] z-20">
         <motion.button 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={onEmergency}
-          className="size-16 rounded-full bg-accent text-white flex items-center justify-center shadow-premium border-4 border-white">
+          className="size-16 rounded-full bg-error text-on-error flex items-center justify-center shadow-premium border-4 border-base">
           <span className="material-symbols-outlined font-black text-2xl">sos</span>
         </motion.button>
       </div>
 
       {/* INCOMING REQUEST BOTTOM SHEET */}
-      <div className="mt-auto relative z-30 p-4 pb-8">
+      <div className="mt-auto relative z-30 p-6 pb-10">
         <motion.div 
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="bg-surface rounded-[48px] shadow-premium flex flex-col border border-white/20 p-8 pt-6 relative overflow-hidden"
+          className="bg-surface-container rounded-[40px] shadow-2xl flex flex-col border border-white/5 p-8 pt-6 relative overflow-hidden"
         >
           {/* Decorative Drag Handle */}
-          <div className="w-12 h-1 bg-slate-100 rounded-full mx-auto mb-8 opacity-50"></div>
+          <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-8"></div>
 
           <div className="space-y-10">
             {/* Header: Rider Info & High-Impact Fare */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-5">
                 <div className="relative">
-                  <div className="size-16 rounded-[28px] overflow-hidden border-4 border-slate-50 shadow-premium bg-slate-100">
-                    <img src={ride.rider_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop"} alt={ride.rider_name} className="w-full h-full object-cover" />
+                  <div className="size-18 rounded-3xl overflow-hidden border-4 border-base shadow-premium bg-surface-bright">
+                    <img src={ride.rider_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ride.rider_name || 'Rider')}&background=1C1B1B&color=46F1C5&bold=true`} alt={ride.rider_name} className="w-full h-full object-cover" />
                   </div>
-                  <div className="absolute -bottom-1.5 -right-1.5 bg-white rounded-xl px-2 py-0.5 shadow-sm border border-slate-50 flex items-center gap-1">
-                     <span className="text-yellow-400 material-symbols-outlined text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                     <span className="text-[10px] font-black text-primary">{ride.rider_rating}</span>
+                  <div className="absolute -bottom-2 -right-2 bg-surface-bright rounded-xl px-2.5 py-1 shadow-premium border border-white/5 flex items-center gap-1.5">
+                     <span className="text-primary material-symbols-outlined text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                     <span className="text-[10px] font-black text-on-surface">{ride.rider_rating || '4.9'}</span>
                   </div>
                 </div>
-                <div className="flex flex-col">
-                  <h2 className="text-2xl font-black tracking-tighter leading-none text-primary">{ride.rider_name}</h2>
-                  <div className="inline-flex items-center bg-success/10 text-success px-3 py-1 rounded-xl w-fit mt-2.5 border border-success/10">
-                    <span className="text-[9px] font-black tracking-[0.2em] uppercase">PRIORITY REQUEST</span>
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-2xl font-black tracking-tighter leading-none text-on-surface">{ride.rider_name || 'New Rider'}</h2>
+                  <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-lg w-fit border border-primary/20">
+                    <span className="text-[9px] font-black tracking-[0.2em] uppercase">Priority</span>
                   </div>
                 </div>
               </div>
 
               <div className="text-right">
-                <p className="text-slate-400 text-[9px] font-black tracking-[0.25em] uppercase mb-1 opacity-60">EST. FARE</p>
+                <p className="text-on-surface-variant text-[10px] font-black tracking-[0.3em] uppercase mb-2 opacity-60">Estimated</p>
                 <p className="text-4xl font-black text-primary tracking-tighter leading-none">PGK {ride.fare}</p>
               </div>
             </div>
 
-            {/* Trip Details - MAX READABILITY */}
-            <div className="space-y-12 relative py-2">
-              <div className="absolute left-[13px] top-10 bottom-10 w-0.5 bg-slate-100/50"></div>
+            {/* Trip Details */}
+            <div className="space-y-10 relative py-2">
+              <div className="absolute left-[13px] top-10 bottom-10 w-[2px] bg-white/5"></div>
 
               {/* Pickup Row */}
               <div className="flex gap-7 items-start relative z-10">
-                <div className="size-7 rounded-full bg-primary flex items-center justify-center ring-4 ring-white shadow-sm shrink-0">
-                  <div className="size-2 bg-white rounded-full"></div>
+                <div className="size-7 rounded-full bg-primary flex items-center justify-center ring-8 ring-base shadow-glow shrink-0">
+                  <div className="size-2 bg-base rounded-full"></div>
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center gap-3">
-                    <span className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase opacity-60">PICKUP</span>
-                    <div className="bg-success text-white px-2.5 py-0.5 rounded-lg text-[9px] font-black shadow-sm tracking-tight uppercase">
+                    <span className="text-on-surface-variant text-[10px] font-black tracking-[0.2em] uppercase opacity-40">PICKUP</span>
+                    <div className="bg-primary text-base px-2.5 py-0.5 rounded-lg text-[9px] font-black tracking-tight uppercase">
                       3 min away
                     </div>
                   </div>
-                  <p className="text-[22px] font-black tracking-tight mt-3 leading-tight text-primary truncate">{ride.pickup_address}</p>
+                  <p className="text-xl font-bold tracking-tight mt-3 leading-tight text-on-surface truncate">{ride.pickup_address}</p>
                 </div>
               </div>
 
               {/* Dropoff Row */}
               <div className="flex gap-7 items-start relative z-10">
-                <div className="size-7 rounded-full bg-accent flex items-center justify-center ring-4 ring-white shadow-sm shrink-0">
-                  <span className="material-symbols-outlined text-[15px] text-white font-black">location_on</span>
+                <div className="size-7 rounded-full bg-surface-bright flex items-center justify-center ring-8 ring-base shadow-premium shrink-0 border border-white/10">
+                  <span className="material-symbols-outlined text-[14px] text-on-surface font-black">location_on</span>
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center gap-3">
-                    <span className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase opacity-60">DROP-OFF</span>
-                    <div className="bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-lg text-[9px] font-black tracking-tight uppercase opacity-80">
-                      {ride.duration} trip
+                    <span className="text-on-surface-variant text-[10px] font-black tracking-[0.2em] uppercase opacity-40">DROP-OFF</span>
+                    <div className="bg-white/5 text-on-surface-variant px-2.5 py-0.5 rounded-lg text-[9px] font-black tracking-tight uppercase">
+                      {ride.duration} Trip
                     </div>
                   </div>
-                  <p className="text-[22px] font-black tracking-tight mt-3 leading-tight text-primary truncate">{ride.destination_address}</p>
+                  <p className="text-xl font-bold tracking-tight mt-3 leading-tight text-on-surface truncate">{ride.destination_address}</p>
                 </div>
               </div>
             </div>
 
-            {/* Pulsating Countdown Bar */}
+            {/* Countdown Bar */}
             <div className="relative pt-4">
               <div className="flex justify-between items-center mb-4">
-                <p className="text-accent text-[10px] font-black tracking-[0.3em] uppercase opacity-80">
-                  DECISION EXPIRES IN {timeLeft}S
+                <p className="text-error text-[10px] font-black tracking-[0.4em] uppercase opacity-80">
+                  Decision Expires in {timeLeft}s
                 </p>
-                <div className="size-2.5 bg-accent rounded-full animate-ping shadow-[0_0_8px_rgba(217,72,62,0.5)]"></div>
+                <div className="size-2 bg-error rounded-full animate-ping shadow-glow"></div>
               </div>
-              <div className="w-full bg-slate-50 h-3 rounded-full overflow-hidden shadow-inner border border-slate-100 relative">
+              <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5 relative">
                 <motion.div 
                    initial={{ width: "100%" }}
                    animate={{ width: `${(timeLeft / 12) * 100}%` }}
                    transition={{ duration: 1, ease: "linear" }}
-                   className="bg-accent h-full rounded-full shadow-premium relative z-10"
-                />
-                <motion.div 
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent z-20"
+                   className="bg-error h-full rounded-full shadow-premium"
                 />
               </div>
             </div>
 
-            {/* Proportional Action Targets */}
-            <div className="flex gap-4 pt-2">
+            {/* Action Buttons */}
+            <div className="flex gap-5 pt-4">
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onDecline}
                 disabled={isAccepting}
-                className="flex-1 h-16 rounded-[24px] border-2 border-border-subtle text-slate-400 font-black text-[11px] tracking-[0.25em] uppercase hover:bg-slate-50 hover:text-primary transition-all disabled:opacity-50">
-                DECLINE
+                className="flex-1 h-18 rounded-pill border border-white/10 text-on-surface-variant font-black text-[11px] tracking-[0.3em] uppercase hover:bg-white/5 transition-all disabled:opacity-50">
+                Decline
               </motion.button>
               
               <motion.button 
@@ -250,13 +240,13 @@ const IncomingRequest = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAccept}
                 disabled={isAccepting}
-                className="flex-[2.5] h-16 rounded-[24px] bg-primary text-white font-black text-xl tracking-tight shadow-premium flex items-center justify-center gap-3 transition-all disabled:opacity-50 border-b-4 border-slate-900">
+                className="flex-[2.5] h-18 rounded-pill teal-pulse-gradient text-on-background font-black text-lg tracking-[0.1em] shadow-teal-glow flex items-center justify-center gap-4 transition-all disabled:opacity-50 uppercase">
                 {isAccepting ? (
-                  <div className="size-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="size-6 border-4 border-base/30 border-t-base rounded-full animate-spin"></div>
                 ) : (
                   <>
                     <span>Accept Trip</span>
-                    <span className="material-symbols-outlined font-black">bolt</span>
+                    <span className="material-symbols-outlined font-black text-xl">bolt</span>
                   </>
                 )}
               </motion.button>

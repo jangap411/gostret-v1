@@ -119,7 +119,21 @@ const DriverDashboard = ({
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/driver/incoming-request')}
+            onClick={() => navigate('/driver/incoming-request', { 
+              state: { 
+                ride: {
+                  id: 'test-123',
+                  rider_name: "Test Rider",
+                  rider_rating: "5.0",
+                  fare: "25.00",
+                  duration: "12 min",
+                  pickup_address: "Vision City Mega Mall",
+                  destination_address: "Jack's Paga Hill",
+                  pickup_lat: -9.43869006941101,
+                  pickup_lng: 147.1810054779053
+                } 
+              } 
+            })}
             className="flex items-center gap-2 px-4 py-2 rounded-xl glass-surface text-primary shadow-sm border border-white/20 group w-fit"
           >
             <span className="material-symbols-outlined text-[14px] font-black text-accent group-hover:rotate-12 transition-transform">bolt</span>

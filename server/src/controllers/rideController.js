@@ -69,10 +69,14 @@ export const requestRide = async (req, res) => {
       ) RETURNING *
     `;
 
+    // Fetch full rider details for the broadcast
+    const [rider] = await sql`SELECT name, avatar_url FROM users WHERE id = ${req.user.id}`;
+
     // --- Broadcast to Drivers Pool ---
     io.to('drivers').emit('new_ride', {
       ...ride,
-      rider_name: req.user.name,
+      rider_name: rider?.name || "New Rider",
+      rider_avatar: rider?.avatar_url,
       rider_rating: "4.9" // Mock rating for now
     });
 

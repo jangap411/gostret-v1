@@ -18,7 +18,7 @@ const SplashScreen = () => {
             <span className="text-primary">Go</span><span className="text-on-surface">Stret</span>
           </h1>
         </div>
-        <p className="text-on-surface-variant font-black text-[10px] uppercase tracking-[0.8em] opacity-40 ml-2">Elevated Mobility</p>
+        <p className="text-on-surface-variant font-black text-[10px] uppercase tracking-[0.8em] opacity-40 ml-2">GoStret, GoSeif</p>
       </motion.div>
       
       <div className="absolute bottom-24 flex flex-col items-center gap-4">
