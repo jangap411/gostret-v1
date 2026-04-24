@@ -35,7 +35,8 @@ export default function SearchingDriver() {
 
     socketService.onStatusUpdate((data) => {
       if (data.status === 'accepted') {
-        const updatedRide = { ...activeRide, status: 'accepted' };
+        // Merge real driver data (name, avatar) from the socket event
+        const updatedRide = { ...activeRide, ...data };
         dispatch(setActiveRide(updatedRide));
         clearInterval(progressTimer);
         navigate('/driver-en-route');
@@ -73,12 +74,12 @@ export default function SearchingDriver() {
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      className="relative flex size-full h-full flex-col bg-background overflow-hidden font-body"
+      className="relative flex size-full h-full flex-col bg-base overflow-hidden font-body"
     >
       {/* Background Map with Depth */}
       <div className="absolute inset-0 z-0">
-        <MapView center={pickup?.marker?.position} zoom={15} className="w-full h-full opacity-30 blur-[4px] grayscale" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background z-[1]"></div>
+        <MapView center={pickup?.marker?.position} zoom={15} className="w-full h-full opacity-20 grayscale contrast-125" />
+        <div className="absolute inset-0 bg-gradient-to-b from-base/20 via-base/80 to-base z-[1]"></div>
       </div>
 
       {/* Main Content Area */}
@@ -87,90 +88,67 @@ export default function SearchingDriver() {
         {/* Advanced Pulsating Search Visual */}
         <div className="relative flex items-center justify-center mb-16">
             <motion.div 
-                animate={{ scale: [1, 2.5, 3.5], opacity: [0.4, 0.2, 0] }}
+                animate={{ scale: [1, 2.5, 3.5], opacity: [0.3, 0.1, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeOut" }}
-                className="absolute size-32 bg-accent/10 rounded-full"
+                className="absolute size-32 bg-primary/10 rounded-full shadow-teal-glow"
             />
             <motion.div 
-                animate={{ scale: [1, 2, 3], opacity: [0.3, 0.1, 0] }}
+                animate={{ scale: [1, 2, 3], opacity: [0.2, 0.05, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeOut", delay: 1 }}
-                className="absolute size-32 bg-accent/20 rounded-full"
+                className="absolute size-32 bg-primary/20 rounded-full"
             />
             
-            <div className="relative size-32 bg-surface rounded-[40px] shadow-premium flex items-center justify-center border border-white/20">
+            <div className="relative size-32 bg-surface-container rounded-[40px] shadow-2xl flex items-center justify-center border border-white/5">
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                    className="absolute inset-0 border-t-4 border-r-4 border-transparent border-t-accent border-r-accent/30 rounded-[40px]"
+                    className="absolute inset-0 border-t-2 border-r-2 border-transparent border-t-primary border-r-primary/20 rounded-[40px]"
                 />
-                <div className="size-20 bg-accent/5 rounded-[28px] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-accent text-4xl font-black animate-pulse">radar</span>
+                <div className="size-20 bg-primary/5 rounded-3xl flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary text-4xl font-black animate-pulse shadow-glow">radar</span>
                 </div>
             </div>
         </div>
 
         {/* Status Text */}
         <div className="text-center mb-12">
-            <h2 className="text-primary text-3xl font-black tracking-tighter mb-3 uppercase">Connecting...</h2>
-            <p className="text-slate-500 font-bold text-sm tracking-tight opacity-80 leading-relaxed max-w-[260px] mx-auto">
-              Scanning for the best nearby <span className="text-accent">GoStret</span> partners to fulfill your request.
+            <h2 className="text-on-surface text-3xl font-black tracking-tighter mb-4 uppercase">Connecting...</h2>
+            <p className="text-on-surface-variant font-medium text-sm tracking-tight opacity-70 leading-relaxed max-w-[260px] mx-auto">
+              Scanning for the best nearby <span className="text-primary font-bold">GoStret</span> partners to fulfill your request.
             </p>
         </div>
 
         {/* Progress Visualization */}
         <div className="w-full max-w-[300px]">
-            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-50 relative">
+            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
                 <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
-                    className="h-full bg-accent shadow-[0_0_15px_rgba(217,72,62,0.4)] rounded-full relative z-10"
-                />
-                <motion.div 
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent z-20"
+                    className="h-full bg-primary shadow-teal-glow rounded-full relative z-10"
                 />
             </div>
-            <div className="mt-4 flex justify-between items-center text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">
+            <div className="mt-5 flex justify-between items-center text-[10px] font-black text-on-surface-variant tracking-[0.3em] uppercase opacity-60">
                 <span className="flex items-center gap-2">
-                  <div className="size-1.5 bg-success rounded-full animate-pulse"></div>
+                  <div className="size-1.5 bg-primary rounded-full animate-pulse shadow-glow"></div>
                   {progress < 40 ? 'SCANNING' : progress < 80 ? 'LOCATING' : 'LINKING'}
                 </span>
                 <span className="text-primary">{progress}%</span>
             </div>
         </div>
         
-        {/* Cancel Button - Tactile and Refined */}
+        {/* Cancel Button */}
         <div className="mt-16">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleCancel}
             disabled={cancelling}
-            className={`h-14 px-10 rounded-2xl border-2 border-border-subtle text-slate-500 font-black text-xs tracking-[0.2em] uppercase hover:bg-slate-50 hover:text-primary transition-all shadow-sm ${cancelling ? 'opacity-50' : ''}`}
+            className={`h-14 px-10 rounded-pill border border-white/10 text-on-surface-variant font-black text-xs tracking-[0.3em] uppercase hover:bg-white/5 transition-all ${cancelling ? 'opacity-50' : ''}`}
           >
-            {cancelling ? 'ABORTING...' : 'CANCEL REQUEST'}
+            {cancelling ? 'Aborting...' : 'Cancel Request'}
           </motion.button>
         </div>
       </div>
-
-      {/* Tip Card - Premium Glassmorphism
-      <div className="mt-auto p-8 z-20">
-        <motion.div 
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="glass-surface p-6 rounded-[32px] shadow-premium flex items-center gap-5 border border-white/40"
-        >
-            <div className="size-14 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-sm">
-                <span className="text-2xl">⚡️</span>
-            </div>
-            <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">PRO TIP</p>
-                <p className="text-primary text-sm font-bold leading-snug tracking-tight">Drivers prefer exact pin locations. It helps them find you faster!</p>
-            </div>
-        </motion.div>
-      </div> */}
 
     </motion.div>
   );
