@@ -116,6 +116,7 @@ const ActiveTrip = () => {
         <MapView 
           center={ride.status === 'accepted' ? [ride.pickup_lat, ride.pickup_lng] : [ride.destination_lat, ride.destination_lng]} 
           zoom={15} 
+          userImage={ride.status === 'accepted' ? ride.rider_avatar : null}
           className="w-full h-full" 
         />
 

@@ -84,7 +84,7 @@ const IncomingRequest = () => {
       className="bg-base text-on-surface font-body h-full relative overflow-hidden flex flex-col"
     >
       {/* Full-Screen Map Background */}
-      <MapView center={mapCenter} zoom={15} className="absolute inset-0 w-full h-full z-0 opacity-40 grayscale contrast-125" />
+      <MapView center={mapCenter} zoom={15} userImage={ride?.rider_avatar} className="absolute inset-0 w-full h-full z-0 opacity-40 grayscale contrast-125" />
       
       {/* Map Gradient Overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-base via-base/40 to-transparent z-[1] pointer-events-none"></div>

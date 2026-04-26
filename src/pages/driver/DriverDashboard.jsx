@@ -85,7 +85,7 @@ const DriverDashboard = ({
       className="bg-background text-primary h-full relative overflow-hidden flex flex-col font-body"
     >
       {/* Full-Screen Map Background */}
-      <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0" />
+      <MapView center={mapCenter} zoom={mapZoom} userImage={user?.avatar_url} className="absolute inset-0 w-full h-full z-0" />
       
       {/* Subtle Gradient Overlays */}
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-900/10 to-transparent z-10 pointer-events-none"></div>

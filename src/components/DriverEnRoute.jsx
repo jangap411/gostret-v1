@@ -57,6 +57,8 @@ export default function DriverEnRoute() {
         <MapView 
             center={activeRide?.pickup_lat ? [activeRide.pickup_lat, activeRide.pickup_lng] : null} 
             driverLocation={driverLocation}
+            userImage={activeRide?.rider_avatar}
+            driverImage={activeRide?.driver_avatar}
             zoom={15} 
             className="w-full h-full" 
         />

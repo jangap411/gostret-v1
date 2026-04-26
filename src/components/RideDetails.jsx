@@ -33,6 +33,10 @@ export default function RideDetails() {
   const [booking, setBooking] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedOption, setSelectedOption] = useState('regular');
+  
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userImage = user?.avatar_url;
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -170,6 +174,7 @@ export default function RideDetails() {
               center={mapCenter} 
               zoom={13} 
               markers={mapMarkers} 
+              userImage={userImage}
               route={route}
               routeMeta={routeMeta}
               className="absolute inset-0 w-full h-full z-0" 

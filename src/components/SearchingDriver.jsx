@@ -20,6 +20,9 @@ export default function SearchingDriver() {
   const pickup = useSelector((state) => state.ride.pickup);
   const { activeRide } = useSelector((state) => state.ride);
   const [cancelling, setCancelling] = useState(false);
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userImage = user?.avatar_url;
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -78,7 +81,7 @@ export default function SearchingDriver() {
     >
       {/* Background Map with Depth */}
       <div className="absolute inset-0 z-0">
-        <MapView center={pickup?.marker?.position} zoom={15} className="w-full h-full opacity-20 grayscale contrast-125" />
+        <MapView center={pickup?.marker?.position} zoom={15} userImage={userImage} className="w-full h-full opacity-20 grayscale contrast-125" />
         <div className="absolute inset-0 bg-gradient-to-b from-base/20 via-base/80 to-base z-[1]"></div>
       </div>
 

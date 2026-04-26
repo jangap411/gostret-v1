@@ -16,6 +16,9 @@ export default function Home() {
   const [showSosModal, setShowSosModal] = useState(false);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userImage = user?.avatar_url;
 
   const handleLocateMe = async () => {
     try {
@@ -40,7 +43,7 @@ export default function Home() {
       className="relative flex size-full h-full flex-col bg-base justify-between group/design-root overflow-hidden font-body"
     >
       {/* FULL SCREEN MAP */}
-      <MapView center={mapCenter} zoom={mapZoom} className="absolute inset-0 w-full h-full z-0 grayscale-[0.2]" />
+      <MapView center={mapCenter} zoom={mapZoom} userImage={userImage} className="absolute inset-0 w-full h-full z-0 grayscale-[0.2]" />
 
       {/* DEPTH OVERLAYS - NO LINES */}
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-base/80 to-transparent z-[1] pointer-events-none"></div>

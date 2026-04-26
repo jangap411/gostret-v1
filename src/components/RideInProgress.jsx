@@ -88,6 +88,8 @@ export default function RideInProgress() {
             center={driverLocation ? [driverLocation.lat, driverLocation.lng] : (activeRide ? [activeRide.pickup_lat, activeRide.pickup_lng] : null)}
             driverLocation={driverLocation}
             destination={activeRide ? [activeRide.destination_lat, activeRide.destination_lng] : null}
+            userImage={activeRide?.rider_avatar}
+            driverImage={activeRide?.driver_avatar}
             zoom={15} 
             className="w-full h-full" 
         />

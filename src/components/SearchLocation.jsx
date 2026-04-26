@@ -32,6 +32,9 @@ export default function SearchLocation() {
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [results, setResults] = useState([]);
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false);
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userImage = user?.avatar_url;
 
   const activeQuery = activeField === 'pickup' ? pickup.query : destination.query;
 
@@ -279,6 +282,7 @@ export default function SearchLocation() {
               center={mapCenter} 
               zoom={14} 
               markers={mapMarkers}
+              userImage={userImage}
               onMapClick={handleMapClick}
               className="absolute inset-0 w-full h-full z-0"
             />
