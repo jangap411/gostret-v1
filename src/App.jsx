@@ -106,6 +106,15 @@ function App() {
     navigate('/activity');
   };
 
+  // Admin route: full-screen web view, outside the mobile shell
+  if (location.pathname === '/admin') {
+    return (
+      <div className="w-full min-h-screen overflow-y-auto bg-slate-50">
+        <AdminDashboard />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-md mx-auto h-screen flex flex-col shadow-2xl relative overflow-hidden bg-neutral-50">
       <div className="flex-1 relative overflow-hidden">
@@ -136,7 +145,6 @@ function App() {
             <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
             <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
-            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </AnimatePresence>
       </div>

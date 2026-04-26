@@ -1,5 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../../services/adminService';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const makeAvatarMarker = (imageUrl, name, color = '#1e293b') => new L.DivIcon({
+  html: imageUrl
+    ? `<div style="width:44px;height:44px;border-radius:50%;border:3px solid ${color};background:#fff;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.25);position:relative">
+         <img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" />
+       </div>
+       <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid ${color}"></div>`
+    : `<div style="width:36px;height:36px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:14px">${(name||'?')[0].toUpperCase()}</div>`,
+  className: '',
+  iconSize: [44, 54],
+  iconAnchor: [22, 54],
+  popupAnchor: [0, -56],
+});
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -76,7 +92,7 @@ export default function AdminDashboard() {
     finally { setCancellingId(null); }
   };
 
-  const TABS = ['overview', 'live', 'rides', 'users', 'reviews'];
+  const TABS = ['overview', 'live', 'map', 'rides', 'users', 'reviews'];
 
   if (error) return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -126,7 +142,7 @@ export default function AdminDashboard() {
                 tab === t ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'
               }`}
             >
-              {t === 'live' ? `🔴 ${t}` : t}
+              {t === 'live' ? `🔴 ${t}` : t === 'map' ? `🗺️ ${t}` : t}
             </button>
           ))}
         </div>
@@ -239,6 +255,102 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* MAP TAB */}
+        {tab === 'map' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-black text-slate-900 text-lg">Live Ride Map</h2>
+                <p className="text-xs text-slate-400 mt-0.5">Pickup locations for all active, accepted &amp; in-progress rides · Auto-refreshes every 10s</p>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-bold">
+                <span className="flex items-center gap-1.5"><span className="size-3 rounded-full bg-blue-500 inline-block"></span> Rider pickup</span>
+                <span className="flex items-center gap-1.5"><span className="size-3 rounded-full bg-slate-800 inline-block"></span> Driver</span>
+                <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">{liveRides.length} active</span>
+              </div>
+            </div>
+
+            {liveRides.length === 0 ? (
+              <div className="h-[600px] bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400">
+                <div className="text-5xl mb-3">🗺️</div>
+                <p className="font-bold">No active rides to display</p>
+                <p className="text-xs mt-1">Rides will appear here when accepted or in progress</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: '640px' }}>
+                <MapContainer
+                  center={[liveRides[0]?.pickup_lat ?? -9.44, liveRides[0]?.pickup_lng ?? 147.18]}
+                  zoom={12}
+                  style={{ width: '100%', height: '100%' }}
+                  zoomControl={true}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                  />
+                  {liveRides.map(r => (
+                    <React.Fragment key={r.id}>
+                      {/* Rider pickup marker (blue ring) */}
+                      <Marker
+                        position={[r.pickup_lat, r.pickup_lng]}
+                        icon={makeAvatarMarker(r.rider_avatar, r.rider_name, '#3b82f6')}
+                      >
+                        <Popup>
+                          <div className="text-xs space-y-1 min-w-[180px]">
+                            <div className="flex items-center gap-2 mb-2">
+                              {r.rider_avatar && <img src={r.rider_avatar} className="size-8 rounded-lg object-cover" alt="rider" />}
+                              <div>
+                                <p className="font-black text-slate-900">{r.rider_name}</p>
+                                <p className="text-slate-400">Rider · #{r.id}</p>
+                              </div>
+                            </div>
+                            <p><span className="font-bold">📍 Pickup:</span> {r.pickup_address}</p>
+                            <p><span className="font-bold">🏁 Dest:</span> {r.destination_address}</p>
+                            <p><span className="font-bold">Status:</span> <span className={`px-1.5 py-0.5 rounded font-bold ${
+                              r.status === 'accepted' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                            }`}>{r.status}</span></p>
+                            <p><span className="font-bold">Fare:</span> PGK {r.fare}</p>
+                            {r.driver_name && <p><span className="font-bold">Driver:</span> {r.driver_name} · {r.car_plate}</p>}
+                          </div>
+                        </Popup>
+                      </Marker>
+                    </React.Fragment>
+                  ))}
+                </MapContainer>
+              </div>
+            )}
+
+            {/* Ride legend table below the map */}
+            {liveRides.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="px-5 py-3 border-b border-slate-100">
+                  <h3 className="font-black text-slate-900 text-sm">Active Rides Summary</h3>
+                </div>
+                <div className="divide-y divide-slate-50">
+                  {liveRides.map(r => (
+                    <div key={r.id} className="px-5 py-3 flex items-center gap-3 flex-wrap">
+                      <Avatar src={r.rider_avatar} name={r.rider_name} size={8} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-slate-900">{r.rider_name} → {r.driver_name || 'Awaiting driver'}</p>
+                        <p className="text-xs text-slate-400 truncate">{r.pickup_address}</p>
+                      </div>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${STATUS_COLORS[r.status]}`}>{r.status.replace('_',' ')}</span>
+                      <span className="text-xs font-black text-slate-700 whitespace-nowrap">PGK {r.fare}</span>
+                      <button
+                        onClick={() => handleCancel(r.id)}
+                        disabled={cancellingId === r.id}
+                        className="text-xs font-bold text-red-500 hover:text-red-700 border border-red-200 px-2 py-1 rounded-lg disabled:opacity-50"
+                      >
+                        {cancellingId === r.id ? '...' : '🚨 Cancel'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
