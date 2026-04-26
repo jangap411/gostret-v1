@@ -33,8 +33,8 @@ export default function Activity() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed': return 'text-success bg-success/10 border-success/20';
-      case 'cancelled': return 'text-accent bg-accent/10 border-accent/20';
-      case 'in_progress': return 'text-primary bg-primary/10 border-primary/20';
+      case 'cancelled': return 'text-error bg-error/10 border-error/20';
+      case 'in_progress': return 'text-slate-400 bg-slate-400/10 border-slate-400/20';
       default: return 'text-slate-400 bg-slate-50 border-slate-100';
     }
   };
@@ -60,7 +60,7 @@ export default function Activity() {
         <motion.button 
           whileTap={{ scale: 0.9 }}
           onClick={() => selectedRide ? setSelectedRide(null) : navigate('/')}
-          className="size-11 rounded-2xl bg-surface border border-white/20 flex items-center justify-center text-primary shadow-sm"
+          className="size-11 rounded-2xl bg-surface border border-white/20 flex items-center justify-center text-slate-400 shadow-sm"
         >
           <span className="material-symbols-outlined font-black">
             {selectedRide ? 'arrow_back' : 'home'}
@@ -123,17 +123,17 @@ export default function Activity() {
                           className="w-full flex items-center justify-between p-6 bg-surface rounded-[32px] border border-white/20 shadow-premium group transition-all"
                         >
                           <div className="flex items-center gap-5 min-w-0">
-                            <div className="size-14 rounded-2xl bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary/5 transition-colors shrink-0">
+                            <div className="size-14 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-slate-50 group-hover:text-slate-800 transition-colors shrink-0">
                               <span className="material-symbols-outlined font-black text-2xl">directions_car</span>
                             </div>
                             <div className="text-left min-w-0">
-                              <p className="text-primary text-base font-black tracking-tight leading-tight truncate">{ride.destination_address}</p>
+                              <p className="text-on-surface group-hover:text-white text-base font-black tracking-tight leading-tight truncate transition-colors">{ride.destination_address}</p>
                               <div className="flex items-center gap-2 mt-1.5">
                                 <span className="text-slate-400 text-[10px] font-black uppercase tracking-tight opacity-80">
                                   {new Date(ride.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                 </span>
                                 <span className="size-1 bg-slate-200 rounded-full"></span>
-                                <span className="text-primary font-black text-[10px] uppercase tracking-tight">PGK {ride.fare}</span>
+                                <span className="text-slate-400 group-hover:text-white font-black text-[10px] uppercase tracking-tight transition-colors">PGK {ride.fare}</span>
                               </div>
                             </div>
                           </div>
@@ -142,7 +142,7 @@ export default function Activity() {
                              <div className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border ${getStatusColor(ride.status)} shadow-sm`}>
                                {ride.status.replace('_', ' ')}
                              </div>
-                             <span className="material-symbols-outlined text-slate-200 group-hover:text-primary transition-colors">chevron_right</span>
+                             <span className="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors">chevron_right</span>
                           </div>
                         </motion.button>
                       ))}
