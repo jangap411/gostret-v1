@@ -49,7 +49,7 @@ export default function RideInProgress() {
 
     return () => {
       socketService.off('status_update');
-      socketService.off('location_update');
+      socketService.off('location_updated');
     };
   }, [activeRide, navigate, dispatch]);
 

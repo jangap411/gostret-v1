@@ -20,6 +20,7 @@ const ActiveTrip = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
+  const [driverLocation, setDriverLocation] = useState(null);
 
   useEffect(() => {
     console.log("ActiveTrip: Component mounted. Ride data:", ride);
@@ -37,16 +38,22 @@ const ActiveTrip = () => {
 
     socketService.joinRide(ride.id);
 
-    const locationInterval = setInterval(async () => {
+    const fetchAndEmitLocation = async () => {
       if (ride.status === 'accepted' || ride.status === 'in_progress') {
         try {
           const position = await locationService.getCurrentPosition();
-          socketService.emitLocationUpdate(ride.id, position.coords.latitude, position.coords.longitude);
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setDriverLocation({ lat, lng });
+          socketService.emitLocationUpdate(ride.id, lat, lng);
         } catch (error) {
           console.error("Broadcasting location error:", error);
         }
       }
-    }, 5000);
+    };
+
+    fetchAndEmitLocation();
+    const locationInterval = setInterval(fetchAndEmitLocation, 5000);
 
     return () => clearInterval(locationInterval);
   }, [ride, navigate]);
@@ -117,6 +124,8 @@ const ActiveTrip = () => {
           center={ride.status === 'accepted' ? [ride.pickup_lat, ride.pickup_lng] : [ride.destination_lat, ride.destination_lng]} 
           zoom={15} 
           userImage={ride.status === 'accepted' ? ride.rider_avatar : null}
+          driverLocation={driverLocation}
+          driverImage={user?.avatar_url}
           className="w-full h-full" 
         />
 

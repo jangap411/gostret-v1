@@ -59,7 +59,7 @@ class SocketService {
 
   onLocationUpdate(callback) {
     if (!this.socket) this.connect();
-    this.socket.on('location_update', callback);
+    this.socket.on('location_updated', callback);
   }
 
   emitLocationUpdate(rideId, lat, lng) {

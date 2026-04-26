@@ -40,7 +40,7 @@ export default function DriverEnRoute() {
 
     return () => {
       socketService.off('status_update');
-      socketService.off('location_update');
+      socketService.off('location_updated');
     };
   }, [activeRide, navigate, dispatch]);
 
