@@ -25,7 +25,7 @@ export const signup = async (req, res) => {
     const [newUser] = await sql`
       INSERT INTO users (name, email, password_hash, role)
       VALUES (${name}, ${email}, ${passwordHash}, ${role || 'rider'})
-      RETURNING id, name, email, role, wallet_balance
+      RETURNING id, name, email, role, wallet_balance, avatar_url
     `;
 
     // Generate JWT
@@ -66,6 +66,7 @@ export const login = async (req, res) => {
         email: user.email,
         role: user.role,
         wallet_balance: user.wallet_balance,
+        avatar_url: user.avatar_url,
         token,
       });
     } else {

@@ -102,7 +102,7 @@ export default function RideDetails() {
   };
 
   const mapMarkers = [];
-  if (pickup?.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup' });
+  if (pickup?.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup', userImage: userImage });
   if (destination?.marker) mapMarkers.push({ ...destination.marker, popup: 'Destination' });
 
   const mapCenter = destination?.marker?.position || pickup?.marker?.position || [-9.43869006941101, 147.1810054779053];

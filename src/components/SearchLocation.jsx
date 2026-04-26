@@ -146,7 +146,7 @@ export default function SearchLocation() {
   };
 
   const mapMarkers = [];
-  if (pickup.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup: ' + pickup.marker.popup });
+  if (pickup.marker) mapMarkers.push({ ...pickup.marker, popup: 'Pickup: ' + pickup.marker.popup, userImage: userImage });
   if (destination.marker) mapMarkers.push({ ...destination.marker, popup: 'Destination: ' + destination.marker.popup });
 
   return (
