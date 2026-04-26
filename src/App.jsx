@@ -25,6 +25,7 @@ import ProfileEarnings from './pages/driver/ProfileEarnings';
 import DriverAccounts from './pages/driver/DriverAccounts';
 import ActiveTrip from './pages/driver/ActiveTrip';
 import IncomingRequest from './pages/driver/IncomingRequest';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -135,6 +136,7 @@ function App() {
             <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
             <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </AnimatePresence>
       </div>

@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import rideRoutes from './routes/rideRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Socket.io connection logic
 io.on('connection', (socket) => {

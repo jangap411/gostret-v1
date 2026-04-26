@@ -10,10 +10,10 @@ export const FARE_CONFIG = {
   baseFare: 2.50,
 
   // Per-kilometre distance rate
-  ratePerKm: 1.00,
+  ratePerKm: 3.00,
 
   // Per-minute time rate
-  ratePerMin: 0.25,
+  ratePerMin: 1.25,
 
   // Platform service fee (percentage of subtotal before fixed fees)
   serviceFeePercent: 0.15,
