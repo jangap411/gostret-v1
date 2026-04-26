@@ -15,8 +15,8 @@ const INITIAL_METHODS = [
 ];
 
 const DIGITAL_WALLETS = [
-  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-green-50', color: 'text-green-600', identifier: '+675 7000 1234' },
-  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-red-50', color: 'text-red-600', identifier: '+675 7100 5678' },
+  { id: 'w1', name: 'Yumipei', icon: 'Yu', bg: 'bg-slate-800', color: 'text-slate-400', identifier: '+675 7000 1234' },
+  { id: 'w2', name: 'Cellmoni', icon: 'Ce', bg: 'bg-slate-800', color: 'text-slate-400', identifier: '+675 7100 5678' },
 ];
 
 export default function PaymentMethods() {
@@ -107,7 +107,7 @@ export default function PaymentMethods() {
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      className="bg-background text-primary font-body h-full flex flex-col relative overflow-hidden"
+      className="bg-background text-on-surface font-body h-full flex flex-col relative overflow-hidden"
     >
       {/* PREMIUM HEADER - GLASSMORPHISM */}
       <header className="fixed top-0 left-0 right-0 z-50 glass-surface border-b border-white/20 px-6 py-4 flex items-center justify-between">
@@ -119,11 +119,11 @@ export default function PaymentMethods() {
             else if (isTopUpOpen) setIsTopUpOpen(false);
             else navigate(-1);
           }} 
-          className="size-11 rounded-2xl bg-surface border border-white/20 flex items-center justify-center text-primary shadow-sm"
+          className="size-11 rounded-2xl bg-surface border border-white/20 flex items-center justify-center text-slate-400 shadow-sm"
         >
           <span className="material-symbols-outlined font-black">arrow_back</span>
         </motion.button>
-        <h2 className="text-sm font-black tracking-[0.2em] uppercase text-primary">
+        <h2 className="text-sm font-black tracking-[0.2em] uppercase text-on-surface">
           {getTitle()}
         </h2>
         <div className="size-11"></div> {/* Spacer */}
@@ -140,14 +140,14 @@ export default function PaymentMethods() {
               className="space-y-8"
             >
               {/* WALLET BALANCE CARD */}
-              <section className="bg-primary rounded-[40px] p-8 shadow-premium border border-slate-800 relative overflow-hidden">
+              <section className="bg-surface rounded-[40px] p-8 shadow-premium border border-white/10 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
                 
                 <div className="relative z-10">
                   <p className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Digital Wallet</p>
                   <div className="flex items-baseline gap-2 mt-2">
                     <span className="text-xl font-black text-white/40 tracking-tighter uppercase">PGK</span>
-                    <h3 className="text-5xl font-black text-white tracking-tighter leading-none">
+                    <h3 className="text-5xl font-black text-on-surface tracking-tighter leading-none">
                       {parseFloat(walletBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </h3>
                   </div>
@@ -156,7 +156,7 @@ export default function PaymentMethods() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setIsTopUpOpen(true)}
-                    className="w-full mt-10 h-16 bg-accent text-white rounded-[24px] font-black text-lg shadow-premium flex items-center justify-center gap-3 border-b-4 border-accent-hover"
+                    className="w-full mt-10 h-16 bg-slate-100 text-slate-900 rounded-[24px] font-black text-lg shadow-premium flex items-center justify-center gap-3 border-b-4 border-slate-400"
                   >
                     <span className="material-symbols-outlined font-black">add</span>
                     <span>Top Up Wallet</span>
@@ -168,39 +168,39 @@ export default function PaymentMethods() {
               <section>
                 <div className="flex items-center justify-between mb-5 px-2">
                   <h4 className="text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Saved Cards</h4>
-                  <div className="size-2 bg-primary/20 rounded-full"></div>
+                  <div className="size-2 bg-slate-400/20 rounded-full"></div>
                 </div>
                 
-                <div className="bg-surface rounded-[40px] border border-white/20 shadow-premium overflow-hidden divide-y divide-slate-100">
+                <div className="bg-surface rounded-[40px] border border-white/20 shadow-premium overflow-hidden divide-y divide-white/5">
                   {methods.map((method) => (
                     <motion.button 
                       key={method.id} 
-                      whileTap={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
+                      whileTap={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
                       onClick={() => handleEdit(method)}
                       className="w-full flex items-center justify-between p-6 transition-all group"
                     >
                       <div className="flex items-center gap-5">
-                        <div className={`size-12 rounded-[18px] ${method.bg} flex items-center justify-center ${method.color} shadow-sm`}>
+                        <div className={`size-12 rounded-[18px] bg-slate-800 flex items-center justify-center text-slate-400 shadow-sm group-hover:bg-slate-50 group-hover:text-slate-800 transition-colors`}>
                           <span className="material-symbols-outlined font-black text-2xl">{method.icon}</span>
                         </div>
                         <div className="text-left">
-                          <p className="text-[11px] font-black text-primary tracking-[0.1em] uppercase">{method.type}</p>
-                          <p className="text-slate-400 font-bold text-xs mt-1">{method.brand} •••• {method.last4}</p>
+                          <p className="text-[11px] font-black text-on-surface group-hover:text-white tracking-[0.1em] uppercase transition-colors">{method.type}</p>
+                          <p className="text-slate-500 font-bold text-xs mt-1">{method.brand} •••• {method.last4}</p>
                         </div>
                       </div>
-                      <span className="material-symbols-outlined text-slate-200 group-hover:text-primary transition-colors">chevron_right</span>
+                      <span className="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors">chevron_right</span>
                     </motion.button>
                   ))}
 
                   <motion.button 
                     onClick={handleAdd}
-                    whileTap={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
+                    whileTap={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
                     className="w-full flex items-center gap-5 p-6 transition-all group"
                   >
-                    <div className="size-12 rounded-[18px] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
+                    <div className="size-12 rounded-[18px] bg-slate-800 border-2 border-dashed border-white/10 flex items-center justify-center text-slate-500 group-hover:bg-slate-50 group-hover:text-slate-800 group-hover:border-solid transition-all">
                       <span className="material-symbols-outlined font-black">add</span>
                     </div>
-                    <span className="font-black text-primary tracking-[0.1em] uppercase text-[11px]">Add New Card</span>
+                    <span className="font-black text-on-surface group-hover:text-white tracking-[0.1em] uppercase text-[11px] transition-colors">Add New Card</span>
                   </motion.button>
                 </div>
               </section>
@@ -215,14 +215,14 @@ export default function PaymentMethods() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setEditingWallet(wallet)}
-                      className="bg-surface p-6 rounded-[32px] border border-white/20 shadow-sm flex flex-col items-center gap-4 text-center"
+                      className="bg-surface p-6 rounded-[32px] border border-white/20 shadow-sm flex flex-col items-center gap-4 text-center group"
                     >
-                      <div className={`size-14 rounded-2xl ${wallet.bg} flex items-center justify-center ${wallet.color} font-black text-xl shadow-sm`}>
+                      <div className={`size-14 rounded-2xl ${wallet.bg} flex items-center justify-center ${wallet.color} font-black text-xl shadow-sm group-hover:bg-slate-50 group-hover:text-slate-800 transition-colors`}>
                         {wallet.icon}
                       </div>
                       <div className="space-y-1">
-                        <p className="font-black text-primary text-[10px] uppercase tracking-widest">{wallet.name}</p>
-                        <p className="text-slate-400 font-bold text-[9px] opacity-60">Linked</p>
+                        <p className="font-black text-on-surface group-hover:text-white text-[10px] uppercase tracking-widest transition-colors">{wallet.name}</p>
+                        <p className="text-slate-500 font-bold text-[9px] opacity-60">Linked</p>
                       </div>
                     </motion.button>
                   ))}
@@ -239,15 +239,15 @@ export default function PaymentMethods() {
             >
               <div className="bg-surface rounded-[40px] p-8 shadow-premium border border-white/20 space-y-8">
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black tracking-[0.25em] text-slate-400 uppercase ml-2 opacity-80">Enter Amount</label>
+                  <label className="text-[10px] font-black tracking-[0.25em] text-slate-500 uppercase ml-2 opacity-80">Enter Amount</label>
                   <div className="relative">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300">PGK</span>
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-600">PGK</span>
                     <input 
                       type="number"
                       placeholder="0.00"
                       value={topUpAmount}
                       onChange={(e) => setTopUpAmount(e.target.value)}
-                      className="w-full h-24 bg-slate-50/50 border border-border-subtle rounded-[32px] pl-20 pr-6 text-4xl font-black text-primary focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                      className="w-full h-24 bg-slate-800/50 border border-white/10 rounded-[32px] pl-20 pr-6 text-4xl font-black text-on-surface focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-slate-400 transition-all"
                     />
                   </div>
                 </div>
@@ -261,8 +261,8 @@ export default function PaymentMethods() {
                       onClick={() => setTopUpAmount(amt.toString())}
                       className={`h-14 rounded-2xl font-black text-xs transition-all border-b-2 ${
                         topUpAmount === amt.toString() 
-                          ? 'bg-primary text-white border-slate-900 shadow-md' 
-                          : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                          ? 'bg-slate-100 text-slate-900 border-slate-400 shadow-md' 
+                          : 'bg-slate-800 border-white/5 text-slate-500 hover:border-white/10'
                       }`}
                     >
                       {amt}
@@ -277,15 +277,15 @@ export default function PaymentMethods() {
                   whileTap={{ scale: 0.98 }}
                   disabled={loading}
                   onClick={handleTopUp}
-                  className="w-full h-18 bg-accent text-white font-black rounded-[28px] text-xl shadow-premium flex items-center justify-center gap-3 border-b-4 border-accent-hover"
+                  className="w-full h-18 bg-slate-100 text-slate-900 font-black rounded-[28px] text-xl shadow-premium flex items-center justify-center gap-3 border-b-4 border-slate-400"
                 >
                   {loading ? (
-                    <div className="size-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="size-6 border-4 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></div>
                   ) : 'Confirm Deposit'}
                 </motion.button>
                 <button 
                   onClick={() => setIsTopUpOpen(false)}
-                  className="w-full h-14 text-slate-400 font-black text-[10px] tracking-[0.2em] uppercase"
+                  className="w-full h-14 text-slate-500 font-black text-[10px] tracking-[0.2em] uppercase"
                 >
                   CANCEL TRANSACTION
                 </button>
@@ -307,7 +307,7 @@ export default function PaymentMethods() {
                     placeholder="Visa, Mastercard, etc."
                     value={formData.brand}
                     onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                    className="w-full h-16 bg-slate-50/50 border border-border-subtle rounded-2xl px-6 text-primary font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                    className="w-full h-16 bg-slate-800/50 border border-white/10 rounded-2xl px-6 text-on-surface font-bold focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-slate-400 transition-all"
                   />
                 </div>
 
@@ -319,7 +319,7 @@ export default function PaymentMethods() {
                     maxLength={4}
                     value={formData.last4}
                     onChange={(e) => setFormData({ ...formData, last4: e.target.value.replace(/\D/g, '') })}
-                    className="w-full h-16 bg-slate-50/50 border border-border-subtle rounded-2xl px-6 text-primary font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                    className="w-full h-16 bg-slate-800/50 border border-white/10 rounded-2xl px-6 text-on-surface font-bold focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-slate-400 transition-all"
                   />
                 </div>
               </div>
@@ -329,7 +329,7 @@ export default function PaymentMethods() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSave}
-                  className="w-full h-18 bg-primary text-white font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-900"
+                  className="w-full h-18 bg-slate-100 text-slate-900 font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-400"
                 >
                   Save Method
                 </motion.button>
@@ -337,7 +337,7 @@ export default function PaymentMethods() {
                   <motion.button 
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDelete(editingMethod)}
-                    className="w-full h-14 bg-accent/5 text-accent font-black text-[10px] tracking-[0.25em] uppercase rounded-2xl border border-accent/10"
+                    className="w-full h-14 bg-slate-800 text-slate-400 font-black text-[10px] tracking-[0.25em] uppercase rounded-2xl border border-white/5 hover:bg-slate-700 hover:text-white"
                   >
                     Delete Card
                   </motion.button>
@@ -363,22 +363,22 @@ export default function PaymentMethods() {
                   {editingWallet.icon}
                 </div>
                 <div>
-                  <h3 className="text-3xl font-black text-primary tracking-tighter">{editingWallet.name}</h3>
-                  <p className="text-slate-400 font-bold text-sm mt-1 uppercase tracking-widest opacity-60">Connected Wallet</p>
+                  <h3 className="text-3xl font-black text-on-surface tracking-tighter">{editingWallet.name}</h3>
+                  <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest opacity-60">Connected Wallet</p>
                 </div>
               </div>
 
               <div className="bg-surface rounded-[40px] p-8 border border-white/20 shadow-sm space-y-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Linked Account</label>
-                  <div className="w-full h-16 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center px-6">
-                    <p className="text-primary font-black text-lg">{editingWallet.identifier}</p>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Linked Account</label>
+                  <div className="w-full h-16 bg-slate-800/50 border border-white/5 rounded-2xl flex items-center px-6">
+                    <p className="text-on-surface font-black text-lg">{editingWallet.identifier}</p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Status</label>
-                  <div className="w-full h-16 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center px-6 justify-between">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Status</label>
+                  <div className="w-full h-16 bg-slate-800/50 border border-white/5 rounded-2xl flex items-center px-6 justify-between">
                     <p className="text-success font-black text-lg">Verified</p>
                     <div className="size-2.5 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                   </div>
@@ -392,7 +392,7 @@ export default function PaymentMethods() {
                     alert(`${editingWallet.name} unlinked`);
                     setEditingWallet(null);
                   }}
-                  className="w-full h-16 bg-accent/5 text-accent font-black text-[11px] tracking-[0.25em] uppercase rounded-[28px] border border-accent/10"
+                  className="w-full h-16 bg-slate-800 text-slate-400 font-black text-[11px] tracking-[0.25em] uppercase rounded-[28px] border border-white/5 hover:bg-slate-700 hover:text-white transition-all"
                 >
                   Unlink Account
                 </motion.button>
@@ -400,7 +400,7 @@ export default function PaymentMethods() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setEditingWallet(null)}
-                  className="w-full h-18 bg-primary text-white font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-900"
+                  className="w-full h-18 bg-slate-100 text-slate-900 font-black rounded-[28px] text-lg shadow-premium border-b-4 border-slate-400"
                 >
                   Back to Payments
                 </motion.button>
