@@ -52,15 +52,15 @@ const DriverAccounts = () => {
       animate="animate"
       exit="exit"
       variants={pageVariants}
-      className="bg-background text-primary font-body h-full flex flex-col relative overflow-hidden"
+      className="bg-background text-on-surface font-body h-full flex flex-col relative overflow-hidden"
     >
       {/* PREMIUM HEADER - GLASSMORPHISM */}
       <header className="fixed top-0 left-0 right-0 z-50 glass-surface border-b border-white/20 px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <div className="size-10 rounded-xl overflow-hidden border-2 border-white shadow-sm bg-slate-100">
+          <div className="size-10 rounded-xl overflow-hidden border-2 border-surface shadow-sm bg-slate-800">
             <img className="w-full h-full object-cover" src={profileImage} alt="Profile" />
           </div>
-          <span className="font-black text-primary tracking-tighter text-lg uppercase">Navigator</span>
+          <p className="font-bold text-on-surface">Navigator</p>
         </div>
         
         <motion.button 
@@ -70,7 +70,7 @@ const DriverAccounts = () => {
           className={`flex items-center gap-2.5 px-5 py-2 rounded-full shadow-sm transition-all border ${
             isOnline 
               ? 'bg-success/10 border-success/20 text-success' 
-              : 'bg-slate-100 border-slate-200 text-slate-500'
+              : 'bg-slate-800 border-slate-700 text-slate-500'
           }`}
         >
           {isOnline && <span className="size-2 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>}
@@ -81,7 +81,7 @@ const DriverAccounts = () => {
       <main className="flex-1 pt-28 pb-32 px-6 overflow-y-auto no-scrollbar max-w-lg mx-auto w-full">
         
         {/* PREMIUM DRIVER HERO CARD */}
-        <section className="bg-primary rounded-[48px] p-8 shadow-premium relative overflow-hidden border border-slate-800 mb-10">
+        <section className="bg-surface rounded-[48px] p-8 shadow-premium relative overflow-hidden border border-white/10 mb-10">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
           
           <div className="flex items-start justify-between relative z-10">
@@ -93,7 +93,7 @@ const DriverAccounts = () => {
                 <motion.button 
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="absolute -bottom-2 -right-2 size-9 bg-white rounded-2xl shadow-premium flex items-center justify-center text-primary border border-slate-100"
+                  className="absolute -bottom-2 -right-2 size-9 bg-slate-100 rounded-2xl shadow-premium flex items-center justify-center text-slate-800 border border-white/10"
                 >
                   <span className="material-symbols-outlined text-lg font-black">edit</span>
                 </motion.button>
@@ -105,11 +105,11 @@ const DriverAccounts = () => {
             </div>
 
             <div className="flex flex-col items-end gap-3 text-right">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 shadow-sm">
+              <div className="flex items-center gap-2 bg-slate-800/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 shadow-sm">
                 <span className="material-symbols-outlined text-yellow-400 text-2xl font-black" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="text-white text-3xl font-black tracking-tighter">4.98</span>
+                <span className="text-on-surface text-3xl font-black tracking-tighter">4.98</span>
               </div>
-              <div className="bg-success text-white text-[9px] font-black tracking-[0.3em] uppercase px-4 py-1.5 rounded-xl shadow-lg border border-white/10">
+              <div className="bg-success/20 text-success text-[9px] font-black tracking-[0.3em] uppercase px-4 py-1.5 rounded-xl shadow-lg border border-success/20">
                 TOP RATED
               </div>
             </div>
@@ -132,7 +132,7 @@ const DriverAccounts = () => {
                   value={carModel}
                   onChange={(e) => setCarModel(e.target.value)}
                   placeholder="e.g. Toyota Prius"
-                  className="w-full bg-slate-50/50 border border-border-subtle text-primary font-bold rounded-2xl px-5 py-4 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                  className="w-full bg-slate-800/50 border border-white/10 text-on-surface font-bold rounded-2xl px-5 py-4 placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-slate-400 transition-all"
                 />
               </div>
             </div>
@@ -145,7 +145,7 @@ const DriverAccounts = () => {
                   value={carPlate}
                   onChange={(e) => setCarPlate(e.target.value)}
                   placeholder="e.g. ABC 123"
-                  className="w-full bg-slate-50/50 border border-border-subtle text-primary font-bold rounded-2xl px-5 py-4 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
+                  className="w-full bg-slate-800/50 border border-white/10 text-on-surface font-bold rounded-2xl px-5 py-4 placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-slate-400 transition-all"
                 />
               </div>
             </div>
@@ -155,10 +155,10 @@ const DriverAccounts = () => {
               whileTap={{ scale: 0.98 }}
               onClick={saveVehicleInfo}
               disabled={isSaving}
-              className="mt-2 w-full h-16 bg-primary text-white font-black rounded-[24px] tracking-tight shadow-premium transition-all border-b-4 border-slate-900 disabled:opacity-50"
+              className="mt-2 w-full h-16 bg-slate-100 text-slate-900 font-black rounded-[24px] tracking-tight shadow-premium transition-all border-b-4 border-slate-400 disabled:opacity-50"
             >
               {isSaving ? (
-                <div className="size-6 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
+                <div className="size-6 border-4 border-slate-900/30 border-t-slate-900 rounded-full animate-spin mx-auto"></div>
               ) : 'Update Vehicle Data'}
             </motion.button>
           </div>
@@ -167,25 +167,25 @@ const DriverAccounts = () => {
         {/* MANAGEMENT ACTIONS */}
         <section className="mb-12">
           <h4 className="px-4 mb-5 text-slate-400 text-[10px] font-black tracking-[0.25em] uppercase opacity-60">Management</h4>
-          <div className="bg-surface rounded-[40px] overflow-hidden border border-white/20 shadow-premium divide-y divide-slate-100">
+          <div className="bg-surface rounded-[40px] overflow-hidden border border-white/20 shadow-premium divide-y divide-white/5">
             {[
-              { icon: 'description', title: 'Vehicle Documents', color: 'text-blue-500', bg: 'bg-blue-50' },
-              { icon: 'safety_check', title: 'Safety Center', color: 'text-orange-500', bg: 'bg-orange-50' },
+              { icon: 'description', title: 'Vehicle Documents', color: 'text-blue-400', bg: 'bg-blue-900/20' },
+              { icon: 'safety_check', title: 'Safety Center', color: 'text-orange-400', bg: 'bg-orange-900/20' },
               { icon: 'help_center', title: 'Help & Support', color: 'text-success', bg: 'bg-success/10' },
-              { icon: 'settings', title: 'App Settings', color: 'text-slate-400', bg: 'bg-slate-50' },
+              { icon: 'settings', title: 'App Settings', color: 'text-slate-400', bg: 'bg-slate-800' },
             ].map((item) => (
               <motion.button 
                 key={item.title}
-                whileTap={{ backgroundColor: "rgba(248, 250, 252, 0.8)" }}
+                whileTap={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
                 className="w-full flex items-center justify-between p-6 transition-all group"
               >
                 <div className="flex items-center gap-5">
-                  <div className={`size-12 rounded-[18px] ${item.bg} flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform shadow-sm`}>
+                  <div className={`size-12 rounded-[18px] ${item.bg} flex items-center justify-center text-on-surface hover:bg-slate-800 transition-colors shadow-sm`}>
                     <span className="material-symbols-outlined font-black text-2xl">{item.icon}</span>
                   </div>
-                  <span className="font-black text-primary tracking-tight opacity-80 uppercase text-xs tracking-[0.1em]">{item.title}</span>
+                  <span className="font-black text-on-surface tracking-tight opacity-80 uppercase text-xs tracking-[0.1em]">{item.title}</span>
                 </div>
-                <span className="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+                <span className="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors">chevron_right</span>
               </motion.button>
             ))}
           </div>
@@ -197,7 +197,7 @@ const DriverAccounts = () => {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={onSignOut}
-              className="w-full py-5 rounded-[24px] bg-accent/5 text-accent font-black text-xs tracking-[0.25em] uppercase transition-all flex items-center justify-center gap-4 border border-accent/10 shadow-sm"
+              className="w-full py-5 rounded-[24px] bg-slate-800 text-slate-400 font-black text-xs tracking-[0.25em] uppercase transition-all flex items-center justify-center gap-4 border border-white/5 shadow-sm hover:bg-slate-700 hover:text-white"
            >
               <span className="material-symbols-outlined font-black">logout</span>
               Sign Out of Navigator

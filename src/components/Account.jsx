@@ -73,13 +73,13 @@ export default function Account() {
     Preferences: (
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between p-5 bg-surface rounded-2xl border border-border-subtle shadow-sm">
-          <p className="font-bold text-primary">Dark Mode</p>
+          <p className="font-bold text-on-surface">Dark Mode</p>
           <div className="w-12 h-6 bg-slate-100 rounded-full relative p-1 cursor-pointer">
              <div className="size-4 bg-white rounded-full shadow-md"></div>
           </div>
         </div>
         <div className="flex items-center justify-between p-5 bg-surface rounded-2xl border border-border-subtle shadow-sm">
-          <p className="font-bold text-primary">Language</p>
+          <p className="font-bold text-on-surface">Language</p>
           <p className="text-accent font-black text-sm uppercase tracking-widest">English</p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function Account() {
           { label: "SMS Notifications", active: false },
         ].map((item, id) => (
           <div key={id} className="flex items-center justify-between p-5 bg-surface rounded-2xl border border-border-subtle shadow-sm">
-            <p className="font-bold text-primary">{item.label}</p>
+            <p className="font-bold text-on-surface">{item.label}</p>
             <div className={`w-12 h-6 ${item.active ? 'bg-success' : 'bg-slate-100'} rounded-full relative p-1 cursor-pointer transition-colors`}>
                <motion.div 
                 animate={{ x: item.active ? 24 : 0 }}
@@ -105,23 +105,23 @@ export default function Account() {
     ),
     Security: (
       <div className="flex flex-col gap-3">
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Change Password</button>
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Two-Factor Authentication</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Change Password</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Two-Factor Authentication</button>
         <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-error hover:bg-red-50 transition-colors shadow-sm">Delete Account</button>
       </div>
     ),
     Help: (
       <div className="flex flex-col gap-3">
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Help Center</button>
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Contact Support</button>
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Community Guidelines</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Help Center</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Contact Support</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Community Guidelines</button>
       </div>
     ),
     Legal: (
       <div className="flex flex-col gap-3">
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Terms of Service</button>
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Privacy Policy</button>
-        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-primary hover:bg-slate-50 transition-colors shadow-sm">Licenses</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Terms of Service</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Privacy Policy</button>
+        <button className="w-full p-5 bg-surface rounded-2xl border border-border-subtle text-left font-bold text-on-surface hover:bg-slate-800 transition-colors shadow-sm">Licenses</button>
       </div>
     )
   };
@@ -143,13 +143,13 @@ export default function Account() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => activeSubmenu ? setActiveSubmenu(null) : navigate('/')} 
-            className="text-primary flex size-11 shrink-0 items-center justify-center hover:bg-white/40 transition rounded-full cursor-pointer"
+            className="text-slate-400 flex size-11 shrink-0 items-center justify-center hover:bg-white/10 transition rounded-full cursor-pointer"
           >
             <span className="material-symbols-outlined font-black">
               {activeSubmenu ? 'arrow_back' : 'home'}
             </span>
           </motion.button>
-          <h2 className="text-primary text-xl font-black leading-tight tracking-tighter flex-1 text-center pr-11 uppercase">
+          <h2 className="text-on-surface text-xl font-black leading-tight tracking-tighter flex-1 text-center pr-11 uppercase">
             {activeSubmenu ? activeSubmenu : 'Account'}
           </h2>
         </div>
@@ -174,25 +174,25 @@ export default function Account() {
                 <div className="relative cursor-pointer group/avatar" onClick={handleEditClick}>
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
-                    className="size-24 rounded-[28px] bg-slate-50 border-4 border-white shadow-premium bg-cover bg-center flex items-center justify-center overflow-hidden"
+                    className="size-24 rounded-[28px] bg-slate-800 border-4 border-surface shadow-premium bg-cover bg-center flex items-center justify-center overflow-hidden"
                     style={{ backgroundImage: user?.avatar_url ? `url(${user.avatar_url})` : 'none' }}
                   >
                     {!user?.avatar_url && (
-                      <span className="text-3xl font-black text-slate-300">
+                      <span className="text-3xl font-black text-slate-600">
                         {user?.name?.charAt(0) || 'U'}
                       </span>
                     )}
                   </motion.div>
-                  <div className="absolute -bottom-1 -right-1 size-8 bg-accent rounded-2xl border-4 border-white flex items-center justify-center shadow-premium group-hover/avatar:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-white text-base font-black">edit</span>
+                  <div className="absolute -bottom-1 -right-1 size-8 bg-slate-100 rounded-2xl border-4 border-surface flex items-center justify-center shadow-premium group-hover/avatar:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-slate-800 text-base font-black">edit</span>
                   </div>
                 </div>
                 
                 <div className="flex flex-col flex-1 min-w-0">
                   {loading ? (
-                    <div className="h-8 w-32 bg-slate-100 animate-pulse rounded-xl mb-2"></div>
+                    <div className="h-8 w-32 bg-slate-800 animate-pulse rounded-xl mb-2"></div>
                   ) : (
-                    <h3 className="text-2xl font-black text-primary leading-none tracking-tighter truncate">{user?.name}</h3>
+                    <h3 className="text-2xl font-black text-on-surface leading-none tracking-tighter truncate">{user?.name}</h3>
                   )}
                   <p className="text-slate-500 text-sm font-bold tracking-tight mt-2 truncate opacity-80">{user?.email}</p>
                   
@@ -231,11 +231,11 @@ export default function Account() {
                     }}
                     className="group flex items-center gap-4 bg-surface/50 hover:bg-surface cursor-pointer transition-all px-5 min-h-[72px] rounded-2xl border border-transparent hover:border-border-subtle hover:shadow-sm"
                   >
-                    <div className="text-primary flex items-center justify-center rounded-2xl bg-slate-100 shrink-0 size-12 group-hover:bg-accent/5 group-hover:text-accent transition-all border border-slate-50 group-hover:border-accent/20">
-                      <span className="material-symbols-outlined font-black text-2xl">{item.icon}</span>
+                    <div className="flex items-center justify-center rounded-2xl bg-slate-800 shrink-0 size-12 group-hover:bg-slate-50 transition-all border border-transparent group-hover:border-white/20">
+                      <span className="material-symbols-outlined font-black text-2xl text-slate-500 group-hover:text-slate-800 transition-colors">{item.icon}</span>
                     </div>
-                    <p className="text-primary text-[15px] font-bold leading-normal flex-1 tracking-tight">{item.label}</p>
-                    <div className="text-slate-300 group-hover:text-accent transition-colors">
+                    <p className="text-on-surface group-hover:text-white text-[15px] font-bold leading-normal flex-1 tracking-tight transition-colors">{item.label}</p>
+                    <div className="text-slate-500 group-hover:text-white transition-colors">
                       <span className="material-symbols-outlined">chevron_right</span>
                     </div>
                   </motion.div>
@@ -272,7 +272,7 @@ export default function Account() {
                 localStorage.removeItem('user');
                 navigate('/login'); 
             }}
-            className="w-full h-16 glass-surface text-primary font-black rounded-2xl flex items-center justify-center gap-3 border border-white/20 hover:bg-red-50 hover:text-error hover:border-error/20 transition-all shadow-sm"
+            className="w-full h-16 glass-surface text-slate-400 font-black rounded-2xl flex items-center justify-center gap-3 border border-white/20 hover:bg-slate-800 hover:text-white transition-all shadow-sm"
           >
             <span className="material-symbols-outlined text-xl">logout</span>
             <span className="text-[15px] tracking-tight">Sign Out</span>
@@ -298,7 +298,7 @@ export default function Account() {
               className="bg-surface rounded-[40px] shadow-premium w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh] border border-white/20"
             >
               <div className="flex items-center justify-between p-8 border-b border-border-subtle">
-                <h3 className="text-2xl font-black text-primary tracking-tighter">Edit Profile</h3>
+                <h3 className="text-2xl font-black text-on-surface tracking-tighter">Edit Profile</h3>
                 <motion.button
                   whileHover={{ rotate: 90 }}
                   onClick={() => setIsEditing(false)}
@@ -315,7 +315,7 @@ export default function Account() {
                     <input
                       required
                       type="text"
-                      className="w-full h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-50 focus:bg-white focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all outline-none font-bold text-primary placeholder:font-medium placeholder:text-slate-300"
+                      className="w-full h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-800 focus:bg-slate-900 focus:border-slate-400 focus:ring-4 focus:ring-slate-100/5 transition-all outline-none font-bold text-on-surface placeholder:font-medium placeholder:text-slate-600"
                       value={editForm.name}
                       onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="Enter your name"
@@ -323,11 +323,11 @@ export default function Account() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Email Address</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-1">Email Address</label>
                     <input
                       required
                       type="email"
-                      className="w-full h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-50 focus:bg-white focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all outline-none font-bold text-primary placeholder:font-medium placeholder:text-slate-300"
+                      className="w-full h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-800 focus:bg-slate-900 focus:border-slate-400 focus:ring-4 focus:ring-slate-100/5 transition-all outline-none font-bold text-on-surface placeholder:font-medium placeholder:text-slate-600"
                       value={editForm.email}
                       onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
                       placeholder="Enter your email"
@@ -335,15 +335,15 @@ export default function Account() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Avatar URL</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-1">Avatar URL</label>
                     <div className="flex gap-4">
-                      <div className="size-16 shrink-0 rounded-[20px] bg-slate-50 border border-border-subtle overflow-hidden bg-cover bg-center flex items-center justify-center text-slate-300 font-black text-xl shadow-inner"
+                      <div className="size-16 shrink-0 rounded-[20px] bg-slate-800 border border-border-subtle overflow-hidden bg-cover bg-center flex items-center justify-center text-slate-600 font-black text-xl shadow-inner"
                            style={{ backgroundImage: editForm.avatar_url ? `url(${editForm.avatar_url})` : 'none' }}>
                          {!editForm.avatar_url && (editForm.name.charAt(0) || 'U')}
                       </div>
                       <input
                         type="url"
-                        className="flex-1 h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-50 focus:bg-white focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all outline-none font-bold text-primary placeholder:font-medium placeholder:text-slate-300"
+                        className="flex-1 h-16 px-6 rounded-[20px] border border-border-subtle bg-slate-800 focus:bg-slate-900 focus:border-slate-400 focus:ring-4 focus:ring-slate-100/5 transition-all outline-none font-bold text-on-surface placeholder:font-medium placeholder:text-slate-600"
                         value={editForm.avatar_url}
                         onChange={(e) => setEditForm(prev => ({ ...prev, avatar_url: e.target.value }))}
                         placeholder="https://..."
@@ -360,10 +360,10 @@ export default function Account() {
                   type="submit"
                   form="edit-profile-form"
                   disabled={updating}
-                  className={`w-full h-16 flex items-center justify-center gap-3 rounded-2xl bg-accent text-white font-black tracking-tight transition-all text-lg shadow-premium border-b-4 border-accent-hover ${updating ? 'opacity-70 cursor-not-allowed' : 'hover:bg-accent-hover'}`}
+                  className={`w-full h-16 flex items-center justify-center gap-3 rounded-2xl bg-slate-100 text-slate-900 font-black tracking-tight transition-all text-lg shadow-premium border-b-4 border-slate-400 ${updating ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white'}`}
                 >
                   {updating ? (
-                    <><div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Saving...</>
+                    <><div className="size-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div> Saving...</>
                   ) : 'Save Profile'}
                 </motion.button>
               </div>
