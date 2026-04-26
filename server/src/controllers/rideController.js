@@ -181,9 +181,11 @@ export const getRideHistory = async (req, res) => {
 
   try {
     const rides = await sql`
-      SELECT r.*, u.name as driver_name 
+      SELECT r.*, u.name as driver_name, u.avatar_url as driver_avatar,
+             rider.name as rider_name, rider.avatar_url as rider_avatar
       FROM rides r 
       LEFT JOIN users u ON r.driver_id = u.id 
+      LEFT JOIN users rider ON r.rider_id = rider.id
       WHERE r.rider_id = ${userId} OR r.driver_id = ${userId} 
       ORDER BY r.created_at DESC
     `;
@@ -202,9 +204,11 @@ export const getActiveRide = async (req, res) => {
 
   try {
     const [ride] = await sql`
-      SELECT r.*, u.name as driver_name, u.avatar_url as driver_avatar 
+      SELECT r.*, u.name as driver_name, u.avatar_url as driver_avatar,
+             rider.name as rider_name, rider.avatar_url as rider_avatar
       FROM rides r 
       LEFT JOIN users u ON r.driver_id = u.id 
+      LEFT JOIN users rider ON r.rider_id = rider.id
       WHERE (r.rider_id = ${userId} OR r.driver_id = ${userId}) 
       AND r.status IN ('pending', 'accepted', 'in_progress') 
       ORDER BY r.created_at DESC 
