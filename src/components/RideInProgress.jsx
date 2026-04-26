@@ -23,6 +23,7 @@ export default function RideInProgress() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   useEffect(() => {
     if (!activeRide) {
@@ -88,7 +89,7 @@ export default function RideInProgress() {
             center={driverLocation ? [driverLocation.lat, driverLocation.lng] : (activeRide ? [activeRide.pickup_lat, activeRide.pickup_lng] : null)}
             driverLocation={driverLocation}
             destination={activeRide ? [activeRide.destination_lat, activeRide.destination_lng] : null}
-            userImage={activeRide?.rider_avatar}
+            userImage={user?.avatar_url || activeRide?.rider_avatar}
             driverImage={activeRide?.driver_avatar}
             zoom={15} 
             className="w-full h-full" 

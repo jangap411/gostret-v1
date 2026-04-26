@@ -28,16 +28,22 @@ export const getCustomMarker = (userImage) => {
 };
 
 // Component to dynamically update map center and bounds
-function ChangeView({ center, zoom, route }) {
+function ChangeView({ center, zoom, route, driverLocation }) {
   const map = useMap();
   useEffect(() => {
     if (route && route.length > 0) {
       const bounds = L.latLngBounds(route);
       map.fitBounds(bounds, { padding: [50, 50] });
+    } else if (center && driverLocation) {
+      const bounds = L.latLngBounds([
+        center, 
+        [driverLocation.lat, driverLocation.lng]
+      ]);
+      map.fitBounds(bounds, { padding: [80, 80], maxZoom: 16 });
     } else if (center) {
       map.setView(center, zoom || map.getZoom());
     }
-  }, [center, zoom, map, route]);
+  }, [center, zoom, map, route, driverLocation]);
   return null;
 }
 
@@ -83,7 +89,7 @@ export default function MapView({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <ChangeView center={center} zoom={zoom} route={route} />
+        <ChangeView center={center} zoom={zoom} route={route} driverLocation={driverLocation} />
         <MapEvents onMapClick={onMapClick} onMapMove={onMapMove} />
         
         {route && (

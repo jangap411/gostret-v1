@@ -17,6 +17,7 @@ export default function DriverEnRoute() {
   const dispatch = useDispatch();
   const { activeRide } = useSelector((state) => state.ride);
   const [driverLocation, setDriverLocation] = useState(null);
+  const [user] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   useEffect(() => {
     if (!activeRide) {
@@ -57,7 +58,7 @@ export default function DriverEnRoute() {
         <MapView 
             center={activeRide?.pickup_lat ? [activeRide.pickup_lat, activeRide.pickup_lng] : null} 
             driverLocation={driverLocation}
-            userImage={activeRide?.rider_avatar}
+            userImage={user?.avatar_url || activeRide?.rider_avatar}
             driverImage={activeRide?.driver_avatar}
             zoom={15} 
             className="w-full h-full" 
