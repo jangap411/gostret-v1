@@ -99,7 +99,48 @@ function App() {
   const isDriver = user.role === 'driver';
 
   const handleSOS = () => {
-    alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour location and status have been sent to emergency services and our 24/7 security team.");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          socketService.emitSOS({
+            userId: user.id,
+            userName: user.name,
+            userRole: user.role,
+            avatar: user.avatar_url,
+            lat,
+            lng,
+            timestamp: new Date().toISOString()
+          });
+          alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour location and status have been sent to emergency services and our 24/7 security team.");
+        },
+        (error) => {
+          console.error("Error getting location for SOS:", error);
+          socketService.emitSOS({
+            userId: user.id,
+            userName: user.name,
+            userRole: user.role,
+            avatar: user.avatar_url,
+            lat: null,
+            lng: null,
+            timestamp: new Date().toISOString()
+          });
+          alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour alert has been sent, but we couldn't access your location. Please contact emergency services directly if possible.");
+        }
+      );
+    } else {
+      socketService.emitSOS({
+        userId: user.id,
+        userName: user.name,
+        userRole: user.role,
+        avatar: user.avatar_url,
+        lat: null,
+        lng: null,
+        timestamp: new Date().toISOString()
+      });
+      alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour alert has been sent. Location services are not supported by your browser.");
+    }
   };
 
   const handleViewAllActivity = () => {

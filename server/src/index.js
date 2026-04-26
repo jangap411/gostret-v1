@@ -63,6 +63,17 @@ io.on('connection', (socket) => {
     io.to(`ride_${data.rideId}`).emit('location_updated', data);
   });
 
+  socket.on('join_admin', () => {
+    socket.join('admin');
+    console.log(`Admin ${socket.id} joined admin pool`);
+  });
+
+  socket.on('trigger_sos', (data) => {
+    // data: { userId, userName, userRole, lat, lng, timestamp }
+    io.to('admin').emit('sos_alert', data);
+    console.log(`SOS triggered by user ${data.userId} (${data.userRole}) at [${data.lat}, ${data.lng}]`);
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });

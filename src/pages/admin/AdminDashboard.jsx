@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../../services/adminService';
+import { socketService } from '../../services/socket';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -15,6 +16,14 @@ const makeAvatarMarker = (imageUrl, name, color = '#1e293b') => new L.DivIcon({
   iconSize: [44, 54],
   iconAnchor: [22, 54],
   popupAnchor: [0, -56],
+});
+
+const makeSOSMarker = () => new L.DivIcon({
+  html: `<div style="width:50px;height:50px;border-radius:50%;background:#ef4444;border:4px solid white;box-shadow:0 0 20px rgba(239,68,68,0.8);display:flex;align-items:center;justify-content:center;color:white;font-size:24px;animation:pulse 1s infinite">🚨</div>`,
+  className: '',
+  iconSize: [50, 50],
+  iconAnchor: [25, 25],
+  popupAnchor: [0, -25],
 });
 
 const STATUS_COLORS = {
@@ -51,6 +60,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [sosAlerts, setSosAlerts] = useState([]);
 
   const token = localStorage.getItem('token');
 
@@ -80,6 +90,31 @@ export default function AdminDashboard() {
     }, 10000);
     return () => clearInterval(iv);
   }, [token]);
+
+  // SOS listener
+  useEffect(() => {
+    if (!token) return;
+    socketService.joinAdmin();
+    socketService.onSOSAlert((data) => {
+      setSosAlerts(prev => [data, ...prev]);
+      // Also switch to map tab to see the location
+      setTab('map');
+      
+      // Play a loud alert sound (if browser allows)
+      try {
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        audio.play().catch(() => {});
+      } catch (err) {}
+    });
+
+    return () => {
+      socketService.off('sos_alert');
+    };
+  }, [token]);
+
+  const dismissSOS = (timestamp) => {
+    setSosAlerts(prev => prev.filter(s => s.timestamp !== timestamp));
+  };
 
   const handleCancel = async (id) => {
     if (!window.confirm('Cancel this ride?')) return;
@@ -149,6 +184,33 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* SOS ALERTS BANNER */}
+        {sosAlerts.length > 0 && (
+          <div className="mb-6 space-y-3">
+            {sosAlerts.map(sos => (
+              <div key={sos.timestamp} className="bg-red-600 text-white rounded-2xl p-5 shadow-2xl flex items-start gap-4 animate-pulse">
+                <div className="text-4xl">🚨</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-black mb-1">EMERGENCY SOS ACTIVATED</h3>
+                  <p className="font-bold opacity-90">User: {sos.userName} ({sos.userRole})</p>
+                  {sos.lat && sos.lng ? (
+                    <p className="text-sm mt-2 opacity-80">Location: {sos.lat}, {sos.lng}</p>
+                  ) : (
+                    <p className="text-sm mt-2 opacity-80">Location: Unavailable</p>
+                  )}
+                  <p className="text-xs mt-1 opacity-75">Time: {new Date(sos.timestamp).toLocaleString()}</p>
+                </div>
+                <button 
+                  onClick={() => dismissSOS(sos.timestamp)}
+                  className="bg-black/20 hover:bg-black/40 text-white px-4 py-2 rounded-xl font-bold text-sm transition-colors"
+                >
+                  Dismiss
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {loading && <div className="text-center py-20 text-slate-400 font-bold">Loading data...</div>}
 
         {/* OVERVIEW TAB */}
@@ -293,6 +355,28 @@ export default function AdminDashboard() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                   />
+                  
+                  {/* SOS Markers */}
+                  {sosAlerts.map(sos => (
+                    sos.lat && sos.lng && (
+                      <Marker 
+                        key={`sos-${sos.timestamp}`} 
+                        position={[sos.lat, sos.lng]} 
+                        icon={makeSOSMarker()}
+                        zIndexOffset={1000}
+                      >
+                        <Popup>
+                          <div className="text-center min-w-[150px]">
+                            <p className="font-black text-red-600 text-lg mb-1">🚨 SOS ALERT</p>
+                            <p className="font-bold">{sos.userName}</p>
+                            <p className="text-xs text-slate-500 capitalize">{sos.userRole}</p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    )
+                  ))}
+
+                  {/* Ride Markers */}
                   {liveRides.map(r => (
                     <React.Fragment key={r.id}>
                       {/* Rider pickup marker (blue ring) */}

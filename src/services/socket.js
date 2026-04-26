@@ -67,6 +67,21 @@ class SocketService {
     this.socket.emit('update_location', { rideId, lat, lng });
   }
 
+  joinAdmin() {
+    if (!this.socket) this.connect();
+    this.socket.emit('join_admin');
+  }
+
+  emitSOS(data) {
+    if (!this.socket) this.connect();
+    this.socket.emit('trigger_sos', data);
+  }
+
+  onSOSAlert(callback) {
+    if (!this.socket) this.connect();
+    this.socket.on('sos_alert', callback);
+  }
+
   off(event) {
     if (this.socket) {
       this.socket.off(event);
