@@ -618,7 +618,7 @@ export default function AdminDashboard() {
                           <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 uppercase tracking-widest">Successful</span>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="text-[10px] font-mono text-slate-500 uppercase">TX-{tx.id.slice(0,8)}</span>
+                          <span className="text-[10px] font-mono text-slate-500 uppercase">TX-{String(tx.id).padStart(6, '0')}</span>
                         </td>
                         <td className="px-6 py-4">
                           <p className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleDateString()}</p>
@@ -905,7 +905,7 @@ export default function AdminDashboard() {
                     {rides.map(r => (
                       <tr key={r.id} className="hover:bg-white/[0.01] transition-colors group">
                         <td className="px-6 py-4">
-                          <span className="text-xs font-mono text-slate-500">#{r.id.slice(0, 8)}</span>
+                          <span className="text-xs font-mono text-slate-500">#{String(r.id).padStart(6, '0')}</span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
