@@ -22,7 +22,8 @@ import {
   Clock,
   ArrowUpRight,
   TrendingUp,
-  LogOut
+  LogOut,
+  Layers
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -103,6 +104,7 @@ export default function AdminDashboard() {
   const [transactions, setTransactions] = useState([]);
   const [rideFilter, setRideFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('all');
+  const [mapLayer, setMapLayer] = useState('standard');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
@@ -771,8 +773,12 @@ export default function AdminDashboard() {
                 zoomControl={false}
               >
                 <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                  attribution={mapLayer === 'standard' 
+                    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    : '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'}
+                  url={mapLayer === 'standard'
+                    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"}
                 />
                 
                 {/* SOS Markers */}
@@ -841,12 +847,23 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => fetchAll()}
-                  className="glass-card size-12 rounded-2xl flex items-center justify-center text-white hover:bg-white/10 transition-colors shadow-2xl border border-white/10"
-                >
-                  <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={() => setMapLayer(prev => prev === 'standard' ? 'satellite' : 'standard')}
+                    className="glass-card size-12 rounded-2xl flex items-center justify-center text-white hover:bg-white/10 transition-colors shadow-2xl border border-white/10 group relative"
+                  >
+                    <Layers size={18} />
+                    <span className="absolute right-14 bg-slate-800 text-[10px] font-bold px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      {mapLayer === 'standard' ? 'Switch to Satellite' : 'Switch to Standard'}
+                    </span>
+                  </button>
+                  <button 
+                    onClick={() => fetchAll()}
+                    className="glass-card size-12 rounded-2xl flex items-center justify-center text-white hover:bg-white/10 transition-colors shadow-2xl border border-white/10"
+                  >
+                    <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
