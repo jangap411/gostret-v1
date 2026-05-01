@@ -81,7 +81,6 @@ const ActiveTrip = ({ onSOS }) => {
     }
   };
 
-  const onEmergency = () => alert("SOS Triggered");
 
   if (!ride) return null;
 
@@ -139,14 +138,6 @@ const ActiveTrip = ({ onSOS }) => {
             <span className="material-symbols-outlined font-black text-xl">my_location</span>
           </motion.button>
           
-          <motion.button 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={onSOS}
-            className="size-11 rounded-xl bg-accent shadow-premium flex items-center justify-center text-white border-b-2 border-accent-hover"
-          >
-            <span className="material-symbols-outlined font-black text-xl">sos</span>
-          </motion.button>
         </div>
       </main>
 
@@ -180,13 +171,23 @@ const ActiveTrip = ({ onSOS }) => {
                 </div>
               </div>
             </div>
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="size-11 rounded-xl bg-slate-50 border border-border-subtle flex items-center justify-center text-primary shadow-sm"
-            >
-              <span className="material-symbols-outlined font-black text-xl">call</span>
-            </motion.button>
+            <div className="flex gap-2.5">
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={onSOS}
+                className="size-11 rounded-xl bg-error/10 border border-error/10 flex items-center justify-center text-error shadow-sm"
+              >
+                <span className="material-symbols-outlined font-black text-xl">sos</span>
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="size-11 rounded-xl bg-slate-50 border border-border-subtle flex items-center justify-center text-primary shadow-sm"
+              >
+                <span className="material-symbols-outlined font-black text-xl">call</span>
+              </motion.button>
+            </div>
           </div>
 
           <SlideButton 
