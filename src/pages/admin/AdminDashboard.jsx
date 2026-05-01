@@ -109,6 +109,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
   const [sosAlerts, setSosAlerts] = useState([]);
+  const [socketConnected, setSocketConnected] = useState(socketService.isConnected());
 
   const token = localStorage.getItem('token');
 
@@ -150,7 +151,19 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!token) return;
+    
+    const handleConnect = () => setSocketConnected(true);
+    const handleDisconnect = () => setSocketConnected(false);
+
     socketService.joinAdmin();
+    setSocketConnected(socketService.isConnected());
+
+    // Listen for connection changes to update UI
+    if (socketService.socket) {
+      socketService.socket.on('connect', handleConnect);
+      socketService.socket.on('disconnect', handleDisconnect);
+    }
+
     socketService.onSOSAlert((data) => {
       setSosAlerts(prev => [data, ...prev]);
       setTab('map');
@@ -159,7 +172,14 @@ export default function AdminDashboard() {
         audio.play().catch(() => {});
       } catch (err) {}
     });
-    return () => { socketService.off('sos_alert'); };
+
+    return () => { 
+      socketService.off('sos_alert');
+      if (socketService.socket) {
+        socketService.socket.off('connect', handleConnect);
+        socketService.socket.off('disconnect', handleDisconnect);
+      }
+    };
   }, [token]);
 
   const dismissSOS = (timestamp) => {
@@ -327,16 +347,22 @@ export default function AdminDashboard() {
         <div className="p-8 mt-auto space-y-6">
           <div className="glass-card rounded-2xl p-4 border border-white/5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Fleet Status</span>
-              <div className="size-2 bg-emerald-500 rounded-full animate-pulse shadow-glow" />
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Status</span>
+              <div className={`size-2 rounded-full animate-pulse shadow-glow ${socketConnected ? 'bg-emerald-500' : 'bg-rose-500'}`} />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">Dispatch Units</span>
+                <span className="text-xs text-slate-400">SOS Frequency</span>
+                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${socketConnected ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-500'}`}>
+                  {socketConnected ? 'Live' : 'Offline'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Fleet Units</span>
                 <span className="text-xs font-bold text-white">{stats?.totalDrivers || 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">System Latency</span>
+                <span className="text-xs text-slate-400">Latency</span>
                 <span className="text-xs font-bold text-emerald-400">{stats?.latency || 12}ms</span>
               </div>
             </div>

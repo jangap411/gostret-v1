@@ -3,29 +3,38 @@ import { SOCKET_URL } from './api';
 
 class SocketService {
   socket = null;
+  currentRole = null; // Track role for auto-rejoin
 
   connect() {
-    if (this.socket) return;
+    if (this.socket && this.socket.connected) return;
     
-    this.socket = io(SOCKET_URL, {
-      transports: ['websocket'],
-      autoConnect: false
-    });
+    if (!this.socket) {
+      this.socket = io(SOCKET_URL, {
+        transports: ['websocket'],
+        autoConnect: false,
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+      });
 
-    this.socket.on('connect', () => {
-      console.log('Connected to socket server');
-    });
+      this.socket.on('connect', () => {
+        console.log('Connected to socket server:', this.socket.id);
+        // Auto-rejoin if a role was previously set
+        if (this.currentRole === 'admin') {
+          this.joinAdmin();
+        } else if (this.currentRole === 'driver') {
+          this.joinDriversPool();
+        }
+      });
 
-    this.socket.on('disconnect', () => {
-      console.log('Disconnected from socket server');
-      // Optionally, try to reconnect
-      this.connect();
-    });
+      this.socket.on('disconnect', (reason) => {
+        console.log('Disconnected from socket server:', reason);
+      });
 
-    this.socket.on('error', (err) => {
-      console.error('Socket error:', err);
-      // Optionally, handle the error appropriately
-    });
+      this.socket.on('connect_error', (err) => {
+        console.error('Socket connection error:', err);
+      });
+    }
 
     this.socket.connect();
   }
@@ -34,6 +43,7 @@ class SocketService {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
+      this.currentRole = null;
     }
   }
 
@@ -43,8 +53,12 @@ class SocketService {
   }
 
   joinDriversPool() {
-    if (!this.socket) this.connect();
-    this.socket.emit('join_drivers');
+    this.currentRole = 'driver';
+    if (!this.socket || !this.socket.connected) {
+      this.connect();
+    } else {
+      this.socket.emit('join_drivers');
+    }
   }
 
   onNewRide(callback) {
@@ -68,8 +82,12 @@ class SocketService {
   }
 
   joinAdmin() {
-    if (!this.socket) this.connect();
-    this.socket.emit('join_admin');
+    this.currentRole = 'admin';
+    if (!this.socket || !this.socket.connected) {
+      this.connect();
+    } else {
+      this.socket.emit('join_admin');
+    }
   }
 
   emitSOS(data) {
@@ -86,6 +104,10 @@ class SocketService {
     if (this.socket) {
       this.socket.off(event);
     }
+  }
+
+  isConnected() {
+    return this.socket?.connected || false;
   }
 }
 

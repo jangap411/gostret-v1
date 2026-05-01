@@ -85,7 +85,7 @@ export const rideService = {
       body: JSON.stringify(payload),
     });
     const data = await response.json();
-    console.log(data);
+
     if (!response.ok) throw new Error(data.message || 'Status update failed');
     return data;
   },

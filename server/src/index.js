@@ -65,13 +65,17 @@ io.on('connection', (socket) => {
 
   socket.on('join_admin', () => {
     socket.join('admin');
-    console.log(`Admin ${socket.id} joined admin pool`);
+    console.log(`[SOCKET] Admin Unit ${socket.id} joined critical safety pool`);
   });
 
   socket.on('trigger_sos', (data) => {
     // data: { userId, userName, userRole, lat, lng, timestamp }
+    console.log(`[SOS ALERT] TRIGGERED by ${data.userName} (${data.userRole})`);
+    console.log(`[SOS ALERT] Location: ${data.lat}, ${data.lng}`);
+    
     io.to('admin').emit('sos_alert', data);
-    console.log(`SOS triggered by user ${data.userId} (${data.userRole}) at [${data.lat}, ${data.lng}]`);
+    
+    console.log(`[SOS ALERT] Broadcasted to all admin units`);
   });
 
   socket.on('disconnect', () => {
