@@ -206,6 +206,28 @@ export default function Account() {
                   </div>
                 </div>
               </motion.div>
+              {/* Become a Driver CTA */}
+              {!user?.role?.includes('driver') && (
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => navigate('/driver/onboarding')}
+                  className="bg-gradient-to-r from-primary/20 to-accent/20 p-6 rounded-[32px] border border-primary/20 cursor-pointer group/cta overflow-hidden relative"
+                >
+                  <div className="absolute -right-4 -bottom-4 size-24 bg-primary/10 rounded-full blur-2xl group-hover/cta:scale-150 transition-transform"></div>
+                  <div className="flex items-center gap-5 relative z-10">
+                    <div className="size-14 rounded-2xl bg-primary flex items-center justify-center text-white shadow-teal-glow">
+                      <span className="material-symbols-outlined text-2xl font-black">local_taxi</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-on-surface font-black text-lg tracking-tight">Earn with GoStret</h4>
+                      <p className="text-on-surface-variant text-[11px] font-bold opacity-60 uppercase tracking-widest mt-0.5">Become a driver partner today</p>
+                    </div>
+                    <span className="material-symbols-outlined text-primary">arrow_forward</span>
+                  </div>
+                </motion.div>
+              )}
 
               <div className="flex flex-col gap-2">
                 {[

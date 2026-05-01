@@ -184,3 +184,43 @@ export const reviewService = {
     return data;
   },
 };
+
+export const driverService = {
+  registerDriver: async (driverData, token) => {
+    const response = await fetch(`${API_BASE_URL}/driver/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(driverData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Registration failed');
+    return data;
+  },
+
+  uploadDocuments: async (formData, token) => {
+    const response = await fetch(`${API_BASE_URL}/driver/documents`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData, // FormData for file uploads
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Document upload failed');
+    return data;
+  },
+
+  getVerificationStatus: async (token) => {
+    const response = await fetch(`${API_BASE_URL}/driver/status`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch status');
+    return data;
+  },
+};

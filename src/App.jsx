@@ -16,6 +16,7 @@ import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import SearchingDriver from './components/SearchingDriver';
 import SOSDialog from './components/SOSDialog';
+import DriverOnboarding from './pages/driver/DriverOnboarding';
 
 import { useDispatch } from 'react-redux';
 import { rideService } from './services/api';
@@ -104,7 +105,8 @@ function App() {
     '/ride-in-progress',
     '/driver-en-route',
     '/driver/active-trip',
-    '/driver/incoming-request'
+    '/driver/incoming-request',
+    '/driver/onboarding'
   ];
   const showBottomNav = !hideBottomNavPaths.includes(location.pathname);
 
@@ -202,6 +204,7 @@ function App() {
             <Route path="/earnings" element={<ProtectedRoute><ProfileEarnings /></ProtectedRoute>} />
             <Route path="/driver/active-trip" element={<ProtectedRoute><ActiveTrip onSOS={triggerSOS} /></ProtectedRoute>} />
             <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest onSOS={triggerSOS} /></ProtectedRoute>} />
+            <Route path="/driver/onboarding" element={<ProtectedRoute><DriverOnboarding /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
             <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
           </Routes>
