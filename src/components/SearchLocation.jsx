@@ -216,10 +216,12 @@ export default function SearchLocation() {
                 value={pickup.query}
                 onFocus={() => { setActiveField('pickup'); setResults([]); setIsMapSelectionMode(false); }}
                 onChange={(e) => dispatch(setPickup({ query: e.target.value, marker: null }))}
-                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-on-surface font-bold placeholder:font-medium placeholder:text-on-surface/20 text-base p-0"
+                className={`flex-1 bg-transparent border-none outline-none focus:ring-0 font-bold placeholder:font-medium text-base p-0 transition-colors ${
+                  activeField === 'pickup' ? 'text-slate-900 placeholder:text-slate-400' : 'text-on-surface placeholder:text-on-surface/20'
+                }`}
               />
               {pickup.query && (
-                <button onClick={() => dispatch(setPickup({ query: '', marker: null }))} className="size-12 flex items-center justify-center text-on-surface/20 hover:text-on-surface">
+                <button onClick={() => dispatch(setPickup({ query: '', marker: null }))} className={`size-12 flex items-center justify-center transition-colors ${activeField === 'pickup' ? 'text-slate-400 hover:text-slate-600' : 'text-on-surface/20 hover:text-on-surface'}`}>
                   <span className="material-symbols-outlined text-xl">close</span>
                 </button>
               )}
@@ -243,10 +245,12 @@ export default function SearchLocation() {
                 value={destination.query}
                 onFocus={() => { setActiveField('destination'); setResults([]); setIsMapSelectionMode(false); }}
                 onChange={(e) => dispatch(setDestination({ query: e.target.value, marker: null }))}
-                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-on-surface font-bold placeholder:font-medium placeholder:text-on-surface/20 text-base p-0"
+                className={`flex-1 bg-transparent border-none outline-none focus:ring-0 font-bold placeholder:font-medium text-base p-0 transition-colors ${
+                  activeField === 'destination' ? 'text-slate-900 placeholder:text-slate-400' : 'text-on-surface placeholder:text-on-surface/20'
+                }`}
               />
               {destination.query && (
-                <button onClick={() => dispatch(setDestination({ query: '', marker: null }))} className="size-12 flex items-center justify-center text-on-surface/20 hover:text-on-surface">
+                <button onClick={() => dispatch(setDestination({ query: '', marker: null }))} className={`size-12 flex items-center justify-center transition-colors ${activeField === 'destination' ? 'text-slate-400 hover:text-slate-600' : 'text-on-surface/20 hover:text-on-surface'}`}>
                   <span className="material-symbols-outlined text-xl">close</span>
                 </button>
               )}
