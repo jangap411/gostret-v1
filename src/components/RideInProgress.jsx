@@ -13,7 +13,7 @@ const pageVariants = {
   exit: { opacity: 0 }
 };
 
-export default function RideInProgress() {
+export default function RideInProgress({ onSOS }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { activeRide } = useSelector((state) => state.ride);
@@ -145,6 +145,7 @@ export default function RideInProgress() {
              <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={onSOS}
                 className="size-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center border border-accent/10 shadow-sm"
              >
                 <span className="material-symbols-outlined font-black">sos</span>

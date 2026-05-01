@@ -348,7 +348,7 @@ export default function SearchLocation() {
           onClick={() => destination.marker ? navigate('/ride-details') : alert('Please select a destination first')}
           className={`h-18 px-10 flex items-center justify-center rounded-pill shadow-premium transition-all gap-4 border-b-4 ${
             destination.marker 
-              ? 'teal-pulse-gradient text-on-background border-accent-hover shadow-teal-glow' 
+              ? 'bg-accent teal-pulse-gradient text-on-background border-accent-hover shadow-teal-glow' 
               : 'glass-surface text-on-surface-variant border-white/5 opacity-60 cursor-not-allowed'
           }`}
         >

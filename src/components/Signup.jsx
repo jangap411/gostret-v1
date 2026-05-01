@@ -147,7 +147,7 @@ export default function Signup() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full teal-pulse-gradient text-base/90 text-on-background font-black rounded-pill h-16 shadow-teal-glow uppercase tracking-[0.2em] disabled:opacity-50 transition-all"
+              className="w-full bg-accent teal-pulse-gradient text-base/90 text-on-background font-black rounded-pill h-16 shadow-teal-glow uppercase tracking-[0.2em] disabled:opacity-50 transition-all border-b-4 border-accent-hover"
             >
               {loading ? 'Processing...' : 'Create Account'}
             </motion.button>

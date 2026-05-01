@@ -12,7 +12,7 @@ const pageVariants = {
   exit: { opacity: 0 }
 };
 
-export default function DriverEnRoute() {
+export default function DriverEnRoute({ onSOS }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { activeRide } = useSelector((state) => state.ride);
@@ -123,6 +123,14 @@ export default function DriverEnRoute() {
             
             {/* Right: Actions */}
             <div className="flex gap-3 shrink-0">
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={onSOS}
+                className="size-12 rounded-2xl bg-error/10 flex items-center justify-center text-error shadow-premium border border-error/10 hover:bg-error/20 transition-colors"
+              >
+                <span className="material-symbols-outlined font-black text-xl">sos</span>
+              </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}

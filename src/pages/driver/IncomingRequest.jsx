@@ -13,7 +13,7 @@ const pageVariants = {
   exit: { opacity: 0 }
 };
 
-const IncomingRequest = () => {
+const IncomingRequest = ({ onSOS }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -125,7 +125,7 @@ const IncomingRequest = () => {
         <motion.button 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={onEmergency}
+          onClick={onSOS}
           className="size-16 rounded-full bg-error text-on-error flex items-center justify-center shadow-premium border-4 border-base">
           <span className="material-symbols-outlined font-black text-2xl">sos</span>
         </motion.button>

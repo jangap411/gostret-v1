@@ -21,7 +21,7 @@ const itemVariants = {
   })
 };
 
-export default function RideDetails() {
+export default function RideDetails({ onSOS }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const pickup = useSelector((state) => state.ride.pickup);
@@ -133,9 +133,17 @@ export default function RideDetails() {
           >
             <span className="material-symbols-outlined font-black">arrow_back</span>
           </motion.button>
-          <h2 className="text-primary text-xl font-black leading-tight tracking-tighter flex-1 text-center pr-11 uppercase">
+          <h2 className="text-primary text-xl font-black leading-tight tracking-tighter flex-1 text-center uppercase ml-11">
             Ride Details
           </h2>
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onSOS}
+            className="text-error flex size-11 shrink-0 items-center justify-center hover:bg-error/10 transition rounded-full cursor-pointer"
+          >
+            <span className="material-symbols-outlined font-black">sos</span>
+          </motion.button>
         </div>
 
         {/* Route Summary Card */}

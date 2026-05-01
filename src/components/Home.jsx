@@ -10,10 +10,9 @@ const pageVariants = {
   exit: { opacity: 0 }
 };
 
-export default function Home() {
+export default function Home({ onSOS }) {
   const navigate = useNavigate();
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
-  const [showSosModal, setShowSosModal] = useState(false);
   const [mapCenter, setMapCenter] = useState([-9.43869006941101, 147.1810054779053]);
   const [mapZoom, setMapZoom] = useState(13);
   const userStr = localStorage.getItem('user');
@@ -55,9 +54,9 @@ export default function Home() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex flex-col items-center gap-2 cursor-pointer group" 
-          onClick={() => setShowSosModal(true)}
+          onClick={onSOS}
         >
-          <div className="size-14 bg-[#FF4B4B] rounded-full shadow-premium text-white flex items-center justify-center border border-white/10">
+          <div className="size-14 bg-error rounded-full shadow-premium text-white flex items-center justify-center border border-white/10 animate-pulse">
             <span className="material-symbols-outlined text-2xl font-black">sos</span>
           </div>
           <div className="glass-surface px-3 py-1 rounded-lg shadow-sm text-[9px] font-black text-on-surface tracking-[0.2em] uppercase">Safety</div>
@@ -164,51 +163,6 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* PREMIUM SOS MODAL (LUMINOUS) */}
-      <AnimatePresence>
-        {showSosModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-base/60 backdrop-blur-xl px-6"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-surface rounded-[48px] p-10 w-full max-w-sm flex flex-col items-center shadow-premium border border-white/5 text-center gap-6"
-            >
-              <div className="size-24 bg-error/10 rounded-[32px] flex items-center justify-center text-error shadow-inner relative">
-                <span className="material-symbols-outlined text-5xl font-black">sos</span>
-                <span className="absolute inset-0 size-full bg-error/20 rounded-[32px] animate-ping"></span>
-              </div>
-              <div>
-                <h2 className="text-3xl font-black text-on-surface tracking-tighter">Emergency Support</h2>
-                <p className="text-on-surface-variant font-bold text-sm mt-3 leading-relaxed opacity-80">Immediate help requested? Your location and details will be shared with our 24/7 Response Team.</p>
-              </div>
-              
-              <div className="flex flex-col w-full gap-4 mt-2">
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => { window.location.href='tel:111'; setShowSosModal(false); }}
-                  className="w-full h-18 bg-[#FF4B4B] text-white font-black rounded-pill flex items-center justify-center gap-3 shadow-premium text-lg"
-                >
-                  <span className="material-symbols-outlined font-black">call</span>
-                  Call Authorities
-                </motion.button>
-                <button 
-                  onClick={() => setShowSosModal(false)}
-                  className="w-full h-14 text-on-surface-variant font-black text-[10px] tracking-[0.3em] uppercase opacity-60"
-                >
-                  DISMISS
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }

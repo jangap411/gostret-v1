@@ -15,6 +15,7 @@ import SearchLocation from './components/SearchLocation';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import SearchingDriver from './components/SearchingDriver';
+import SOSDialog from './components/SOSDialog';
 
 import { useDispatch } from 'react-redux';
 import { rideService } from './services/api';
@@ -42,6 +43,7 @@ import { useActiveRide } from './hooks/useRides';
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [isSOSDialogOpen, setIsSOSDialogOpen] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -109,7 +111,11 @@ function App() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isDriver = user.role === 'driver';
 
-  const handleSOS = () => {
+  const triggerSOS = () => {
+    setIsSOSDialogOpen(true);
+  };
+
+  const confirmSOS = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -124,7 +130,6 @@ function App() {
             lng,
             timestamp: new Date().toISOString()
           });
-          alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour location and status have been sent to emergency services and our 24/7 security team.");
         },
         (error) => {
           console.error("Error getting location for SOS:", error);
@@ -137,7 +142,6 @@ function App() {
             lng: null,
             timestamp: new Date().toISOString()
           });
-          alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour alert has been sent, but we couldn't access your location. Please contact emergency services directly if possible.");
         }
       );
     } else {
@@ -150,8 +154,11 @@ function App() {
         lng: null,
         timestamp: new Date().toISOString()
       });
-      alert("🚨 EMERGENCY SOS ACTIVATED\n\nYour alert has been sent. Location services are not supported by your browser.");
     }
+    
+    // Open emergency number on phone app
+    window.location.href = 'tel:111'; 
+    setIsSOSDialogOpen(false);
   };
 
   const handleViewAllActivity = () => {
@@ -176,31 +183,37 @@ function App() {
               <ProtectedRoute>
                 {isDriver ? (
                   <DriverDashboard 
-                    onSOS={handleSOS} 
+                    onSOS={triggerSOS} 
                     onViewAllActivity={handleViewAllActivity} 
                   />
                 ) : (
-                  <Home />
+                  <Home onSOS={triggerSOS} />
                 )}
               </ProtectedRoute>
             } />
-            <Route path="/ride-details" element={<ProtectedRoute><RideDetails /></ProtectedRoute>} />
+            <Route path="/ride-details" element={<ProtectedRoute><RideDetails onSOS={triggerSOS} /></ProtectedRoute>} />
             <Route path="/payment-methods" element={<ProtectedRoute><PaymentMethods /></ProtectedRoute>} />
-            <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress /></ProtectedRoute>} />
+            <Route path="/ride-in-progress" element={<ProtectedRoute><RideInProgress onSOS={triggerSOS} /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
-            <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute /></ProtectedRoute>} />
+            <Route path="/driver-en-route" element={<ProtectedRoute><DriverEnRoute onSOS={triggerSOS} /></ProtectedRoute>} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/account" element={<ProtectedRoute>{isDriver ? <DriverAccounts /> : <Account />}</ProtectedRoute>} />
             <Route path="/earnings" element={<ProtectedRoute><ProfileEarnings /></ProtectedRoute>} />
-            <Route path="/driver/active-trip" element={<ProtectedRoute><ActiveTrip /></ProtectedRoute>} />
-            <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest /></ProtectedRoute>} />
+            <Route path="/driver/active-trip" element={<ProtectedRoute><ActiveTrip onSOS={triggerSOS} /></ProtectedRoute>} />
+            <Route path="/driver/incoming-request" element={<ProtectedRoute><IncomingRequest onSOS={triggerSOS} /></ProtectedRoute>} />
             <Route path="/search-location" element={<ProtectedRoute><SearchLocation /></ProtectedRoute>} />
             <Route path="/searching-driver" element={<ProtectedRoute><SearchingDriver /></ProtectedRoute>} />
           </Routes>
         </AnimatePresence>
       </div>
       {showBottomNav && <BottomNav />}
+      
+      <SOSDialog 
+        isOpen={isSOSDialogOpen} 
+        onClose={() => setIsSOSDialogOpen(false)} 
+        onConfirm={confirmSOS} 
+      />
     </div>
   );
 }

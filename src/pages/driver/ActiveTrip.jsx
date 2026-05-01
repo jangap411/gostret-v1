@@ -13,7 +13,7 @@ const pageVariants = {
   exit: { opacity: 0 }
 };
 
-const ActiveTrip = () => {
+const ActiveTrip = ({ onSOS }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [ride, setRide] = useState(location.state?.ride);
@@ -142,7 +142,7 @@ const ActiveTrip = () => {
           <motion.button 
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={onEmergency}
+            onClick={onSOS}
             className="size-11 rounded-xl bg-accent shadow-premium flex items-center justify-center text-white border-b-2 border-accent-hover"
           >
             <span className="material-symbols-outlined font-black text-xl">sos</span>
