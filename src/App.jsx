@@ -93,7 +93,18 @@ function App() {
   }
 
 
-  const showBottomNav = !['/login', '/signup', '/searching-driver'].includes(location.pathname);
+  const hideBottomNavPaths = [
+    '/login', 
+    '/signup', 
+    '/searching-driver', 
+    '/search-location', 
+    '/ride-details', 
+    '/ride-in-progress',
+    '/driver-en-route',
+    '/driver/active-trip',
+    '/driver/incoming-request'
+  ];
+  const showBottomNav = !hideBottomNavPaths.includes(location.pathname);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isDriver = user.role === 'driver';

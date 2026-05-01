@@ -156,40 +156,59 @@ export default function SearchLocation() {
       exit="exit"
       variants={pageVariants}
       transition={{ duration: 0.3 }}
-      className="relative flex size-full h-full flex-col bg-background justify-between group/design-root overflow-x-hidden font-body"
+      className="relative flex size-full h-screen w-full flex-col bg-background overflow-hidden font-body"
     >
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Premium Sticky Header */}
-        <div className="glass-surface flex items-center p-4 justify-between sticky top-0 z-50 border-b border-white/20">
-          <motion.button 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => navigate(-1)} 
-            className="text-primary flex size-11 shrink-0 items-center justify-center hover:bg-white/40 transition rounded-full cursor-pointer"
-          >
-            <span className="material-symbols-outlined font-black">arrow_back</span>
-          </motion.button>
-          <h2 className="text-primary text-xl font-black leading-tight tracking-tighter flex-1 text-center pr-11 uppercase">
-            Where to?
-          </h2>
-        </div>
+      {/* IMMERSIVE MAP BACKGROUND */}
+      <div className="absolute inset-0 z-0">
+        <MapView 
+          center={mapCenter} 
+          zoom={14} 
+          markers={mapMarkers}
+          userImage={userImage}
+          onMapClick={handleMapClick}
+          className="absolute inset-0 w-full h-full z-0 grayscale-[0.2]"
+        />
+        {/* Depth Gradients */}
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-base/90 via-base/40 to-transparent z-[1] pointer-events-none"></div>
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-base/90 to-transparent z-[1] pointer-events-none"></div>
+      </div>
 
-        <div className="px-4 flex flex-col gap-4 py-6 w-full max-w-[600px] mx-auto relative z-50">
-          
-          {/* Input Stack with Visual Connector */}
-          <div className="relative flex flex-col gap-3">
-            <div className="absolute left-[26px] top-[30px] bottom-[30px] w-0.5 bg-slate-100 z-0"></div>
+      {/* FLOATING COMMAND CENTER (SEARCH CARD) */}
+      <div className="relative z-50 px-4 pt-6 w-full max-w-[600px] mx-auto">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="glass-surface rounded-[32px] p-2 shadow-premium border border-white/10"
+        >
+          {/* Header Bar */}
+          <div className="flex items-center p-2 gap-3">
+            <motion.button 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigate(-1)} 
+              className="text-primary flex size-10 shrink-0 items-center justify-center hover:bg-white/10 transition rounded-full cursor-pointer"
+            >
+              <span className="material-symbols-outlined font-black">arrow_back</span>
+            </motion.button>
+            <h2 className="text-primary text-sm font-black uppercase tracking-[0.2em] opacity-60">
+              Plan Journey
+            </h2>
+          </div>
+
+          <div className="p-3 flex flex-col gap-3 relative">
+            {/* Visual Connector Line */}
+            <div className="absolute left-[35px] top-[45px] bottom-[45px] w-0.5 bg-primary/10 z-0"></div>
             
             {/* Pickup Input */}
             <motion.div 
-              animate={{ scale: activeField === 'pickup' ? 1.02 : 1 }}
+              animate={{ scale: activeField === 'pickup' ? 1.01 : 1 }}
               className={`flex items-center h-14 w-full rounded-2xl border transition-all relative z-10 ${
                 activeField === 'pickup' 
-                  ? 'border-primary bg-white shadow-premium ring-4 ring-primary/5' 
-                  : 'border-border-subtle bg-slate-50/50'
+                  ? 'border-primary/50 bg-white shadow-premium ring-4 ring-primary/5' 
+                  : 'border-white/5 bg-surface-container/40'
               } overflow-hidden`}
             >
-              <div className="size-14 shrink-0 flex items-center justify-center">
+              <div className="size-12 shrink-0 flex items-center justify-center">
                  <div className="size-3 bg-primary rounded-full shadow-sm border-2 border-white"></div>
               </div>
               <input
@@ -197,20 +216,25 @@ export default function SearchLocation() {
                 value={pickup.query}
                 onFocus={() => { setActiveField('pickup'); setResults([]); setIsMapSelectionMode(false); }}
                 onChange={(e) => dispatch(setPickup({ query: e.target.value, marker: null }))}
-                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-primary font-bold placeholder:font-medium placeholder:text-slate-400 text-base p-0"
+                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-on-surface font-bold placeholder:font-medium placeholder:text-on-surface/20 text-base p-0"
               />
+              {pickup.query && (
+                <button onClick={() => dispatch(setPickup({ query: '', marker: null }))} className="size-12 flex items-center justify-center text-on-surface/20 hover:text-on-surface">
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              )}
             </motion.div>
 
             {/* Destination Input */}
             <motion.div 
-              animate={{ scale: activeField === 'destination' ? 1.02 : 1 }}
+              animate={{ scale: activeField === 'destination' ? 1.01 : 1 }}
               className={`flex items-center h-14 w-full rounded-2xl border transition-all relative z-10 ${
                 activeField === 'destination' 
-                  ? 'border-accent bg-white shadow-premium ring-4 ring-accent/5' 
-                  : 'border-border-subtle bg-slate-50/50'
+                  ? 'border-accent/50 bg-white shadow-premium ring-4 ring-accent/5' 
+                  : 'border-white/5 bg-surface-container/40'
               } overflow-hidden`}
             >
-              <div className="size-14 shrink-0 flex items-center justify-center">
+              <div className="size-12 shrink-0 flex items-center justify-center">
                  <div className="size-3 bg-accent rounded-full shadow-sm border-2 border-white"></div>
               </div>
               <input
@@ -219,36 +243,24 @@ export default function SearchLocation() {
                 value={destination.query}
                 onFocus={() => { setActiveField('destination'); setResults([]); setIsMapSelectionMode(false); }}
                 onChange={(e) => dispatch(setDestination({ query: e.target.value, marker: null }))}
-                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-primary font-bold placeholder:font-medium placeholder:text-slate-400 text-base p-0"
+                className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-on-surface font-bold placeholder:font-medium placeholder:text-on-surface/20 text-base p-0"
               />
+              {destination.query && (
+                <button onClick={() => dispatch(setDestination({ query: '', marker: null }))} className="size-12 flex items-center justify-center text-on-surface/20 hover:text-on-surface">
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              )}
             </motion.div>
           </div>
 
-          {/* Map Selection Toggle */}
-          <div className="flex justify-end mt-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={toggleMapSelection}
-              className={`flex items-center gap-2 text-xs px-5 py-2.5 rounded-full font-black uppercase tracking-widest transition-all cursor-pointer shadow-sm ${
-                isMapSelectionMode 
-                  ? 'bg-primary text-white shadow-premium' 
-                  : 'bg-white border border-border-subtle text-primary hover:bg-slate-50'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px] font-black">map</span>
-              {isMapSelectionMode ? 'Cancel Selection' : 'Pin on map'}
-            </motion.button>
-          </div>
-
-          {/* Search Results Overlay */}
+          {/* Search Results Overlay (Inside Card for better containment) */}
           <AnimatePresence>
             {results.length > 0 && !isMapSelectionMode && (
               <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-52 left-4 right-4 bg-white border border-border-subtle rounded-3xl shadow-premium overflow-hidden z-[100] max-h-72 overflow-y-auto no-scrollbar border-b-4 border-slate-100"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="border-t border-white/5 max-h-[300px] overflow-y-auto no-scrollbar"
               >
                 {results.map((r, i) => (
                   <motion.div 
@@ -258,85 +270,103 @@ export default function SearchLocation() {
                     initial="hidden"
                     animate="visible"
                     onClick={() => handleSelect(r)}
-                    className="px-6 py-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-b-0 flex items-start gap-4 transition-colors"
+                    className="px-5 py-4 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-b-0 flex items-start gap-4 transition-colors"
                   >
-                    <div className="size-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
-                      <span className="material-symbols-outlined text-slate-400 text-xl">location_on</span>
+                    <div className="size-10 rounded-xl bg-surface-bright/20 flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-primary/60 text-xl">location_on</span>
                     </div>
                     <div className="min-w-0">
-                      <span className="block font-black text-primary truncate tracking-tight">{r.properties.name || r.properties.label}</span>
-                      <span className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider truncate mt-0.5 opacity-80">{r.properties.label}</span>
+                      <span className="block font-black text-on-surface truncate tracking-tight">{r.properties.name || r.properties.label}</span>
+                      <span className="block text-on-surface-variant text-[10px] font-bold uppercase tracking-wider truncate mt-0.5 opacity-60">{r.properties.label}</span>
                     </div>
                   </motion.div>
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
 
-        {/* Map View Section */}
-        <div className="flex-1 px-4 pb-6 relative z-0">
-          <div className={`relative flex h-full flex-col rounded-[32px] overflow-hidden shadow-inner bg-slate-100 transition-all border-4 ${isMapSelectionMode ? 'border-accent animate-pulse shadow-premium' : 'border-white'}`}>
-            
-            <MapView 
-              center={mapCenter} 
-              zoom={14} 
-              markers={mapMarkers}
-              userImage={userImage}
-              onMapClick={handleMapClick}
-              className="absolute inset-0 w-full h-full z-0"
-            />
-
-            {/* Map Interaction Hint */}
-            <AnimatePresence>
-              {isMapSelectionMode && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="absolute top-6 left-1/2 -translate-x-1/2 glass-surface text-primary px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] z-10 shadow-premium flex items-center gap-3 border border-white/40"
-                >
-                  <div className="size-2 bg-accent rounded-full animate-ping"></div>
-                  Tap map to set {activeField}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Recenter Control */}
-            <div className="absolute right-4 bottom-4 z-10">
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="size-12 pointer-events-auto flex items-center justify-center rounded-2xl bg-white shadow-premium hover:bg-slate-50 transition border border-border-subtle"
-                onClick={() => {
-                  if (activeField === 'pickup' && pickup.marker) setMapCenter(pickup.marker.position);
-                  else if (activeField === 'destination' && destination.marker) setMapCenter(destination.marker.position);
-                  else if (mapMarkers.length > 0) setMapCenter(mapMarkers[0].position);
-                }}
-              >
-                <span className="material-symbols-outlined text-primary font-black">my_location</span>
-              </motion.button>
-            </div>
-
-          </div>
+        {/* Map Selection Toggle (Floating under card) */}
+        <div className="flex justify-end mt-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleMapSelection}
+            className={`flex items-center gap-2 text-[10px] px-6 py-3 rounded-full font-black uppercase tracking-[0.2em] transition-all cursor-pointer shadow-premium ${
+              isMapSelectionMode 
+                ? 'bg-accent text-white shadow-teal-glow ring-2 ring-white/20' 
+                : 'glass-surface text-primary hover:bg-white/10'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px] font-black">{isMapSelectionMode ? 'close' : 'map'}</span>
+            {isMapSelectionMode ? 'Cancel Selection' : 'Pin on map'}
+          </motion.button>
         </div>
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-8 right-6 z-[60]">
+      {/* INTERACTIVE OVERLAYS */}
+      <AnimatePresence>
+        {isMapSelectionMode && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none"
+          >
+            <div className="relative">
+              <span className="material-symbols-outlined text-5xl text-accent animate-bounce">location_on</span>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 size-4 bg-accent/20 rounded-full blur-sm animate-pulse"></div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ERGONOMIC CONTROLS (BOTTOM) */}
+      <div className="fixed bottom-8 left-0 right-0 z-50 px-6 flex justify-between items-end">
+        {/* Recenter Control */}
+        <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="size-14 flex items-center justify-center rounded-2xl glass-surface shadow-premium text-primary transition-all active:scale-90"
+          onClick={() => {
+            if (activeField === 'pickup' && pickup.marker) setMapCenter(pickup.marker.position);
+            else if (activeField === 'destination' && destination.marker) setMapCenter(destination.marker.position);
+            else if (mapMarkers.length > 0) setMapCenter(mapMarkers[0].position);
+          }}
+        >
+          <span className="material-symbols-outlined font-black text-2xl">my_location</span>
+        </motion.button>
+
+        {/* Action Button */}
         <motion.button
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          whileTap={{ scale: 0.9, rotate: -5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => destination.marker ? navigate('/ride-details') : alert('Please select a destination first')}
-          className={`size-16 flex items-center justify-center rounded-[24px] shadow-premium transition-all border-b-4 ${
+          className={`h-18 px-10 flex items-center justify-center rounded-pill shadow-premium transition-all gap-4 border-b-4 ${
             destination.marker 
-              ? 'bg-accent text-white border-accent-hover' 
-              : 'bg-primary text-white border-slate-900 opacity-80'
+              ? 'teal-pulse-gradient text-on-background border-accent-hover shadow-teal-glow' 
+              : 'glass-surface text-on-surface-variant border-white/5 opacity-60 cursor-not-allowed'
           }`}
         >
-          <span className="material-symbols-outlined font-black text-3xl">arrow_forward</span>
+          <span className="text-base font-black uppercase tracking-[0.2em]">{destination.marker ? 'Confirm' : 'Select Destination'}</span>
+          <span className="material-symbols-outlined font-black text-2xl">arrow_forward</span>
         </motion.button>
       </div>
+
+      {/* Selection Hint */}
+      <AnimatePresence>
+        {isMapSelectionMode && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-32 left-1/2 -translate-x-1/2 glass-surface text-primary px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.3em] z-50 shadow-teal-glow flex items-center gap-4 border border-white/20"
+          >
+            <div className="size-2 bg-accent rounded-full animate-ping"></div>
+            Tap map for {activeField}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
