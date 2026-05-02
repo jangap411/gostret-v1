@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { adminService } from '../../services/adminService';
 import { socketService } from '../../services/socket';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -110,6 +110,62 @@ export default function AdminDashboard() {
   const [cancellingId, setCancellingId] = useState(null);
   const [sosAlerts, setSosAlerts] = useState([]);
   const [socketConnected, setSocketConnected] = useState(socketService.isConnected());
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const filteredLiveRides = useMemo(() => {
+    if (!searchQuery) return liveRides;
+    const q = searchQuery.toLowerCase();
+    return liveRides.filter(r => 
+      r.rider_name?.toLowerCase().includes(q) || 
+      r.driver_name?.toLowerCase().includes(q) ||
+      r.pickup_address?.toLowerCase().includes(q) ||
+      r.destination_address?.toLowerCase().includes(q) ||
+      String(r.id).includes(q)
+    );
+  }, [liveRides, searchQuery]);
+
+  const filteredRides = useMemo(() => {
+    if (!searchQuery) return rides;
+    const q = searchQuery.toLowerCase();
+    return rides.filter(r => 
+      r.rider_name?.toLowerCase().includes(q) || 
+      r.driver_name?.toLowerCase().includes(q) ||
+      r.rider_email?.toLowerCase().includes(q) ||
+      r.car_plate?.toLowerCase().includes(q) ||
+      String(r.id).includes(q)
+    );
+  }, [rides, searchQuery]);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+    const q = searchQuery.toLowerCase();
+    return users.filter(u => 
+      u.name?.toLowerCase().includes(q) || 
+      u.email?.toLowerCase().includes(q) ||
+      u.car_model?.toLowerCase().includes(q) ||
+      u.car_plate?.toLowerCase().includes(q)
+    );
+  }, [users, searchQuery]);
+
+  const filteredTransactions = useMemo(() => {
+    if (!searchQuery) return transactions;
+    const q = searchQuery.toLowerCase();
+    return transactions.filter(tx => 
+      tx.user_name?.toLowerCase().includes(q) || 
+      tx.type?.toLowerCase().includes(q) ||
+      String(tx.id).includes(q)
+    );
+  }, [transactions, searchQuery]);
+
+  const filteredReviews = useMemo(() => {
+    if (!searchQuery) return reviews;
+    const q = searchQuery.toLowerCase();
+    return reviews.filter(rv => 
+      rv.reviewer_name?.toLowerCase().includes(q) || 
+      rv.reviewee_name?.toLowerCase().includes(q) ||
+      rv.comment?.toLowerCase().includes(q)
+    );
+  }, [reviews, searchQuery]);
 
   const token = localStorage.getItem('token');
 
@@ -199,7 +255,7 @@ export default function AdminDashboard() {
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'live', label: 'Live Activity', icon: Radio, badge: liveRides.length },
+    { id: 'live', label: 'Live Activity', icon: Radio, badge: filteredLiveRides.length },
     { id: 'map', label: 'Safety Map', icon: MapIcon },
     { id: 'financials', label: 'Financials', icon: Wallet },
     { id: 'rides', label: 'Ride History', icon: Car },
@@ -398,6 +454,8 @@ export default function AdminDashboard() {
               <input 
                 type="text" 
                 placeholder="Global System Search..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-white/5 border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 w-64 transition-all"
               />
             </div>
@@ -507,8 +565,8 @@ export default function AdminDashboard() {
                     </button>
                   </div>
                   <div className="divide-y divide-white/5">
-                    {liveRides.length > 0 ? (
-                      liveRides.slice(0, 6).map(r => (
+                    {filteredLiveRides.length > 0 ? (
+                      filteredLiveRides.slice(0, 6).map(r => (
                         <div key={r.id} className="px-8 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors">
                           <Avatar src={r.rider_avatar} name={r.rider_name} size={10} />
                           <div className="flex-1 min-w-0">
@@ -603,7 +661,7 @@ export default function AdminDashboard() {
               </div>
               <div className="glass-card rounded-3xl p-6 border-l-4 border-amber-500">
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Active Wallet Pool</p>
-                <p className="text-3xl font-bold text-white font-heading">PGK {users.reduce((acc, u) => acc + (parseFloat(u.wallet_balance) || 0), 0).toFixed(0)}</p>
+                <p className="text-3xl font-bold text-white font-heading">PGK {filteredUsers.reduce((acc, u) => acc + (parseFloat(u.wallet_balance) || 0), 0).toFixed(0)}</p>
               </div>
             </div>
 
@@ -621,7 +679,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {transactions.map(tx => (
+                    {filteredTransactions.map(tx => (
                       <tr key={tx.id} className="hover:bg-white/[0.01] transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -674,7 +732,7 @@ export default function AdminDashboard() {
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Refreshes in 10s</span>
             </div>
             
-            {liveRides.length === 0 ? (
+            {filteredLiveRides.length === 0 ? (
               <div className="glass-card rounded-3xl py-32 text-center">
                 <div className="size-20 bg-white/5 text-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Radio size={40} />
@@ -684,7 +742,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
-                {liveRides.map(r => (
+                {filteredLiveRides.map(r => (
                   <motion.div 
                     layout
                     initial={{ opacity: 0, scale: 0.98 }}
@@ -793,7 +851,7 @@ export default function AdminDashboard() {
 
             <div className="flex-1 min-h-[500px] glass-card rounded-3xl overflow-hidden relative border border-white/10">
               <MapContainer
-                center={[liveRides[0]?.pickup_lat ?? -9.44, liveRides[0]?.pickup_lng ?? 147.18]}
+                center={[filteredLiveRides[0]?.pickup_lat ?? -9.44, filteredLiveRides[0]?.pickup_lng ?? 147.18]}
                 zoom={13}
                 style={{ width: '100%', height: '100%' }}
                 zoomControl={false}
@@ -829,7 +887,7 @@ export default function AdminDashboard() {
                 ))}
 
                 {/* Ride Markers */}
-                {liveRides.map(r => (
+                {filteredLiveRides.map(r => (
                   <Marker
                     key={r.id}
                     position={[r.pickup_lat, r.pickup_lng]}
@@ -865,7 +923,7 @@ export default function AdminDashboard() {
                 <div className="glass-card rounded-2xl p-4 flex flex-col gap-3 border border-white/10 shadow-2xl">
                   <div className="flex items-center gap-3">
                     <div className="size-2.5 bg-emerald-500 rounded-full" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{liveRides.length} Active Missions</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{filteredLiveRides.length} Active Missions</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="size-2.5 bg-rose-500 rounded-full" />
@@ -928,7 +986,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {rides.map(r => (
+                    {filteredRides.map(r => (
                       <tr key={r.id} className="hover:bg-white/[0.01] transition-colors group">
                         <td className="px-6 py-4">
                           <span className="text-xs font-mono text-slate-500">#{String(r.id).padStart(6, '0')}</span>
@@ -969,7 +1027,7 @@ export default function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
-                {rides.length === 0 && (
+                {filteredRides.length === 0 && (
                   <div className="py-20 text-center">
                     <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">No matching archives found</p>
                   </div>
@@ -1002,7 +1060,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {users.map(u => (
+              {filteredUsers.map(u => (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1054,7 +1112,7 @@ export default function AdminDashboard() {
                   )}
                 </motion.div>
               ))}
-              {users.length === 0 && (
+              {filteredUsers.length === 0 && (
                 <div className="col-span-full py-20 text-center">
                   <p className="text-slate-500 font-bold uppercase tracking-widest">No users indexed</p>
                 </div>
@@ -1076,7 +1134,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {reviews.map(rv => (
+              {filteredReviews.map(rv => (
                 <motion.div 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -1114,7 +1172,7 @@ export default function AdminDashboard() {
                   </div>
                 </motion.div>
               ))}
-              {reviews.length === 0 && (
+              {filteredReviews.length === 0 && (
                 <div className="col-span-full py-20 text-center">
                   <p className="text-slate-500 font-bold uppercase tracking-widest">No reports in buffer</p>
                 </div>
