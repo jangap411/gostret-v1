@@ -257,7 +257,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen animated-gradient text-slate-200 flex flex-col md:flex-row font-body">
+    <div className="min-h-screen bg-base text-slate-200 flex flex-col md:flex-row font-body">
       <style>{`
         .sos-marker {
           position: relative;

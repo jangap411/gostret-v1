@@ -164,19 +164,6 @@
     box-shadow: var(--shadow-primary-glow);
   }
 
-  /* --- Premium Animations --- */
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .animated-gradient {
-    background: linear-gradient(-45deg, #020617, #0f172a, #1e1b4b, #020617);
-    background-size: 400% 400%;
-    animation: gradient-shift 15s ease infinite;
-  }
-
   /* --- Custom Scrollbar --- */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
